@@ -82,6 +82,19 @@ namespace PowerSchemes.Services
                 Text = Language.Settings
             };
 
+            #region CplSchemeWindows
+            var itemCplScheme = new ToolStripMenuItem()
+            {
+                Name = CPL_SCHEME_WINDOWS_MENU,
+                Text = Language.PowerOptions,
+                ImageScaling = ToolStripItemImageScaling.SizeToFit,
+                Image = GetImage(CPL_WINDOWS_ICON)
+            };
+            itemCplScheme.Click += ItemCplScheme_Click;
+
+            itemDropDownSetting.DropDownItems.Add(itemCplScheme);
+            #endregion
+
             #region RestoreDefaultWindows
             var itemRestore = new ToolStripMenuItem()
             {
@@ -94,19 +107,6 @@ namespace PowerSchemes.Services
             itemRestore.Click += RestoreDefaultPowerSchemes_Click;
 
             itemDropDownSetting.DropDownItems.Add(itemRestore);
-            #endregion
-
-            #region CplSchemeWindows
-            var itemCplScheme = new ToolStripMenuItem()
-            {
-                Name = CPL_SCHEME_WINDOWS_MENU,
-                Text = Language.PowerOptions,
-                ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                Image = GetImage(CPL_WINDOWS_ICON)
-            };
-            itemCplScheme.Click += ItemCplScheme_Click;
-
-            itemDropDownSetting.DropDownItems.Add(itemCplScheme);
             #endregion
 
             itemDropDownSetting.DropDownItems.Add(new ToolStripSeparator());
