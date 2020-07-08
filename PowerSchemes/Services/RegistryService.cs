@@ -1,13 +1,10 @@
 ﻿using Microsoft.Win32;
 using PowerManagerAPI;
-using PowerSchemes.Properties;
 using PowerSchemes.Utility;
 using RegistryManager;
 using RegistryManager.Model;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using static RegistryManager.Registry;
 
@@ -51,6 +48,13 @@ namespace PowerSchemes.Services
             return GetSettings(RegDescriptionPowerSchemes(guid));
         }
 
+        public static int GetLidOption(Guid guid)
+        {
+            var value = GetSettings(RegLidOption(guid));
+            var result = value == null ? 1 : int.Parse(value);
+            return result;
+        }
+
         public static bool IsExistsTypicalPowerScheme(Guid guid)
             => GetSettings(RegTypicalPowerSchemes(guid)) != null;
 
@@ -90,9 +94,9 @@ namespace PowerSchemes.Services
 
         private static void SaveRegistryEx(RegistryParam registryParam)
         {
-            var executorRegistryService = 
+            var executorRegistryService =
                 new ExecutorRegistryService(
-                    registryParam, 
+                    registryParam,
                     RegistryAdminAction.set,
                     Guid.NewGuid());
 
@@ -201,6 +205,18 @@ namespace PowerSchemes.Services
                 Path = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer",
                 Section = "FlyoutMenuSettings",
                 Name = "ShowLockOption",
+                RegistryValueKind = RegistryValueKind.DWord
+            };
+
+        private static RegistryParam RegLidOption(Guid guid, string settingIndex = "ACSettingIndex") =>
+            new RegistryParam()
+            {
+                RegistryHive = RegistryHive.LocalMachine,
+                Path = @"SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes\"
+                       + guid +
+                       @"\4f971e89-eebd-4455-a8de-9e59040e7347",
+                Section = "5ca83367-6e45-459f-a27b-476b1d01c936",
+                Name = settingIndex,
                 RegistryValueKind = RegistryValueKind.DWord
             };
     }

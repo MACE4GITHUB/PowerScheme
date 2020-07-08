@@ -11,7 +11,7 @@ namespace PowerSchemes.Services
 {
     public class PowerSchemeService : IPowerSchemeService
     {
-        private static readonly Guid HIGH_SCHEME_GUID = new Guid( "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
+        private static readonly Guid HIGH_SCHEME_GUID = new Guid("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
         private static readonly Guid BALANCE_SCHEME_GUID = new Guid("381b4222-f694-41f0-9685-ff5bb260df2e");
         private static readonly Guid LOW_SCHEME_GUID = new Guid("a1841308-3541-4fab-bc81-f71556f20b4a");
 
@@ -44,8 +44,11 @@ namespace PowerSchemes.Services
         public IEnumerable<IPowerScheme> UserPowerSchemes
             => RegistryService.UserPowerSchemes.Select(g => NewPowerScheme(Guid.Parse(g)));
 
+        public IPowerScheme FirstAnyPowerScheme
+            => AllPowerSchemes.FirstOrDefault();
+
         private IEnumerable<IPowerScheme> PowerSchemes
-            => DefaultPowerSchemes.Union(UserPowerSchemes);
+        => DefaultPowerSchemes.Union(UserPowerSchemes);
 
         public IPowerScheme ActivePowerScheme
         {
@@ -63,7 +66,7 @@ namespace PowerSchemes.Services
             OnActivePowerSchemeChanged(new PowerSchemeEventArgs(powerScheme));
         }
 
-        public void SetActivePowerScheme(Guid guid) 
+        public void SetActivePowerScheme(Guid guid)
             => SetActivePowerScheme((PowerScheme)PowerSchemes.FirstOrDefault(p => p.Guid == guid));
 
         public void RestoreDefaultPowerSchemes()
@@ -71,7 +74,7 @@ namespace PowerSchemes.Services
 
         public bool IsMobilePlatformRole()
             => PowerManager.IsMobilePlatformRole();
-        
+
         public void DeleteTypicalScheme()
         {
             var activeGuid = ActivePowerScheme.Guid;
@@ -89,10 +92,22 @@ namespace PowerSchemes.Services
         {
             CreateTypicalPowerScheme(HIGH_SCHEME_GUID, STABLE_SCHEME_GUID,
                 name, description);
-            
+
             var settings = new PowerSchemeSettings(STABLE_SCHEME_GUID);
-            
+
             settings.ApplyDefaultValues();
+        }
+
+        public void SetLid(int value)
+        {
+            var listGuid = AllPowerSchemes.Select(p => p.Guid);
+            var powerSchemeDCACValues = new PowerSchemeDCACValues(value, value);
+
+            foreach (var guid in listGuid)
+            {
+                var settingLid = new PowerSchemeLid(guid, powerSchemeDCACValues);
+                settingLid.ApplyValues();
+            }
         }
 
         public void CreateMediaPowerScheme(string name, string description = null) =>
@@ -103,19 +118,25 @@ namespace PowerSchemes.Services
             CreateTypicalPowerScheme(LOW_SCHEME_GUID, SIMPLE_SCHEME_GUID,
                 name, description);
 
+        private IEnumerable<IPowerScheme> AllPowerSchemes
+            => DefaultPowerSchemes.Concat(UserPowerSchemes);
+
+        private bool IsAnyPowerSchemes
+            => AllPowerSchemes.Any();
+
         private void CreateTypicalPowerScheme(Guid source, Guid destination, string name, string description = null)
         {
             var isExistsTypicalPowerScheme = IsExistsTypicalPowerScheme(destination);
             if (isExistsTypicalPowerScheme) return;
             PowerManager.DuplicatePlan(source, destination);
-            
+
             PowerManager.SetPlanName(destination, name);
 
             if (description == null) return;
             PowerManager.SetPlanDescription(destination, description);
         }
 
-        private static bool IsExistsTypicalPowerScheme(Guid guid) 
+        private static bool IsExistsTypicalPowerScheme(Guid guid)
             => RegistryService.IsExistsTypicalPowerScheme(guid);
 
         public Watchers Watchers { get; } = new Watchers();

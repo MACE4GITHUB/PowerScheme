@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using PowerSchemes.Properties;
 using static PowerSchemes.Program;
@@ -21,10 +22,19 @@ namespace PowerSchemes.Services
         private const string MEDIA_ICON = "Media";
         private const string SIMPLE_ICON = "Simple";
 
+        private const string RADIO_ON_ICON = "RadioOn";
+        private const string RADIO_OFF_ICON = "RadioOff";
+
         private const string STARTUP_ON_WINDOWS_MENU = "StartupOnWindowsToolStripMenuItem";
         private const string SHOW_HIBERNATE_OPTION_MENU = "ShowHibernateOptionToolStripMenuItem";
         private const string SHOW_SLEEP_OPTION_MENU = "ShowSleepOptionToolStripMenuItem";
         private const string EXIT_MENU = "ExitToolStripMenuItem";
+
+        private const string LIDON_DROP_DOWN_MENU = "LidOnToolStripMenuItem";
+        private const string LID_NOTHING_MENU = "LidNothingToolStripMenuItem";
+        private const string LID_SLEEP_MENU = "LidSleepToolStripMenuItem";
+        private const string LID_HIBERNATE_MENU = "LidHibernateToolStripMenuItem";
+        private const string LID_SHUTDOWN_MENU = "LidShutdownToolStripMenuItem";
 
         private const string SETTINGS_DROP_DOWN_MENU = "SettingsToolStripMenuItem";
 
@@ -44,69 +54,25 @@ namespace PowerSchemes.Services
         {
             ViewModel.ContextRightMenu.Items.Clear();
 
-            var stripRightMenuItems = new List<ToolStripItem>();
+            ViewModel.ContextRightMenu.Items.Add(MenuItemSettings());
+            ViewModel.ContextRightMenu.Items.Add(MenuItemSepatator());
 
-            #region RunOnStartup
-            var itemStartup = new ToolStripMenuItem
-            {
-                Name = STARTUP_ON_WINDOWS_MENU,
-                Text = Language.StartupOnWindows,
-            };
+            ViewModel.ContextRightMenu.Items.Add(MenuItemStartWithWindows());
+            ViewModel.ContextRightMenu.Items.Add(MenuItemHibernate());
+            ViewModel.ContextRightMenu.Items.Add(MenuItemSleep());
 
-            itemStartup.Click += StartWithWindowsToolStripMenuItem_Click;
-            stripRightMenuItems.Add(itemStartup);
-            #endregion
+            if (_power.IsMobilePlatformRole())
+                ViewModel.ContextRightMenu.Items.Add(MenuItemLidOn());
 
-            #region RunShowHibernateOption
-            var itemShowHibernateOption = new ToolStripMenuItem
-            {
-                Name = SHOW_HIBERNATE_OPTION_MENU,
-                Text = Language.ShowHibernateOptionName,
-                ToolTipText = Language.ShowHibernateOptionDescription,
-            };
+            ViewModel.ContextRightMenu.Items.Add(MenuItemSepatator());
+            ViewModel.ContextRightMenu.Items.Add(MenuItemExit());
+        }
 
-            itemShowHibernateOption.Click += ItemShowHibernateOption_Click;
-            stripRightMenuItems.Add(itemShowHibernateOption);
-            #endregion
 
-            #region RunShowSleepOption
-            var itemShowSleepOption = new ToolStripMenuItem
-            {
-                Name = SHOW_SLEEP_OPTION_MENU,
-                Text = Language.ShowSleepOptionName,
-                ToolTipText = Language.ShowSleepOptionDescription,
-            };
+        #region MenuItems
 
-            itemShowSleepOption.Click += ItemShowSleepOption_Click;
-            stripRightMenuItems.Add(itemShowSleepOption);
-            #endregion
-
-            //var itemCaptionCover = new ToolStripMenuItem
-            //{
-            //    Text = "Действие при закрытии крышки:",
-            //    Enabled = false
-            //};
-
-            //stripRightMenuItems.Add(itemCaptionCover);
-
-            //#region MobileCloseCover
-            //if (_power.IsMobilePlatformRole())
-            //{
-            //    var itemCover = new ToolStripComboBox();
-            //    {
-
-            //        //Text = Language.StartupOnWindows,
-            //        //Name = STARTUP_ON_WINDOWS_MENU,
-            //        //Tag = isOnStartup,
-            //        //Image = isOnStartup ? GetImage("Check") : null
-            //    };
-
-            //    //itemStartup.Click += StartWithWindowsToolStripMenuItem_Click;
-            //    stripRightMenuItems.Add(itemCover);
-            //}
-            //#endregion
-
-            #region DropDownSettings
+        private ToolStripMenuItem MenuItemSettings()
+        {
             var itemDropDownSetting = new ToolStripMenuItem()
             {
                 Name = SETTINGS_DROP_DOWN_MENU,
@@ -131,7 +97,7 @@ namespace PowerSchemes.Services
             var itemCplScheme = new ToolStripMenuItem()
             {
                 Name = CPL_SCHEME_WINDOWS_MENU,
-                Text = Language.ShowCplName,
+                Text = Language.PowerOptions,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit,
                 Image = GetImage(CPL_WINDOWS_ICON)
             };
@@ -209,26 +175,130 @@ namespace PowerSchemes.Services
             itemDropDownSetting.DropDownItems.Add(itemSimpleScheme);
             #endregion
 
-            stripRightMenuItems.Add(itemDropDownSetting);
-            #endregion
+            return itemDropDownSetting;
+        }
 
-            stripRightMenuItems.Add(new ToolStripSeparator());
+        private ToolStripMenuItem MenuItemStartWithWindows()
+        {
+            var item = new ToolStripMenuItem
+            {
+                Name = STARTUP_ON_WINDOWS_MENU,
+                Text = Language.StartupOnWindows
+            };
 
-            #region Exit
-            var itemExit = new ToolStripMenuItem
+            item.Click += StartWithWindowsOnClick;
+            return item;
+        }
+
+        private ToolStripMenuItem MenuItemHibernate()
+        {
+            var item = new ToolStripMenuItem
+            {
+                Name = SHOW_HIBERNATE_OPTION_MENU,
+                Text = Language.Hibernate,
+                ToolTipText = Language.HibernateDescription
+            };
+
+            item.Click += HibernateOnClick;
+            return item;
+        }
+
+        private ToolStripMenuItem MenuItemSleep()
+        {
+            var item = new ToolStripMenuItem
+            {
+                Name = SHOW_SLEEP_OPTION_MENU,
+                Text = Language.Sleep,
+                ToolTipText = Language.SleepDescription
+            };
+
+            item.Click += SleepOnClick;
+            return item;
+        }
+
+        private ToolStripMenuItem MenuItemExit()
+        {
+            var item = new ToolStripMenuItem
             {
                 Name = EXIT_MENU,
                 Text = Language.Exit
             };
 
-            itemExit.Click += ExitStripMenuItem_Click;
-            stripRightMenuItems.Add(itemExit);
-            #endregion
-
-            var stripRightMenuItemsArray = stripRightMenuItems.ToArray();
-
-            ViewModel.ContextRightMenu.Items.AddRange(stripRightMenuItemsArray);
+            item.Click += ExitOnClick;
+            return item;
         }
+
+        private ToolStripSeparator MenuItemSepatator() 
+            => new ToolStripSeparator();
+
+        private ToolStripMenuItem MenuItemLidOn()
+        {
+            var item = new ToolStripMenuItem
+            {
+                Name = LIDON_DROP_DOWN_MENU,
+                Text = Language.WhenICloseTheLid
+            };
+
+            var lidItems = new List<ToolStripMenuItem>();
+            var lidItem = new ToolStripMenuItem()
+            {
+                Name = LID_NOTHING_MENU,
+                Tag = 0,
+                Text = Language.DoNothing,
+                ImageScaling = ToolStripItemImageScaling.SizeToFit
+            };
+            lidItem.Click += LidOnClick;
+            lidItems.Add(lidItem);
+
+            lidItem = new ToolStripMenuItem()
+            {
+                Name = LID_SLEEP_MENU,
+                Tag = 1,
+                Text = Language.Sleep, 
+                ImageScaling = ToolStripItemImageScaling.SizeToFit
+            };
+            lidItem.Click += LidOnClick;
+            lidItems.Add(lidItem);
+
+            lidItem = new ToolStripMenuItem()
+            {
+                Name = LID_HIBERNATE_MENU,
+                Tag = 2,
+                Text = Language.Hibernate,
+                ImageScaling = ToolStripItemImageScaling.SizeToFit
+            };
+            lidItem.Click += LidOnClick;
+            lidItems.Add(lidItem);
+
+            lidItem = new ToolStripMenuItem()
+            {
+                Name = LID_SHUTDOWN_MENU,
+                Tag = 3,
+                Text = Language.ShutDown,
+                ImageScaling = ToolStripItemImageScaling.SizeToFit
+            };
+            lidItem.Click += LidOnClick;
+            lidItems.Add(lidItem);
+            
+            var lidItemsArray = lidItems.ToArray();
+
+            item.DropDownItems.AddRange(lidItemsArray);
+
+            return item;
+        }
+
+        private void LidOnClick(object sender, EventArgs e)
+        {
+            if (!(sender is ToolStripMenuItem item)) return;
+            if (!(item.Tag is int value)) return;
+            var values = new int[] {0, 1, 2, 3};
+
+            if (!values.Contains(value)) return;
+
+            _power.SetLid(value);
+        }
+
+        #endregion
 
         private void ItemDeleteTypicalSchemes_Click(object sender, EventArgs e)
         {
@@ -275,7 +345,7 @@ namespace PowerSchemes.Services
             UACHelper.AttemptPrivilegeEscalation("powercfg.cpl");
         }
 
-        private void ExitStripMenuItem_Click(object sender, EventArgs e)
+        private void ExitOnClick(object sender, EventArgs e)
         {
             ViewModel.NotifyIcon.Visible = false;
             Environment.Exit(0);
@@ -286,14 +356,14 @@ namespace PowerSchemes.Services
             _power.RestoreDefaultPowerSchemes();
         }
 
-        private static void StartWithWindowsToolStripMenuItem_Click(object sender, EventArgs e)
+        private static void StartWithWindowsOnClick(object sender, EventArgs e)
         {
             if (!GetCheckedOption(sender, out var isChecked)) return;
 
             RegistryService.SetStartup(isChecked);
         }
 
-        private void ItemShowSleepOption_Click(object sender, EventArgs e)
+        private void SleepOnClick(object sender, EventArgs e)
         {
             if (!GetCheckedOption(sender, out var isChecked)) return;
 
@@ -301,7 +371,7 @@ namespace PowerSchemes.Services
             RegistryService.SetSleepOption(value);
         }
 
-        private void ItemShowHibernateOption_Click(object sender, EventArgs e)
+        private void HibernateOnClick(object sender, EventArgs e)
         {
             if (!GetCheckedOption(sender, out var isChecked)) return;
 
@@ -324,10 +394,10 @@ namespace PowerSchemes.Services
 
         private void UnsubscribeFromContextRightMenu()
         {
-            ViewModel.ContextLeftMenu.Items[STARTUP_ON_WINDOWS_MENU].Click -= StartWithWindowsToolStripMenuItem_Click;
-            ViewModel.ContextLeftMenu.Items[SHOW_HIBERNATE_OPTION_MENU].Click -= ItemShowHibernateOption_Click;
-            ViewModel.ContextLeftMenu.Items[SHOW_SLEEP_OPTION_MENU].Click -= ItemShowSleepOption_Click;
-            ViewModel.ContextLeftMenu.Items[EXIT_MENU].Click -= ExitStripMenuItem_Click;
+            ViewModel.ContextLeftMenu.Items[STARTUP_ON_WINDOWS_MENU].Click -= StartWithWindowsOnClick;
+            ViewModel.ContextLeftMenu.Items[SHOW_HIBERNATE_OPTION_MENU].Click -= HibernateOnClick;
+            ViewModel.ContextLeftMenu.Items[SHOW_SLEEP_OPTION_MENU].Click -= SleepOnClick;
+            ViewModel.ContextLeftMenu.Items[EXIT_MENU].Click -= ExitOnClick;
 
             if (!(ViewModel.ContextRightMenu.Items[SETTINGS_DROP_DOWN_MENU] is ToolStripMenuItem settingsToolStripMenuItem)) return;
 
@@ -339,6 +409,5 @@ namespace PowerSchemes.Services
             settingsToolStripMenuItem.DropDownItems[ADD_MEDIA_TYPICAL_SCHEME_MENU].Click -= ItemMediaScheme_Click;
             settingsToolStripMenuItem.DropDownItems[ADD_SIMPLE_TYPICAL_SCHEME_MENU].Click -= ItemSimpleScheme_Click;
         }
-
     }
 }

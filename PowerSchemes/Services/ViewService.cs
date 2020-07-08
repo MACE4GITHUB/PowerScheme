@@ -111,11 +111,25 @@ namespace PowerSchemes.Services
                 CheckMenu(
                     ViewModel.ContextRightMenu.Items[SHOW_SLEEP_OPTION_MENU],
                     RegistryService.IsShowSleepOption);
+
+                CheckLid();
             }
 
             var mi = typeof(NotifyIcon).GetMethod(SHOW_CONTEXT_MENU, BindingFlags.Instance | BindingFlags.NonPublic);
             mi?.Invoke(ViewModel.NotifyIcon, null);
             ViewModel.NotifyIcon.ContextMenuStrip = null;
+        }
+
+        private void CheckLid()
+        {
+            var any = _power.FirstAnyPowerScheme.Guid;
+            var valueLidOn = RegistryService.GetLidOption(any);
+            var lidItems = ViewModel.ContextRightMenu.Items[LIDON_DROP_DOWN_MENU] as ToolStripMenuItem;
+            foreach (ToolStripMenuItem lidStripMenuItem in lidItems.DropDownItems)
+            {
+                var @checked = valueLidOn == (int) lidStripMenuItem.Tag;
+                lidStripMenuItem.Image = GetImage(@checked ? RADIO_ON_ICON : RADIO_OFF_ICON);
+            }
         }
 
         private void CheckMenu(ToolStripItem item, bool @checked)

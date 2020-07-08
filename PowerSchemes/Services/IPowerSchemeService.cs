@@ -10,6 +10,9 @@ namespace PowerSchemes.Services
         IPowerScheme ActivePowerScheme { get; }
         IEnumerable<IPowerScheme> DefaultPowerSchemes { get; }
         IEnumerable<IPowerScheme> UserPowerSchemes { get; }
+
+        IPowerScheme FirstAnyPowerScheme { get; }
+
         Watchers Watchers { get; }
         void SetActivePowerScheme(IPowerScheme powerScheme);
 
@@ -24,6 +27,8 @@ namespace PowerSchemes.Services
         void CreateMediaPowerScheme(string name, string description = null);
 
         void CreateSimplePowerScheme(string name, string description = null);
+
+        void SetLid(int value);
 
         event EventHandler<PowerSchemeEventArgs> ActivePowerSchemeChanged;
 

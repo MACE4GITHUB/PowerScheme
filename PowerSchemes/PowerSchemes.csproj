@@ -101,6 +101,7 @@
     <Compile Include="Settings\BaseMinMaxPowerSchemeValues.cs" />
     <Compile Include="Settings\IApplicable.cs" />
     <Compile Include="Settings\PowerSchemeDCACValues.cs" />
+    <Compile Include="Settings\PowerSchemeLid.cs" />
     <Compile Include="Settings\PowerSchemeValues.cs" />
     <Compile Include="Settings\BaseStatePowerSchemeValues.cs" />
     <Compile Include="Settings\PowerSchemeProcessorThrottle.cs" />
@@ -152,6 +153,8 @@
     <None Include="Resources\Stable.png" />
     <None Include="Resources\Panel.png" />
     <None Include="Resources\Simple.png" />
+    <None Include="Resources\RadioOff.png" />
+    <None Include="Resources\RadioOn.png" />
     <Content Include="Resources\RegWriter.exe" />
     <Content Include="Resources\Start.ico" />
     <None Include="Resources\Unknown.png" />

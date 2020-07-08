@@ -17,19 +17,19 @@
         public override string Settings
             => "Настройки";
 
-        public override string ShowHibernateOptionName
+        public override string Hibernate
             => "Режим гибернации";
 
-        public override string ShowHibernateOptionDescription
+        public override string HibernateDescription
             => "Отображать в меню завершения работы";
 
-        public override string ShowSleepOptionName
+        public override string Sleep
             => "Режим сна";
 
-        public override string ShowSleepOptionDescription
+        public override string SleepDescription
             => "Отображать в меню завершения работы";
 
-        public override string ShowCplName
+        public override string PowerOptions
             => "Панель Электропитания Windows";
 
         public override string CreateTypicalSchemes
@@ -64,5 +64,14 @@
 
         public override string SimpleDescription
             => "Энергосбережение";
+
+        public override string ShutDown
+            => "Выключить компьютер";
+
+        public override string DoNothing
+            => "Действие не требуется";
+
+        public override string WhenICloseTheLid
+            => "Действие при закрытии крышки";
     }
 }

@@ -36,6 +36,8 @@ namespace PowerSchemes.Settings
 
         private void ApplyDCValues(PowerSchemeValues powerSchemeValues)
         {
+            if (powerSchemeValues.DCSettings == -1) return;
+
             if (PowerSchemeGuid == Guid.Empty)
                 throw new ArgumentNullException(nameof(PowerSchemeGuid));
 
@@ -51,6 +53,8 @@ namespace PowerSchemes.Settings
 
         private void ApplyACValues(PowerSchemeValues powerSchemeValues)
         {
+            if (powerSchemeValues.ACSettings == -1) return;
+
             if (PowerSchemeGuid == Guid.Empty)
                 throw new ArgumentNullException(nameof(PowerSchemeGuid));
 

@@ -30,19 +30,19 @@ namespace PowerSchemes.Languages
         public virtual string Settings
             => "Settings";
 
-        public virtual string ShowHibernateOptionName
+        public virtual string Hibernate
             => "Hibernate";
 
-        public virtual string ShowHibernateOptionDescription
+        public virtual string HibernateDescription
             => "Show in Power menu";
 
-        public virtual string ShowSleepOptionName
+        public virtual string Sleep
             => "Sleep";
 
-        public virtual string ShowSleepOptionDescription
+        public virtual string SleepDescription
             => "Show in Power menu";
 
-        public virtual string ShowCplName
+        public virtual string PowerOptions
             => "Power Options";
 
         public virtual string CreateTypicalSchemes
@@ -77,5 +77,14 @@ namespace PowerSchemes.Languages
 
         public virtual string SimpleDescription
             => "Power saver";
+
+        public virtual string ShutDown
+            => "Shut down";
+
+        public virtual string DoNothing
+            => "Do nothing";
+
+        public virtual string WhenICloseTheLid
+            => "When I close the lid";
     }
 }
