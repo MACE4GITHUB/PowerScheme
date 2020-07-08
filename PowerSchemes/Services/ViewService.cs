@@ -101,10 +101,11 @@ namespace PowerSchemes.Services
             if (e.Button == MouseButtons.Right)
             {
                 CheckMenu(
-                    ViewModel.ContextRightMenu.Items[STARTUP_ON_WINDOWS_MENU], 
+                    ViewModel.ContextRightMenu.Items[STARTUP_ON_WINDOWS_MENU],
                     RegistryService.IsRunOnStartup);
 
-                CheckMenu(
+                if (_power.IsHibernate())
+                    CheckMenu(
                     ViewModel.ContextRightMenu.Items[SHOW_HIBERNATE_OPTION_MENU],
                     RegistryService.IsShowHibernateOption);
 
@@ -122,12 +123,14 @@ namespace PowerSchemes.Services
 
         private void CheckLid()
         {
+            if (!_power.IsMobilePlatformRole()) return;
+
             var any = _power.FirstAnyPowerScheme.Guid;
             var valueLidOn = RegistryService.GetLidOption(any);
             var lidItems = ViewModel.ContextRightMenu.Items[LIDON_DROP_DOWN_MENU] as ToolStripMenuItem;
             foreach (ToolStripMenuItem lidStripMenuItem in lidItems.DropDownItems)
             {
-                var @checked = valueLidOn == (int) lidStripMenuItem.Tag;
+                var @checked = valueLidOn == (int)lidStripMenuItem.Tag;
                 lidStripMenuItem.Image = GetImage(@checked ? RADIO_ON_ICON : RADIO_OFF_ICON);
             }
         }

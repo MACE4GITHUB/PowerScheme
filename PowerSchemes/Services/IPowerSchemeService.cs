@@ -20,6 +20,10 @@ namespace PowerSchemes.Services
 
         bool IsMobilePlatformRole();
 
+        bool IsHibernate();
+
+        bool IsSleep();
+
         void DeleteTypicalScheme();
 
         void CreateStablePowerScheme(string name, string description = null);

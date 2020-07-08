@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace PowerManagerAPI
 {
@@ -92,6 +93,203 @@ namespace PowerManagerAPI
         /// <summary>Values equal to or greater than this value indicate an out of range value.</summary>
         PlatformRoleMaximum,
     };
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    public struct SYSTEM_POWER_CAPABILITIES
+    {
+        /// <summary>If this member is <c>TRUE</c>, there is a system power button.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool PowerButtonPresent;
+
+        /// <summary>If this member is <c>TRUE</c>, there is a system sleep button.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool SleepButtonPresent;
+
+        /// <summary>If this member is <c>TRUE</c>, there is a lid switch.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool LidPresent;
+
+        /// <summary>If this member is <c>TRUE</c>, the operating system supports sleep state S1.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool SystemS1;
+
+        /// <summary>If this member is <c>TRUE</c>, the operating system supports sleep state S2.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool SystemS2;
+
+        /// <summary>If this member is <c>TRUE</c>, the operating system supports sleep state S3.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool SystemS3;
+
+        /// <summary>If this member is <c>TRUE</c>, the operating system supports sleep state S4 (hibernation).</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool SystemS4;
+
+        /// <summary>If this member is <c>TRUE</c>, the operating system supports power off state S5 (soft off).</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool SystemS5;
+
+        /// <summary>If this member is <c>TRUE</c>, the system hibernation file is present.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool HiberFilePresent;
+
+        /// <summary>If this member is <c>TRUE</c>, the system supports wake capabilities.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool FullWake;
+
+        /// <summary>If this member is <c>TRUE</c>, the system supports video display dimming capabilities.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool VideoDimPresent;
+
+        /// <summary>If this member is <c>TRUE</c>, the system supports APM BIOS power management features.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool ApmPresent;
+
+        /// <summary>If this member is <c>TRUE</c>, there is an uninterruptible power supply (UPS).</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool UpsPresent;
+
+        /// <summary>If this member is <c>TRUE</c>, the system supports thermal zones.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool ThermalControl;
+
+        /// <summary>If this member is <c>TRUE</c>, the system supports processor throttling.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool ProcessorThrottle;
+
+        /// <summary>The minimum level of system processor throttling supported, expressed as a percentage.</summary>
+        public byte ProcessorMinThrottle;
+
+        /// <summary>The processor throttle scale</summary>
+        public byte ProcessorThrottleScale;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+        private byte[] spare2;
+
+        /// <summary>The maximum level of system processor throttling supported, expressed as a percentage.</summary>
+        public byte ProcessorMaxThrottle;
+
+        /// <summary>If this member is <c>TRUE</c>, the system supports the hybrid sleep state.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool FastSystemS4;
+
+        /// <summary>The hiberboot</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool Hiberboot;
+
+        /// <summary>
+        /// If this member is <c>TRUE</c>, the platform has support for ACPI wake alarm devices. For more details on wake alarm devices,
+        /// please see the ACPI specification section 9.18.
+        /// </summary>
+        [MarshalAs(UnmanagedType.U1)] public bool WakeAlarmPresent;
+
+        /// <summary>If this member is <c>TRUE</c>, the system supports the S0 low power idle model.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool AoAc;
+
+        /// <summary>If this member is <c>TRUE</c>, the system supports allowing the removal of power to fixed disk devices.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool DiskSpinDown;
+
+        /// <summary>The hiber file type</summary>
+        public byte HiberFileType;
+
+        /// <summary>The ao ac connectivity supported</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool AoAcConnectivitySupported;
+
+        /// <summary>The spare3</summary>
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
+        private readonly byte[] spare3;
+
+        /// <summary>If this member is <c>TRUE</c>, there are one or more batteries in the system.</summary>
+        [MarshalAs(UnmanagedType.U1)] public bool SystemBatteriesPresent;
+
+        /// <summary>
+        /// If this member is <c>TRUE</c>, the system batteries are short-term. Short-term batteries are used in uninterruptible power
+        /// supplies (UPS).
+        /// </summary>
+        [MarshalAs(UnmanagedType.U1)] public bool BatteriesAreShortTerm;
+
+        /// <summary>A BATTERY_REPORTING_SCALE structure that contains information about how system battery metrics are reported.</summary>
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public BATTERY_REPORTING_SCALE[] BatteryScale;
+
+        /// <summary>
+        /// The lowest system sleep state (Sx) that will generate a wake event when the system is on AC power. This member must be one of
+        /// the SYSTEM_POWER_STATE enumeration type values.
+        /// </summary>
+        public SYSTEM_POWER_STATE AcOnLineWake;
+
+        /// <summary>
+        /// The lowest system sleep state (Sx) that will generate a wake event via the lid switch. This member must be one of the
+        /// SYSTEM_POWER_STATE enumeration type values.
+        /// </summary>
+        public SYSTEM_POWER_STATE SoftLidWake;
+
+        /// <summary>
+        /// <para>
+        /// The lowest system sleep state (Sx) supported by hardware that will generate a wake event via the Real Time Clock (RTC). This
+        /// member must be one of the SYSTEM_POWER_STATE enumeration type values.
+        /// </para>
+        /// <para>
+        /// To wake the computer using the RTC, the operating system must also support waking from the sleep state the computer is in
+        /// when the RTC generates the wake event. Therefore, the effective lowest sleep state from which an RTC wake event can wake the
+        /// computer is the lowest sleep state supported by the operating system that is equal to or higher than the value of
+        /// <c>RtcWake</c>. To determine the sleep states that the operating system supports, check the <c>SystemS1</c>, <c>SystemS2</c>,
+        /// <c>SystemS3</c>, and <c>SystemS4</c> members.
+        /// </para>
+        /// </summary>
+        public SYSTEM_POWER_STATE RtcWake;
+
+        /// <summary>
+        /// The minimum allowable system power state supporting wake events. This member must be one of the SYSTEM_POWER_STATE
+        /// enumeration type values. Note that this state may change as different device drivers are installed on the system.
+        /// </summary>
+        public SYSTEM_POWER_STATE MinDeviceWakeState;
+
+        /// <summary>
+        /// The default system power state used if an application calls RequestWakeupLatency with <c>LT_LOWEST_LATENCY</c>. This member
+        /// must be one of the SYSTEM_POWER_STATE enumeration type values.
+        /// </summary>
+        public SYSTEM_POWER_STATE DefaultLowLatencyWake;
+    }
+
+    public enum SYSTEM_POWER_STATE
+    {
+        /// <summary>Indicates an unspecified system power state.</summary>
+        PowerSystemUnspecified,
+
+        /// <summary>Indicates maximum system power, which corresponds to system working state S0.</summary>
+        PowerSystemWorking,
+
+        /// <summary>
+        /// Indicates a system sleeping state less than PowerSystemWorking and greater than PowerSystemSleeping2, which corresponds to
+        /// system power state S1.
+        /// </summary>
+        PowerSystemSleeping1,
+
+        /// <summary>
+        /// Indicates a system sleeping state less than PowerSystemSleeping1 and greater than PowerSystemSleeping3, which corresponds to
+        /// system power state S2.
+        /// </summary>
+        PowerSystemSleeping2,
+
+        /// <summary>
+        /// Indicates a system sleeping state less than PowerSystemSleeping2 and greater than PowerSystemHibernate, which corresponds to
+        /// system power state S3.
+        /// </summary>
+        PowerSystemSleeping3,
+
+        /// <summary>Indicates the lowest-powered sleeping state, which corresponds to system power state S4.</summary>
+        PowerSystemHibernate,
+
+        /// <summary>Indicates the system is turned off, which corresponds to system shutdown state S5.</summary>
+        PowerSystemShutdown,
+
+        /// <summary>
+        /// The number of system power state values for this enumeration type that represents actual power states. This value is the
+        /// number of elements in the DeviceState member of the DEVICE_CAPABILITIES structure for a device. The other system power state
+        /// values are less than this value.
+        /// </summary>
+        PowerSystemMaximum,
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    public struct BATTERY_REPORTING_SCALE
+    {
+        /// <summary>
+        /// The granularity of the capacity reading returned by IOCTL_BATTERY_QUERY_STATUS in milliwatt-hours (mWh). Granularity may
+        /// change over time as battery discharge and recharge lowers the range of readings.
+        /// </summary>
+        public uint Granularity;
+
+        /// <summary>
+        /// The upper capacity limit for Granularity. The value of Granularity is valid for capacities reported by
+        /// IOCTL_BATTERY_QUERY_STATUS that are less than or equal to this capacity (mWh), but greater than or equal to the capacity
+        /// given in the previous array element, or zero if this is the first array element.
+        /// </summary>
+        public uint Capacity;
+    }
 
     public static class SettingIdLookup
     {

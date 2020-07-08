@@ -58,7 +58,10 @@ namespace PowerSchemes.Services
             ViewModel.ContextRightMenu.Items.Add(MenuItemSepatator());
 
             ViewModel.ContextRightMenu.Items.Add(MenuItemStartWithWindows());
-            ViewModel.ContextRightMenu.Items.Add(MenuItemHibernate());
+
+            if (_power.IsHibernate())
+                ViewModel.ContextRightMenu.Items.Add(MenuItemHibernate());
+
             ViewModel.ContextRightMenu.Items.Add(MenuItemSleep());
 
             if (_power.IsMobilePlatformRole())
@@ -228,7 +231,7 @@ namespace PowerSchemes.Services
             return item;
         }
 
-        private ToolStripSeparator MenuItemSepatator() 
+        private ToolStripSeparator MenuItemSepatator()
             => new ToolStripSeparator();
 
         private ToolStripMenuItem MenuItemLidOn()
@@ -254,7 +257,7 @@ namespace PowerSchemes.Services
             {
                 Name = LID_SLEEP_MENU,
                 Tag = 1,
-                Text = Language.Sleep, 
+                Text = Language.Sleep,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit
             };
             lidItem.Click += LidOnClick;
@@ -279,7 +282,7 @@ namespace PowerSchemes.Services
             };
             lidItem.Click += LidOnClick;
             lidItems.Add(lidItem);
-            
+
             var lidItemsArray = lidItems.ToArray();
 
             item.DropDownItems.AddRange(lidItemsArray);
@@ -291,7 +294,7 @@ namespace PowerSchemes.Services
         {
             if (!(sender is ToolStripMenuItem item)) return;
             if (!(item.Tag is int value)) return;
-            var values = new int[] {0, 1, 2, 3};
+            var values = new int[] { 0, 1, 2, 3 };
 
             if (!values.Contains(value)) return;
 

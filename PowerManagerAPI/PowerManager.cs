@@ -319,17 +319,16 @@ namespace PowerManagerAPI
                 throw new Win32Exception((int)res);
         }
 
-        public static PowerPlatformRole PlatformRole()
-        {
-            var res = PowerDeterminePlatformRole();
-            return res;
-        }
+        public static bool IsMobilePlatformRole() 
+            => GetCapabilities().LidPresent;
 
-        public static bool IsMobilePlatformRole()
-        {
-            var res = PowerDeterminePlatformRole() == PowerPlatformRole.PlatformRoleMobile;
-            return res;
-        }
+        public static bool IsHibernate()
+            => GetCapabilities().HiberFilePresent;
+
+        public static bool IsSleep()
+            => GetCapabilities().SystemS1;
+
+        private static SYSTEM_POWER_CAPABILITIES GetCapabilities() => GetPwrCapabilities(out var c) ? c : default;
 
         #region DLL Imports
 
@@ -453,9 +452,10 @@ namespace PowerManagerAPI
 
         [DllImport("powrprof.dll")]
         private static extern uint PowerRestoreDefaultPowerSchemes();
-
-        [DllImport("powrprof.dll", SetLastError = false)]
-        private static extern PowerPlatformRole PowerDeterminePlatformRole();
+        
+        [DllImport("powrprof.dll", SetLastError = true, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetPwrCapabilities(out SYSTEM_POWER_CAPABILITIES lpspc);
         #endregion
     }
 }

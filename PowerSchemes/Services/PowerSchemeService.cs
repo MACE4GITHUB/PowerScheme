@@ -1,11 +1,10 @@
 ﻿using PowerManagerAPI;
 using PowerSchemes.EventsArgs;
 using PowerSchemes.Model;
+using PowerSchemes.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using PowerSchemes.Settings;
 
 namespace PowerSchemes.Services
 {
@@ -72,8 +71,14 @@ namespace PowerSchemes.Services
         public void RestoreDefaultPowerSchemes()
             => Watchers.RaiseActionWithoutWatchers(PowerManager.RestoreDefaultPlans);
 
-        public bool IsMobilePlatformRole()
+        public bool IsMobilePlatformRole() 
             => PowerManager.IsMobilePlatformRole();
+
+        public bool IsHibernate()
+            => PowerManager.IsHibernate();
+
+        public bool IsSleep()
+            => PowerManager.IsSleep();
 
         public void DeleteTypicalScheme()
         {
