@@ -94,8 +94,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Services\ExecutorRunAsService.cs" />
     <Compile Include="Services\ExecutorRegistryService.cs" />
-    <Compile Include="Services\ExecutorService.cs" />
     <Compile Include="Services\ViewService.LeftMenu.cs" />
     <Compile Include="Services\ViewService.RightMenu.cs" />
     <Compile Include="Settings\BaseMinMaxPowerSchemeValues.cs" />
@@ -117,7 +117,6 @@
     <Compile Include="Utility\Paths.cs" />
     <Compile Include="Utility\Strings.cs" />
     <Compile Include="Utility\TrayIcon.cs" />
-    <Compile Include="Utility\UACHelper.cs" />
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
@@ -156,6 +155,7 @@
     <None Include="Resources\RadioOff.png" />
     <None Include="Resources\RadioOn.png" />
     <Content Include="Resources\RegWriter.exe" />
+    <None Include="Resources\RunAs.exe" />
     <Content Include="Resources\Start.ico" />
     <None Include="Resources\Unknown.png" />
     <Content Include="Resources\Stop.png" />
@@ -174,10 +174,14 @@
       <Project>{0BA349FF-9FBB-45F8-87FC-9423CB283F33}</Project>
       <Name>RegistryManager</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RunAs.Common\RunAs.Common.csproj">
+      <Project>{747985B7-1908-4C46-8CE8-1B378779AB0D}</Project>
+      <Name>RunAs.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"D:\Portable\ILMergeGUI\ILMerge.exe" /internalize /ndebug /copyattrs /targetplatform:4.0,"C:\Windows\Microsoft.NET\Framework64\v4.0.30319" /out:"$(TargetDir)Merge\PowerSchemes.exe" $(TargetPath) "$(TargetDir)FormAutoClose.dll" "$(TargetDir)PowerManagerAPI.dll" "$(TargetDir)RegistryManager.dll"</PostBuildEvent>
+    <PostBuildEvent>"D:\Portable\ILMergeGUI\ILMerge.exe" /internalize /ndebug /copyattrs /targetplatform:4.0,"C:\Windows\Microsoft.NET\Framework64\v4.0.30319" /out:"$(TargetDir)Merge\PowerSchemes.exe" $(TargetPath) "$(TargetDir)FormAutoClose.dll" "$(TargetDir)PowerManagerAPI.dll" "$(TargetDir)RegistryManager.dll" "$(TargetDir)RunAs.Common.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

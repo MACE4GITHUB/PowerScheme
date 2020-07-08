@@ -73,5 +73,16 @@
 
         public override string WhenICloseTheLid
             => "Действие при закрытии крышки";
+
+
+        public override string AlreadyRunning
+            => "Приложение уже было запущено.";
+
+        public override string Error
+            => "Ошибка.";
+
+        public override string ApplicationLatter
+            => "Приложение не может работать в текущей версии Windows. Приложение работает в Vista и более поздних версиях.";
+
     }
 }

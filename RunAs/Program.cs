@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using RunAs.Common.Services;
 
 namespace RunAs
 {
@@ -10,9 +6,20 @@ namespace RunAs
     {
         static void Main(string[] args)
         {
+            var program = args[0];
+            var arguments = args[1];
 
+            var executorService = new ExecutorService()
+            {
+                Name = program,
+                Arguments = arguments,
+                UseExecutor = false,
+                IsWait = false,
+                IsRemoveFile = false
+            };
+            executorService.Execute();
         }
     }
 
-    
+
 }

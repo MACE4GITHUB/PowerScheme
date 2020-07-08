@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PowerSchemes.Properties;
-using PowerSchemes.Utility;
+using System.Resources;
+using RunAs.Common.Utils;
 
-namespace PowerSchemes.Services
+namespace RunAs.Common.Services
 {
-
     public class ExecutorService
     {
         private const string EXE_EXTENTION = ".exe";
@@ -18,10 +13,11 @@ namespace PowerSchemes.Services
         public ExecutorService()
         { }
 
-        public ExecutorService(string name, string arguments)
+        public ExecutorService(string name, string arguments, ResourceManager resourceManager)
         {
             Name = name;
             Arguments = arguments;
+            ResourceManager = resourceManager;
         }
 
         public string Name { get; set; }
@@ -31,15 +27,23 @@ namespace PowerSchemes.Services
 
         public string Arguments { get; set; }
 
+        public ResourceManager ResourceManager { get; set; }
+
         public ProcessWindowStyle ProcessWindowStyle { get; set; } = ProcessWindowStyle.Hidden;
 
         public bool Runas { get; set; } = true;
 
         public bool IsWait { get; set; } = true;
 
+        public bool UseExecutor { get; set; } = true;
+        
+        public bool IsRemoveFile { get; set; } = true;
+
         public virtual void Execute()
         {
-            File.WriteAllBytes(FullName, Executor);
+            if (UseExecutor)
+                File.WriteAllBytes(FullName, Executor);
+
             try
             {
                 UACHelper.AttemptPrivilegeEscalation(
@@ -51,12 +55,17 @@ namespace PowerSchemes.Services
             }
             finally
             {
-                if (File.Exists(FullName)) File.Delete(FullName);
+                if (IsRemoveFile) RemoveIfExists();
             }
         }
 
+        public virtual void RemoveIfExists()
+        {
+            if (File.Exists(FullName)) File.Delete(FullName);
+        }
+
         private byte[] Executor
-            => (byte[])Resources.ResourceManager.GetObject(Name)
+            => (byte[])ResourceManager.GetObject(Name)
                ?? throw new ArgumentNullException(nameof(Name));
     }
 }

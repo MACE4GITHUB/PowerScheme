@@ -58,9 +58,26 @@ namespace PowerSchemes.Services
             }
         }
 
+        public bool IsNeedAdminAccessForChangePowerScheme()
+        {
+            var result = false;
+
+            try
+            {
+                PowerManager.SetActivePlan(ActivePowerScheme.Guid);
+            }
+            catch (Exception)
+            {
+                result = true;
+            }
+
+            return result;
+        }
+
         public void SetActivePowerScheme(IPowerScheme powerScheme)
         {
             if (powerScheme.Guid == ActivePowerScheme.Guid) return;
+
             PowerManager.SetActivePlan(powerScheme.Guid);
             OnActivePowerSchemeChanged(new PowerSchemeEventArgs(powerScheme));
         }
@@ -71,7 +88,7 @@ namespace PowerSchemes.Services
         public void RestoreDefaultPowerSchemes()
             => Watchers.RaiseActionWithoutWatchers(PowerManager.RestoreDefaultPlans);
 
-        public bool IsMobilePlatformRole() 
+        public bool IsMobilePlatformRole()
             => PowerManager.IsMobilePlatformRole();
 
         public bool IsHibernate()

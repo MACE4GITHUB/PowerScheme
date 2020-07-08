@@ -86,5 +86,14 @@ namespace PowerSchemes.Languages
 
         public virtual string WhenICloseTheLid
             => "When I close the lid";
+
+        public virtual string AlreadyRunning
+            => "Another instance is already running.";
+
+        public virtual string Error
+            => "Error.";
+
+        public virtual string ApplicationLatter
+            => "This application does not run on the current Windows version. Works on Vista and latter.";
     }
 }

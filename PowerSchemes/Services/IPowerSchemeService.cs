@@ -16,6 +16,8 @@ namespace PowerSchemes.Services
         Watchers Watchers { get; }
         void SetActivePowerScheme(IPowerScheme powerScheme);
 
+        bool IsNeedAdminAccessForChangePowerScheme();
+
         void RestoreDefaultPowerSchemes();
 
         bool IsMobilePlatformRole();

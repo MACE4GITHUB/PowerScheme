@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.IO;
 
-namespace PowerSchemes.Utility
+namespace RunAs.Common.Utils
 {
-    internal static class Paths
+    public static class Paths
     {
         public static string ApplicationPath
             => System.IO.Path.GetDirectoryName(ApplicationFullName);
@@ -13,7 +13,7 @@ namespace PowerSchemes.Utility
 
         public static string ApplicationName
             => Process.GetCurrentProcess().MainModule?.ModuleName;
-
+        
         public static string ApplicationNameWithoutExtension
             => Path.GetFileNameWithoutExtension(ApplicationName);
     }

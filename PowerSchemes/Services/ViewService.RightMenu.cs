@@ -1,11 +1,9 @@
 ﻿using PowerSchemes.Utility;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using PowerSchemes.Properties;
+using RunAs.Common.Utils;
 using static PowerSchemes.Program;
 using static PowerSchemes.Utility.TrayIcon;
 

@@ -80,11 +80,6 @@ namespace RegistryManager
             disposedValue = true;
         }
 
-        //~RegistrySaver()
-        //{
-        //    Dispose(disposing: false);
-        //}
-
         void IDisposable.Dispose()
         {
             Dispose(disposing: true);

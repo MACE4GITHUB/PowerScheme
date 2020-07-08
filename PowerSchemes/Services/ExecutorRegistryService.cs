@@ -1,6 +1,8 @@
 ﻿using System;
+using PowerSchemes.Properties;
 using RegistryManager;
 using RegistryManager.Model;
+using RunAs.Common.Services;
 
 namespace PowerSchemes.Services
 {
@@ -28,6 +30,7 @@ namespace PowerSchemes.Services
 
             Name = NAME;
             Arguments = RegistrySaver.Arguments;
+            ResourceManager = Resources.ResourceManager;
         }
 
         public RegistrySaver RegistrySaver { get; }

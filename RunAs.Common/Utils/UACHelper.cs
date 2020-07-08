@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Windows.Forms;
 
-namespace PowerSchemes.Utility
+namespace RunAs.Common.Utils
 {
     /// <summary>
     /// Helper class for UAC based functions.
