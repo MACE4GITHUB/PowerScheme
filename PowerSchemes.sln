@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerManagerAPI", "PowerMan
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegWriter", "RegWriter\RegWriter.csproj", "{9F448406-F168-4C75-A254-BC895EF0B25D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunAs", "RunAs\RunAs.csproj", "{2F3C447D-7BA9-49D6-93FC-D29873F6AB5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,14 @@ Global
 		{9F448406-F168-4C75-A254-BC895EF0B25D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9F448406-F168-4C75-A254-BC895EF0B25D}.Release|x64.ActiveCfg = Release|Any CPU
 		{9F448406-F168-4C75-A254-BC895EF0B25D}.Release|x64.Build.0 = Release|Any CPU
+		{2F3C447D-7BA9-49D6-93FC-D29873F6AB5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F3C447D-7BA9-49D6-93FC-D29873F6AB5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F3C447D-7BA9-49D6-93FC-D29873F6AB5A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2F3C447D-7BA9-49D6-93FC-D29873F6AB5A}.Debug|x64.Build.0 = Debug|Any CPU
+		{2F3C447D-7BA9-49D6-93FC-D29873F6AB5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F3C447D-7BA9-49D6-93FC-D29873F6AB5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F3C447D-7BA9-49D6-93FC-D29873F6AB5A}.Release|x64.ActiveCfg = Release|Any CPU
+		{2F3C447D-7BA9-49D6-93FC-D29873F6AB5A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
