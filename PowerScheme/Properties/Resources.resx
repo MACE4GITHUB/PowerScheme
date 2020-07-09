@@ -139,9 +139,6 @@
   <data name="Media" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Media.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Optimal" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\optimal.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="Panel" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Panel.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

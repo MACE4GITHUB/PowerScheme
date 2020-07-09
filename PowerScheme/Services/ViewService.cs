@@ -1,14 +1,15 @@
-﻿using PowerScheme.Utility;
-using RegistryManager.EventsArgs;
-using System;
-using System.Drawing;
-using System.Reflection;
-using System.Windows.Forms;
-using PowerScheme.Model;
-using static PowerScheme.Utility.TrayIcon;
-
-namespace PowerScheme.Services
+﻿namespace PowerScheme.Services
 {
+    using Model;
+    using RegistryManager.EventsArgs;
+    using System;
+    using System.Drawing;
+    using System.Reflection;
+    using System.Windows.Forms;
+    using Utility;
+    using static Program;
+    using static Utility.TrayIcon;
+
     public partial class ViewService : IDisposable
     {
         private const string SHOW_CONTEXT_MENU = "ShowContextMenu";
@@ -23,8 +24,10 @@ namespace PowerScheme.Services
             _form = form;
             _power = power;
             ViewModel = viewModel;
-        }
 
+            FirstStart();
+        }
+        
         public ViewModel ViewModel { get; }
 
         public void Start()
@@ -59,6 +62,22 @@ namespace PowerScheme.Services
             });
 
             _power.Watchers.Stop();
+        }
+
+        private void FirstStart()
+        {
+            void ShowFirstStartDialog()
+            {
+                var result = MessageBox.Show(Language.FirstStartDescription, Language.FirstStartCaption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result != DialogResult.Yes) return;
+                _power.Watchers.RaiseActionWithoutWatchers(CreateTypicalSchemes);
+            }
+
+            var entryViewService = new EntryViewService
+            {
+                ActionIsFirstStart = ShowFirstStartDialog
+            };
+            entryViewService.ExecuteActionIsFirstStart();
         }
 
         private void ChangedActivePowerScheme(object sender, RegistryChangedEventArgs e)

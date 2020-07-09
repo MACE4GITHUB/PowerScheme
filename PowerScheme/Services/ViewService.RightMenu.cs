@@ -313,14 +313,19 @@ namespace PowerScheme.Services
 
         private void ItemCreateTypicalSchemes_Click(object sender, EventArgs e)
         {
-            void CreateTypicalSchemes()
+            CreateTypicalSchemes();
+        }
+
+        private void CreateTypicalSchemes()
+        {
+            void CreateSchemes()
             {
                 CreateMediaPowerScheme();
                 CreateStablePowerScheme();
                 CreateSimplePowerScheme();
             }
 
-            _power.Watchers.RaiseActionWithoutWatchers(CreateTypicalSchemes);
+            _power.Watchers.RaiseActionWithoutWatchers(CreateSchemes);
         }
 
         private void ItemMediaScheme_Click(object sender, EventArgs e)

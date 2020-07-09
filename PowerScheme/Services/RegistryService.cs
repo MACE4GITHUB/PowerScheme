@@ -54,6 +54,11 @@ namespace PowerScheme.Services
             var result = value == null ? 1 : int.Parse(value);
             return result;
         }
+        
+        public static bool IsFirstStart(string company, string product)
+        {
+            return !ExistsSettings(RegAppSettings(company, product));
+        }
 
         public static bool IsExistsTypicalPowerScheme(Guid guid)
             => GetSettings(RegTypicalPowerSchemes(guid)) != null;
@@ -84,6 +89,15 @@ namespace PowerScheme.Services
         public static void SetSleepOption(string value)
         {
             SetRegistryValue(RegShowSleepOption, value);
+        }
+
+        public static void SetAppSettings(string company, string product, string name, string value)
+        {
+            var regAppSettings = RegAppSettings(company, product);
+            regAppSettings.Name = name;
+            regAppSettings.Value = value;
+            regAppSettings.RegistryValueKind = RegistryValueKind.String;
+            SaveSetting(regAppSettings);
         }
 
         private static void SetRegistryValue(RegistryParam registryParam, string value)
@@ -166,6 +180,14 @@ namespace PowerScheme.Services
                 Section = "Run",
                 Name = "PowerScheme",
                 RegistryValueKind = RegistryValueKind.String
+            };
+
+        private static RegistryParam RegAppSettings(string company, string product) =>
+            new RegistryParam()
+            {
+                RegistryHive = RegistryHive.CurrentUser,
+                Path = @"SOFTWARE\" + company,
+                Section = product
             };
 
         private static RegistryParam RegStartup

@@ -35,7 +35,7 @@
 
         public static void SaveSetting(RegistryParam registryParam)
         {
-            using (var regKey = GetRegistryKey(registryParam, true))
+            using (var regKey = GetRegistryKey(registryParam, true, true))
             {
                 if (regKey == null) return;
                 switch (registryParam.RegistryValueKind)
@@ -83,31 +83,47 @@
             }
         }
 
-        private static RegistryKey GetRegistryKey(RegistryParam registryParam, bool writable = false)
+        private static RegistryKey GetRegistryKey(RegistryParam registryParam, bool writable = false, bool create = false)
         {
             RegistryKey regKey;
             switch (registryParam.RegistryHive)
             {
                 case RegistryHive.ClassesRoot:
-                    regKey = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(registryParam.RegistrySubKey, writable);
+                    regKey = create
+                        ? Microsoft.Win32.Registry.ClassesRoot.CreateSubKey(registryParam.RegistrySubKey, writable)
+                        : Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(registryParam.RegistrySubKey, writable);
                     break;
                 case RegistryHive.CurrentUser:
-                    regKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(registryParam.RegistrySubKey, writable);
+                    regKey = create
+                        ? Microsoft.Win32.Registry.CurrentUser.CreateSubKey(registryParam.RegistrySubKey, writable)
+                        : Microsoft.Win32.Registry.CurrentUser.OpenSubKey(registryParam.RegistrySubKey, writable);
                     break;
                 case RegistryHive.LocalMachine:
-                    regKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(registryParam.RegistrySubKey, writable);
+                    regKey = create
+                        ? Microsoft.Win32.Registry.LocalMachine.CreateSubKey(registryParam.RegistrySubKey, writable)
+                        : Microsoft.Win32.Registry.LocalMachine.OpenSubKey(registryParam.RegistrySubKey, writable);
                     break;
                 case RegistryHive.Users:
-                    regKey = Microsoft.Win32.Registry.Users.OpenSubKey(registryParam.RegistrySubKey, writable);
+                    regKey = create
+                        ? Microsoft.Win32.Registry.Users.CreateSubKey(registryParam.RegistrySubKey, writable)
+                        : Microsoft.Win32.Registry.Users.OpenSubKey(registryParam.RegistrySubKey, writable);
                     break;
                 case RegistryHive.PerformanceData:
-                    regKey = Microsoft.Win32.Registry.PerformanceData.OpenSubKey(registryParam.RegistrySubKey, writable);
+                    regKey = create
+                        ? Microsoft.Win32.Registry.PerformanceData.CreateSubKey(registryParam.RegistrySubKey, writable)
+                        : Microsoft.Win32.Registry.PerformanceData.OpenSubKey(registryParam.RegistrySubKey, writable);
                     break;
                 case RegistryHive.CurrentConfig:
-                    regKey = Microsoft.Win32.Registry.CurrentConfig.OpenSubKey(registryParam.RegistrySubKey, writable);
+                    regKey = create
+                        ? Microsoft.Win32.Registry.CurrentConfig.CreateSubKey(registryParam.RegistrySubKey, writable)
+                        : Microsoft.Win32.Registry.CurrentConfig.OpenSubKey(registryParam.RegistrySubKey, writable);
                     break;
                 case RegistryHive.DynData:
-                    regKey = Microsoft.Win32.Registry.DynData.OpenSubKey(registryParam.RegistrySubKey, writable);
+                    regKey = create
+#pragma warning disable CS0618 
+                        ? Microsoft.Win32.Registry.DynData.CreateSubKey(registryParam.RegistrySubKey, writable)
+                        : Microsoft.Win32.Registry.DynData.OpenSubKey(registryParam.RegistrySubKey, writable);
+#pragma warning restore CS0618 
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(registryParam.RegistryHive), registryParam.RegistryHive, null);

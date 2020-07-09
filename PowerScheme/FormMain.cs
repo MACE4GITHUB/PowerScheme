@@ -13,10 +13,10 @@
         public FormMain()
         {
             InitializeComponent();
+            _power = new PowerSchemeService();
 
             var executorMainService = new ExecutorRunAsService("admin");
 
-            _power = new PowerSchemeService();
             var isNeedAdminAccess = _power.IsNeedAdminAccessForChangePowerScheme();
             if (isNeedAdminAccess)
             {
@@ -27,8 +27,6 @@
             {
                 executorMainService.RemoveIfExists();
             }
-            executorMainService = null;
-
 
             var viewModel =
                 new ViewModel(notifyIcon, contextLeftMenuStrip, contextRightMenuStrip);

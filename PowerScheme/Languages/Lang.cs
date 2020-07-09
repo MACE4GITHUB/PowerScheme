@@ -95,5 +95,11 @@ namespace PowerScheme.Languages
 
         public virtual string ApplicationLatter
             => "This application does not run on the current Windows version. Works on Vista and latter.";
+        
+        public virtual string FirstStartCaption
+            => "First start";
+
+        public virtual string FirstStartDescription
+            => $"Create typical power schemes ({StableName}, {MediaName}, {SimpleName})?";
     }
 }

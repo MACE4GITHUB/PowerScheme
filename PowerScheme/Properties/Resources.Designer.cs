@@ -133,16 +133,6 @@ namespace PowerScheme.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap Optimal {
-            get {
-                object obj = ResourceManager.GetObject("Optimal", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
         public static System.Drawing.Bitmap Panel {
             get {
                 object obj = ResourceManager.GetObject("Panel", resourceCulture);
