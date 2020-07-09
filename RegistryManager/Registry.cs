@@ -72,6 +72,17 @@
             }
         }
 
+        public static bool ExistsSettings(RegistryParam registryParam)
+        {
+            using (var regKey = GetRegistryKey(registryParam))
+            {
+                if (regKey == null) return false;
+                if (registryParam.Name == null) return true;
+                var regValue = regKey.GetValue(registryParam.Name, registryParam.Value);
+                return regValue != null;
+            }
+        }
+
         private static RegistryKey GetRegistryKey(RegistryParam registryParam, bool writable = false)
         {
             RegistryKey regKey;
