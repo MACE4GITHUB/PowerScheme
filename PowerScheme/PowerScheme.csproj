@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{23610885-8476-4388-AFC8-BC564F6BE09F}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>PowerScheme</RootNamespace>
+    <AssemblyName>PowerScheme</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Start.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="EventsArgs\PowerSchemeEventArgs.cs" />
+    <Compile Include="FormMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMain.Designer.cs">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Languages\Lang.cs" />
+    <Compile Include="Languages\LangRu.cs" />
+    <Compile Include="Model\IPowerScheme.cs" />
+    <Compile Include="Model\ViewModel.cs" />
+    <Compile Include="Model\Watchers.cs" />
+    <Compile Include="Model\PowerScheme.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Services\ExecutorRunAsService.cs" />
+    <Compile Include="Services\ExecutorRegistryService.cs" />
+    <Compile Include="Services\ViewService.LeftMenu.cs" />
+    <Compile Include="Services\ViewService.RightMenu.cs" />
+    <Compile Include="Settings\BaseMinMaxPowerSchemeValues.cs" />
+    <Compile Include="Settings\IApplicable.cs" />
+    <Compile Include="Settings\PowerSchemeDCACValues.cs" />
+    <Compile Include="Settings\PowerSchemeLid.cs" />
+    <Compile Include="Settings\PowerSchemeValues.cs" />
+    <Compile Include="Settings\BaseStatePowerSchemeValues.cs" />
+    <Compile Include="Settings\PowerSchemeProcessorThrottle.cs" />
+    <Compile Include="Settings\PowerSchemeSettings.cs" />
+    <Compile Include="Settings\PowerSchemeTurnOffDisplay.cs" />
+    <Compile Include="Settings\PowerSchemeSleep.cs" />
+    <Compile Include="Utility\Image.cs" />
+    <Compile Include="Services\IPowerSchemeService.cs" />
+    <Compile Include="Services\PowerSchemeService.cs" />
+    <Compile Include="Services\RegistryService.cs" />
+    <Compile Include="Services\ViewService.cs" />
+    <Compile Include="Utility\Invoker.cs" />
+    <Compile Include="Utility\Paths.cs" />
+    <Compile Include="Utility\Strings.cs" />
+    <Compile Include="Utility\TrayIcon.cs" />
+    <EmbeddedResource Include="FormMain.resx">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Add.png" />
+    <Content Include="Resources\Balance.png" />
+    <None Include="Resources\Check.png" />
+    <None Include="Resources\Delete.png" />
+    <Content Include="Resources\High.png" />
+    <Content Include="Resources\Low.png" />
+    <None Include="Resources\Media.png" />
+    <Content Include="Resources\Optimal.png" />
+    <None Include="Resources\Restore.png" />
+    <None Include="Resources\Stable.png" />
+    <None Include="Resources\Panel.png" />
+    <None Include="Resources\Simple.png" />
+    <None Include="Resources\RadioOff.png" />
+    <None Include="Resources\RadioOn.png" />
+    <Content Include="Resources\RegWriter.exe" />
+    <None Include="Resources\RunAs.exe" />
+    <Content Include="Resources\Start.ico" />
+    <None Include="Resources\Unknown.png" />
+    <Content Include="Resources\Stop.png" />
+    <Content Include="Start.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FormAutoClose\FormAutoClose.csproj">
+      <Project>{9B901C5D-1720-42C0-ADBD-C58F19B47248}</Project>
+      <Name>FormAutoClose</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PowerManagerAPI\PowerManagerAPI.csproj">
+      <Project>{11d90b11-3c6e-4c27-ac3e-f4a84b992628}</Project>
+      <Name>PowerManagerAPI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RegistryManager\RegistryManager.csproj">
+      <Project>{0BA349FF-9FBB-45F8-87FC-9423CB283F33}</Project>
+      <Name>RegistryManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RunAs.Common\RunAs.Common.csproj">
+      <Project>{747985B7-1908-4C46-8CE8-1B378779AB0D}</Project>
+      <Name>RunAs.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"D:\Portable\ILMergeGUI\ILMerge.exe" /internalize /ndebug /copyattrs /targetplatform:4.0,"C:\Windows\Microsoft.NET\Framework64\v4.0.30319" /out:"$(TargetDir)Merge\PowerScheme.exe" $(TargetPath) "$(TargetDir)FormAutoClose.dll" "$(TargetDir)PowerManagerAPI.dll" "$(TargetDir)RegistryManager.dll" "$(TargetDir)RunAs.Common.dll"</PostBuildEvent>
+  </PropertyGroup>
+</Project>
