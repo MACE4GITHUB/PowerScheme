@@ -7,17 +7,22 @@
 
     public static class Registry
     {
-        public static string GetSettings(RegistryParam registryParam)
+        public static T GetSettings<T>(RegistryParam registryParam)
         {
-            object regValue = null;
+            T regValue = default;
             using (var regKey = GetRegistryKey(registryParam))
             {
-                if (regKey != null)
+                if (regKey == null) return regValue;
+
+                if (registryParam.Name != null)
+                    regValue = (T) regKey.GetValue(registryParam.Name, registryParam.Value);
+                else
                 {
-                    regValue = registryParam.Name != null ? regKey.GetValue(registryParam.Name, registryParam.Value) : registryParam.Section;
+                    var type = typeof(T).Name.ToLowerInvariant() == "string";
+                    regValue = (T)(object)registryParam.Section;
                 }
             }
-            return regValue?.ToString();
+            return regValue;
         }
 
         public static IEnumerable<string> GetSubKeys(RegistryParam registryParam)
@@ -38,29 +43,8 @@
             using (var regKey = GetRegistryKey(registryParam, true, true))
             {
                 if (regKey == null) return;
-                switch (registryParam.RegistryValueKind)
-                {
-                    case RegistryValueKind.String:
-                    case RegistryValueKind.ExpandString:
-                        regKey.SetValue(registryParam.Name, registryParam.Value, registryParam.RegistryValueKind);
-                        break;
-                    case RegistryValueKind.DWord:
-                        if (!int.TryParse(registryParam.Value, out var resultInt))
-                        {
-                            return;
-                        }
-                        regKey.SetValue(registryParam.Name, resultInt, registryParam.RegistryValueKind);
-                        break;
-                    case RegistryValueKind.QWord:
-                        if (!ulong.TryParse(registryParam.Value, out var resultUlong))
-                        {
-                            return;
-                        }
-                        regKey.SetValue(registryParam.Name, resultUlong, registryParam.RegistryValueKind);
-                        break;
-                    default:
-                        return;
-                }
+
+                regKey.SetValue(registryParam.Name, registryParam.Value, registryParam.RegistryValueKind);
             }
         }
 

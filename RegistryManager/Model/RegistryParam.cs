@@ -5,6 +5,7 @@ using Microsoft.Win32;
 
 namespace RegistryManager.Model
 {
+    [Serializable]
     public struct RegistryParam
     {
         private const string HKEY_CLASSES_ROOT = "HKEY_CLASSES_ROOT";
@@ -15,8 +16,9 @@ namespace RegistryManager.Model
         private const string HKEY_PERFORMANCE_DATA = "HKEY_PERFORMANCE_DATA";
         private const string HKEY_USERS = "HKEY_USERS";
 
-        private const string DELIMITER = "|+&+|";
+        private const string DELIMITER = "|&|";
 
+        private RegistryValueKind _registryValueKind;
 
         public RegistryHive RegistryHive { get; set; }
 
@@ -26,49 +28,21 @@ namespace RegistryManager.Model
 
         public string Name { get; set; }
 
-        public RegistryValueKind RegistryValueKind { get; set; }
+        public RegistryValueKind RegistryValueKind
+        {
+            get => _registryValueKind == RegistryValueKind.Unknown ? CalculateValueKind() : _registryValueKind;
+            set => _registryValueKind = value;
+        }
 
-        public string Value { get; set; }
+        public object Value { get; set; }
 
-        
+
         /// <summary>
         /// Returns 'Path + "\\" + Section'
         /// </summary>
         public string RegistrySubKey => Path + "\\" + Section;
 
-        public string Hive
-        {
-            get
-            {
-                switch (RegistryHive)
-                {
-                    case RegistryHive.ClassesRoot:
-                        return HKEY_CLASSES_ROOT;
-
-                    case RegistryHive.CurrentConfig:
-                        return HKEY_CURRENT_CONFIG;
-
-                    case RegistryHive.CurrentUser:
-                        return HKEY_CURRENT_USER;
-
-                    case RegistryHive.DynData:
-                        return HKEY_DYN_DATA;
-
-                    case RegistryHive.LocalMachine:
-                        return HKEY_LOCAL_MACHINE;
-
-                    case RegistryHive.PerformanceData:
-                        return HKEY_PERFORMANCE_DATA;
-
-                    case RegistryHive.Users:
-                        return HKEY_USERS;
-
-                    default:
-                        throw new InvalidEnumArgumentException(nameof(RegistryHive),
-                            (int)RegistryHive, typeof(RegistryHive));
-                }
-            }
-        }
+        public string Hive => CalculateRegistryHive();
 
         /// <summary>
         /// Returns Hive + "\\" + RegistrySubKey
@@ -89,17 +63,102 @@ namespace RegistryManager.Model
                 return new RegistryParam();
             }
 
-            var registryParam = new RegistryParam()
+            var registryValueKind = (RegistryValueKind) Enum.Parse(typeof(RegistryValueKind), param[4]);
+            var value = CalculateTypeValue(param[5], registryValueKind);
+            var registryParam = new RegistryParam
             {
                 RegistryHive = (RegistryHive)Enum.Parse(typeof(RegistryHive), param[0]),
                 Path = param[1],
                 Section = param[2],
                 Name = param[3],
-                RegistryValueKind = (RegistryValueKind)Enum.Parse(typeof(RegistryValueKind), param[4]),
-                Value = param[5]
+                RegistryValueKind = registryValueKind,
+                Value = value
             };
 
             return registryParam;
+        }
+
+        private RegistryValueKind CalculateValueKind()
+        {
+            switch (Value)
+            {
+                case null:
+                    return RegistryValueKind.None;
+                case int _:
+                    return RegistryValueKind.DWord;
+                case uint _:
+                    return RegistryValueKind.QWord;
+                case Array _:
+                    switch (Value)
+                    {
+                        case byte[] _:
+                            return RegistryValueKind.Binary;
+                        case string[] _:
+                            return RegistryValueKind.MultiString;
+                        default:
+                            throw new ArgumentException(Value.GetType().Name);
+                    }
+                default:
+                    return RegistryValueKind.String;
+            }
+        }
+
+        private static object CalculateTypeValue(string value, RegistryValueKind registryValueKind)
+        {
+            switch (registryValueKind)
+            {
+                case RegistryValueKind.String:
+                    return value;
+                case RegistryValueKind.ExpandString:
+                    break;
+                case RegistryValueKind.Binary:
+                    break;
+                case RegistryValueKind.DWord:
+                    return int.Parse(value);
+                case RegistryValueKind.MultiString:
+                    break;
+                case RegistryValueKind.QWord:
+                    return uint.Parse(value);
+                case RegistryValueKind.Unknown:
+                    break;
+                case RegistryValueKind.None:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(registryValueKind), registryValueKind, null);
+            }
+
+            return value;
+        }
+
+        private string CalculateRegistryHive()
+        {
+            switch (RegistryHive)
+            {
+                case RegistryHive.ClassesRoot:
+                    return HKEY_CLASSES_ROOT;
+
+                case RegistryHive.CurrentConfig:
+                    return HKEY_CURRENT_CONFIG;
+
+                case RegistryHive.CurrentUser:
+                    return HKEY_CURRENT_USER;
+
+                case RegistryHive.DynData:
+                    return HKEY_DYN_DATA;
+
+                case RegistryHive.LocalMachine:
+                    return HKEY_LOCAL_MACHINE;
+
+                case RegistryHive.PerformanceData:
+                    return HKEY_PERFORMANCE_DATA;
+
+                case RegistryHive.Users:
+                    return HKEY_USERS;
+
+                default:
+                    throw new InvalidEnumArgumentException(nameof(RegistryHive),
+                        (int)RegistryHive, typeof(RegistryHive));
+            }
         }
 
     }

@@ -1,13 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
 using Microsoft.Win32;
 using RegistryManager.EventsArgs;
 using RegistryManager.Model;
+using System;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using static RegistryManager.NativeMethods;
 
 namespace RegistryManager
 {
@@ -47,24 +46,8 @@ namespace RegistryManager
     /// }
     /// </code>
     /// </example>
-    public class RegistryWatcher : IRegistryWatcher, IDisposable
+    public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
     {
-        #region P/Invoke
-
-        private const string ADVAPI32 = "advapi32.dll";
-
-        [DllImport(ADVAPI32, SetLastError = true)]
-        private static extern int RegOpenKeyEx(IntPtr hKey, string subKey, uint options, int samDesired,
-                                               out IntPtr phkResult);
-
-        [DllImport(ADVAPI32, SetLastError = true)]
-        private static extern int RegNotifyChangeKeyValue(IntPtr hKey, bool bWatchSubtree,
-                                                          RegChangeNotifyFilter dwNotifyFilter, IntPtr hEvent,
-                                                          bool fAsynchronous);
-
-        [DllImport(ADVAPI32, SetLastError = true)]
-        private static extern int RegCloseKey(IntPtr hKey);
-
         private const int KEY_QUERY_VALUE = 0x0001;
         private const int KEY_NOTIFY = 0x0010;
         private const int STANDARD_RIGHTS_READ = 0x00020000;
@@ -76,8 +59,6 @@ namespace RegistryManager
         private static readonly IntPtr HKEY_PERFORMANCE_DATA = new IntPtr(unchecked((int)0x80000004));
         private static readonly IntPtr HKEY_CURRENT_CONFIG = new IntPtr(unchecked((int)0x80000005));
         private static readonly IntPtr HKEY_DYN_DATA = new IntPtr(unchecked((int)0x80000006));
-
-        #endregion
 
         #region Private member variables
 
@@ -121,7 +102,7 @@ namespace RegistryManager
         {
             if (RegChangeNotifyFilter == RegChangeNotifyFilter.Value)
             {
-                _registryParamCurrent.Value = Registry.GetSettings(_registryParamTemp);
+                _registryParamCurrent.Value = Registry.GetSettings<T>(_registryParamTemp);
                 if (_registryParamCurrent.Value == _registryParamTemp.Value &&
                     _registryParam.Value != _registryParamTemp.Value) return;
                 if (_registryParamCurrent.Value == _registryParamPrevious.Value) return;
@@ -189,10 +170,10 @@ namespace RegistryManager
             _registryParam = registryParam;
 
             _registryParamTemp = registryParam;
-            _registryParamTemp.Value = string.Empty;
+            _registryParamTemp.Value = null;
 
             _registryParamPrevious = _registryParamTemp;
-            _registryParamPrevious.Value = Registry.GetSettings(_registryParamTemp);
+            _registryParamPrevious.Value = Registry.GetSettings<T>(_registryParamTemp);
 
             _registryParamCurrent = registryParam;
 

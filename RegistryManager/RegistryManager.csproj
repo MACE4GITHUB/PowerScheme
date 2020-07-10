@@ -64,6 +64,7 @@
     <Compile Include="EventsArgs\RegistryChangedEventArgs.cs" />
     <Compile Include="IRegistryWatcher.cs" />
     <Compile Include="Model\RegistryParam.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="Paths.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\RegChangeNotifyFilter.cs" />

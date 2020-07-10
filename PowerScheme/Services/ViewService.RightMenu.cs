@@ -373,7 +373,7 @@ namespace PowerScheme.Services
         {
             if (!GetCheckedOption(sender, out var isChecked)) return;
 
-            var value = isChecked ? "1" : "0";
+            var value = isChecked ? 1 : 0;
             RegistryService.SetSleepOption(value);
         }
 
@@ -381,7 +381,7 @@ namespace PowerScheme.Services
         {
             if (!GetCheckedOption(sender, out var isChecked)) return;
 
-            var value = isChecked ? "1" : "0";
+            var value = isChecked ? 1 : 0;
             RegistryService.SetHibernateOption(value);
         }
 
