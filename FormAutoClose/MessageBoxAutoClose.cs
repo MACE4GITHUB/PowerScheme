@@ -36,7 +36,7 @@
         public void Show()
         {
             _timeoutTimer = new System.Threading.Timer(OnTimerElapsed, null, _timeout * 1000, System.Threading.Timeout.Infinite);
-            MessageBox.Show(_text, _caption);
+            MessageBox.Show(_text, _caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void OnTimerElapsed(object state)
