@@ -115,15 +115,15 @@ namespace RegistryManager
             if (RegChangeNotifyFilter == RegChangeNotifyFilter.Key)
             {
                 var subKeysCurrent = Registry.GetSubKeys(_registryParamCurrent).ToArray();
-                
+
                 if (subKeysCurrent.Length == _subKeysPrevious.Length) return;
 
                 string[] subKeysExcept;
                 bool isChange;
 
-                subKeysExcept = 
-                    subKeysCurrent.Length > _subKeysPrevious.Length ? 
-                        subKeysCurrent.Except(_subKeysPrevious).ToArray() : 
+                subKeysExcept =
+                    subKeysCurrent.Length > _subKeysPrevious.Length ?
+                        subKeysCurrent.Except(_subKeysPrevious).ToArray() :
                         _subKeysPrevious.Except(subKeysCurrent).ToArray();
 
                 isChange = subKeysExcept.Length > 0;
@@ -315,19 +315,22 @@ namespace RegistryManager
             if (result != 0)
                 throw new Win32Exception(result);
 
-            var eventNotify = new AutoResetEvent(false);
             try
             {
-                WaitHandle[] waitHandles = { eventNotify, _eventTerminate };
-                while (!_eventTerminate.WaitOne(0, true))
+                using(var eventNotify = new AutoResetEvent(false))
+                using (var hEvent = eventNotify.SafeWaitHandle)
                 {
-                    result = RegNotifyChangeKeyValue(registryKey, false, _regFilter, eventNotify.Handle, true);
-                    if (result != 0)
-                        throw new Win32Exception(result);
-
-                    if (WaitHandle.WaitAny(waitHandles) == 0)
+                    WaitHandle[] waitHandles = {eventNotify, _eventTerminate};
+                    while (!_eventTerminate.WaitOne(0, true))
                     {
-                        OnChanged();
+                        result = RegNotifyChangeKeyValue(registryKey, false, _regFilter, eventNotify, true);
+                        if (result != 0)
+                            throw new Win32Exception(result);
+
+                        if (WaitHandle.WaitAny(waitHandles) == 0)
+                        {
+                            OnChanged();
+                        }
                     }
                 }
             }
