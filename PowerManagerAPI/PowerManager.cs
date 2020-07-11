@@ -16,6 +16,9 @@ namespace PowerManagerAPI
 
     public static class PowerManager
     {
+        private const string POWRPROF = "powrprof.dll";
+        private const string KERNEL32 = "kernel32.dll";
+
         /// <summary>
         /// Gets the currently active power plan
         /// </summary>
@@ -319,7 +322,20 @@ namespace PowerManagerAPI
                 throw new Win32Exception((int)res);
         }
 
-        public static bool IsMobilePlatformRole() 
+        public static bool SetLid(POWER_ACTION powerAction)
+        {
+            var pwrPolicy = GetPwrPolicy();
+            pwrPolicy.user.LidCloseDc.Action = powerAction;
+            pwrPolicy.user.LidCloseAc.Action = powerAction;
+            var isSet = SetPwrPolicy(pwrPolicy);
+            return isSet;
+        }
+
+        public static GLOBAL_POWER_POLICY GetPwrPolicy() => ReadGlobalPwrPolicy(out var p) ? p : default;
+
+        public static bool SetPwrPolicy(GLOBAL_POWER_POLICY p) => WriteGlobalPwrPolicy(p);
+
+        public static bool IsMobilePlatformRole()
             => GetCapabilities().LidPresent;
 
         public static bool IsHibernate()
@@ -327,12 +343,12 @@ namespace PowerManagerAPI
 
         public static bool IsSleep()
             => GetCapabilities().SystemS1;
-
+        
         private static SYSTEM_POWER_CAPABILITIES GetCapabilities() => GetPwrCapabilities(out var c) ? c : default;
 
         #region DLL Imports
 
-        [DllImport("powrprof.dll")]
+        [DllImport(POWRPROF)]
         private static extern uint PowerEnumerate(
             [In, Optional] IntPtr RootPowerKey,
             [In, Optional] IntPtr SchemeGuid,
@@ -343,32 +359,32 @@ namespace PowerManagerAPI
             [In, Out] ref uint BufferSize
         );
 
-        [DllImport("powrprof.dll")]
+        [DllImport(POWRPROF)]
         private static extern uint PowerGetActiveScheme(
             [In, Optional] IntPtr UserPowerKey,
             [Out] out IntPtr ActivePolicyGuid
         );
 
-        [DllImport("powrprof.dll")]
+        [DllImport(POWRPROF)]
         private static extern uint PowerSetActiveScheme(
             [In, Optional] IntPtr UserPowerKey,
             [In] ref Guid ActivePolicyGuid
         );
 
-        [DllImport("powrprof.dll")]
+        [DllImport(POWRPROF)]
         private static extern uint PowerDuplicateScheme(
             [In, Optional] IntPtr RootPowerKey,
             [In] ref Guid SourceSchemeGuid,
             [In] ref IntPtr DestinationSchemeGuid
         );
 
-        [DllImport("powrprof.dll")]
+        [DllImport(POWRPROF)]
         private static extern uint PowerDeleteScheme(
             [In, Optional] IntPtr RootPowerKey,
             [In] ref Guid SchemeGuid
         );
 
-        [DllImport("powrprof.dll")]
+        [DllImport(POWRPROF)]
         private static extern uint PowerReadFriendlyName(
             [In, Optional] IntPtr RootPowerKey,
             [In, Optional] ref Guid SchemeGuid,
@@ -378,7 +394,7 @@ namespace PowerManagerAPI
             [In, Out] ref uint BufferSize
         );
 
-        [DllImport("powrprof.dll", CharSet = CharSet.Unicode)]
+        [DllImport(POWRPROF, CharSet = CharSet.Unicode)]
         private static extern uint PowerWriteFriendlyName(
             [In, Optional] IntPtr RootPowerKey,
             [In] ref Guid SchemeGuid,
@@ -388,7 +404,7 @@ namespace PowerManagerAPI
             [In] UInt32 BufferSize
         );
 
-        [DllImport("powrprof.dll")]
+        [DllImport(POWRPROF)]
         private static extern uint PowerReadDescription(
             [In, Optional] IntPtr RootPowerKey,
             [In, Optional] ref Guid SchemeGuid,
@@ -398,7 +414,7 @@ namespace PowerManagerAPI
             [In, Out] ref uint BufferSize
         );
 
-        [DllImport("powrprof.dll", CharSet = CharSet.Unicode)]
+        [DllImport(POWRPROF, CharSet = CharSet.Unicode)]
         private static extern uint PowerWriteDescription(
             [In, Optional] IntPtr RootPowerKey,
             [In] ref Guid SchemeGuid,
@@ -408,7 +424,7 @@ namespace PowerManagerAPI
             [In] UInt32 BufferSize
         );
 
-        [DllImport("powrprof.dll")]
+        [DllImport(POWRPROF)]
         private static extern uint PowerReadACValueIndex(
             [In, Optional] IntPtr RootPowerKey,
             [In, Optional] ref Guid SchemeGuid,
@@ -417,7 +433,7 @@ namespace PowerManagerAPI
             [Out] out uint AcValueIndex
         );
 
-        [DllImport("powrprof.dll")]
+        [DllImport(POWRPROF)]
         private static extern uint PowerWriteACValueIndex(
             [In, Optional] IntPtr RootPowerKey,
             [In] ref Guid SchemeGuid,
@@ -426,7 +442,7 @@ namespace PowerManagerAPI
             [In] uint AcValueIndex
         );
 
-        [DllImport("powrprof.dll")]
+        [DllImport(POWRPROF)]
         private static extern uint PowerReadDCValueIndex(
             [In, Optional] IntPtr RootPowerKey,
             [In, Optional] ref Guid SchemeGuid,
@@ -435,7 +451,7 @@ namespace PowerManagerAPI
             [Out] out uint DcValueIndex
         );
 
-        [DllImport("powrprof.dll")]
+        [DllImport(POWRPROF)]
         private static extern uint PowerWriteDCValueIndex(
             [In, Optional] IntPtr RootPowerKey,
             [In] ref Guid SchemeGuid,
@@ -445,17 +461,25 @@ namespace PowerManagerAPI
         );
 
 
-        [DllImport("kernel32.dll")]
+        [DllImport(KERNEL32)]
         private static extern IntPtr LocalFree(
             [In] IntPtr hMem
         );
 
-        [DllImport("powrprof.dll")]
+        [DllImport(POWRPROF)]
         private static extern uint PowerRestoreDefaultPowerSchemes();
-        
-        [DllImport("powrprof.dll", SetLastError = true, ExactSpelling = true)]
+
+        [DllImport(POWRPROF, SetLastError = true, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool GetPwrCapabilities(out SYSTEM_POWER_CAPABILITIES lpspc);
+        private static extern bool GetPwrCapabilities(out SYSTEM_POWER_CAPABILITIES lpspc);
+
+        [DllImport(POWRPROF, SetLastError = true, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool ReadGlobalPwrPolicy(out GLOBAL_POWER_POLICY pGlobalPowerPolicy);
+
+        [DllImport(POWRPROF, SetLastError = true, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool WriteGlobalPwrPolicy(in GLOBAL_POWER_POLICY pGlobalPowerPolicy);
         #endregion
     }
 }

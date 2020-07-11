@@ -291,6 +291,463 @@ namespace PowerManagerAPI
         public uint Capacity;
     }
 
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    public struct GLOBAL_POWER_POLICY
+    {
+        /// <summary>A GLOBAL_USER_POWER_POLICY structure that defines the global user power policy settings.</summary>
+        public GLOBAL_USER_POWER_POLICY user;
+
+        /// <summary>A GLOBAL_MACHINE_POWER_POLICY structure that defines the global computer power policy settings.</summary>
+        public GLOBAL_MACHINE_POWER_POLICY mach;
+    }
+
+    /// <summary>
+    /// Contains global user power policy settings that apply to all power schemes for a user. This structure is part of the
+    /// GLOBAL_POWER_POLICY structure.
+    /// </summary>
+    // https://docs.microsoft.com/en-us/windows/desktop/api/powrprof/ns-powrprof-_global_user_power_policy typedef struct
+    // _GLOBAL_USER_POWER_POLICY { ULONG Revision; POWER_ACTION_POLICY PowerButtonAc; POWER_ACTION_POLICY PowerButtonDc;
+    // POWER_ACTION_POLICY SleepButtonAc; POWER_ACTION_POLICY SleepButtonDc; POWER_ACTION_POLICY LidCloseAc; POWER_ACTION_POLICY
+    // LidCloseDc; SYSTEM_POWER_LEVEL DischargePolicy[NUM_DISCHARGE_POLICIES]; ULONG GlobalFlags; } GLOBAL_USER_POWER_POLICY, *PGLOBAL_USER_POWER_POLICY;
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    public struct GLOBAL_USER_POWER_POLICY
+    {
+        /// <summary>
+        /// The current structure revision level. Set this value by calling GetCurrentPowerPolicies or ReadGlobalPwrPolicy before using a
+        /// <c>GLOBAL_USER_POWER_POLICY</c> structure to set power policy.
+        /// </summary>
+        public uint Revision;
+
+        /// <summary>
+        /// A POWER_ACTION_POLICY structure that defines the action to take when the power button is pressed and the system is running on
+        /// AC power.
+        /// </summary>
+        public POWER_ACTION_POLICY PowerButtonAc;
+
+        /// <summary>
+        /// A POWER_ACTION_POLICY structure that defines the action to take when the power button is pressed and the system is running on
+        /// battery power.
+        /// </summary>
+        public POWER_ACTION_POLICY PowerButtonDc;
+
+        /// <summary>
+        /// A POWER_ACTION_POLICY structure that defines the action to take when the sleep button is pressed and the system is running on
+        /// AC power.
+        /// </summary>
+        public POWER_ACTION_POLICY SleepButtonAc;
+
+        /// <summary>
+        /// A POWER_ACTION_POLICY structure that defines the action to take when the sleep button is pressed and the system is running on
+        /// battery power.
+        /// </summary>
+        public POWER_ACTION_POLICY SleepButtonDc;
+
+        /// <summary>
+        /// A POWER_ACTION_POLICY structure that defines the action to take when the lid is closed and the system is running on AC power.
+        /// </summary>
+        public POWER_ACTION_POLICY LidCloseAc;
+
+        /// <summary>
+        /// A POWER_ACTION_POLICY structure that defines the action to take when the lid is closed and the system is running on battery power.
+        /// </summary>
+        public POWER_ACTION_POLICY LidCloseDc;
+
+        /// <summary>An array of SYSTEM_POWER_LEVEL structures that defines the actions to take at system battery discharge events.</summary>
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+        public SYSTEM_POWER_LEVEL[] DischargePolicy;
+
+        /// <summary>
+        /// <para>
+        /// A flag that enables or disables miscellaneous user power policy settings. This member can be one or more of the values
+        /// described in Global Flags Constants.
+        /// </para>
+        /// </summary>
+        public GlobalFlags GlobalFlags;
+    }
+
+    /// <summary>The global flags constants are used to enable or disable user power policy options.</summary>
+    [Flags]
+    public enum GlobalFlags : uint
+    {
+        /// <summary>Enables or disables multiple battery display in the system Power Meter.</summary>
+        EnableMultiBatteryDisplay = 0x02,
+
+        /// <summary>Enables or disables requiring password logon when the system resumes from standby or hibernate.</summary>
+        EnablePasswordLogon = 0x04,
+
+        /// <summary>
+        /// Enables or disables the battery meter icon in the system tray. When this flag is cleared, the battery meter icon is not displayed.
+        /// </summary>
+        EnableSysTrayBatteryMeter = 0x01,
+
+        /// <summary>
+        /// Enables or disables support for dimming the video display when the system changes from running on AC power to running on
+        /// battery power.
+        /// </summary>
+        EnableVideoDimDisplay = 0x10,
+
+        /// <summary>Enables or disables wake on ring support.</summary>
+        EnableWakeOnRing = 0x08,
+    }
+
+    /// <summary>
+    /// Contains global computer power policy settings that apply to all power schemes for all users. This structure is part of the
+    /// GLOBAL_POWER_POLICY structure.
+    /// </summary>
+    // https://docs.microsoft.com/en-us/windows/desktop/api/powrprof/ns-powrprof-_global_machine_power_policy typedef struct
+    // _GLOBAL_MACHINE_POWER_POLICY { ULONG Revision; SYSTEM_POWER_STATE LidOpenWakeAc; SYSTEM_POWER_STATE LidOpenWakeDc; ULONG
+    // BroadcastCapacityResolution; } GLOBAL_MACHINE_POWER_POLICY, *PGLOBAL_MACHINE_POWER_POLICY;
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    public struct GLOBAL_MACHINE_POWER_POLICY
+    {
+        /// <summary>
+        /// The current structure revision level. Set this value by calling GetCurrentPowerPolicies or ReadGlobalPwrPolicy before using a
+        /// <c>GLOBAL_MACHINE_POWER_POLICY</c> structure to set power policy.
+        /// </summary>
+        public uint Revision;
+
+        /// <summary>
+        /// The maximum power state (highest Sx value) from which a lid-open event should wake the system when running on AC power. This
+        /// member must be one of the SYSTEM_POWER_STATE enumeration type values. A value of <c>PowerSystemUnspecified</c> indicates that
+        /// a lid-open event does not wake the system.
+        /// </summary>
+        public SYSTEM_POWER_STATE LidOpenWakeAc;
+
+        /// <summary>
+        /// The maximum power state (highest Sx value) from which a lid-open event should wake the system when running on battery. This
+        /// member must be one of the SYSTEM_POWER_STATE enumeration type values. A value of <c>PowerSystemUnspecified</c> indicates that
+        /// a lid-open event does not wake the system.
+        /// </summary>
+        public SYSTEM_POWER_STATE LidOpenWakeDc;
+
+        /// <summary>
+        /// The resolution of change in the current battery capacity that should cause the system to be notified of a system power state
+        /// changed event.
+        /// </summary>
+        public uint BroadcastCapacityResolution;
+    }
+
+    /// <summary>
+    /// Contains computer power policy settings that are unique to each power scheme on the computer. This structure is part of the
+    /// POWER_POLICY structure.
+    /// </summary>
+    /// <remarks>
+    /// <c>DozeS4TimeoutAc</c> and <c>DozeS4TimeoutDc</c> correspond to the <c>DozeS4Timeout</c> member of SYSTEM_POWER_POLICY. These
+    /// values are merged from the machine power policy to the system power policy when the SetActivePwrScheme function is called to
+    /// apply a power scheme.
+    /// </remarks>
+    // https://docs.microsoft.com/en-us/windows/desktop/api/powrprof/ns-powrprof-_machine_power_policy typedef struct
+    // _MACHINE_POWER_POLICY { ULONG Revision; SYSTEM_POWER_STATE MinSleepAc; SYSTEM_POWER_STATE MinSleepDc; SYSTEM_POWER_STATE
+    // ReducedLatencySleepAc; SYSTEM_POWER_STATE ReducedLatencySleepDc; ULONG DozeTimeoutAc; ULONG DozeTimeoutDc; ULONG DozeS4TimeoutAc;
+    // ULONG DozeS4TimeoutDc; UCHAR MinThrottleAc; UCHAR MinThrottleDc; UCHAR pad1[2]; POWER_ACTION_POLICY OverThrottledAc;
+    // POWER_ACTION_POLICY OverThrottledDc; } MACHINE_POWER_POLICY, *PMACHINE_POWER_POLICY;
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    public struct MACHINE_POWER_POLICY
+    {
+        /// <summary>
+        /// The current structure revision level. Set this value by calling GetCurrentPowerPolicies or ReadPwrScheme before using a
+        /// <c>MACHINE_POWER_POLICY</c> structure to set power policy.
+        /// </summary>
+        public uint Revision;
+
+        /// <summary>
+        /// The minimum system power state (lowest Sx value) to enter on a system sleep action when running on AC power. This member must
+        /// be one of the SYSTEM_POWER_STATE enumeration type values.
+        /// </summary>
+        public SYSTEM_POWER_STATE MinSleepAc;
+
+        /// <summary>
+        /// The minimum system power state (lowest Sx value) to enter on a system sleep action when running on battery power. This member
+        /// must be one of the SYSTEM_POWER_STATE enumeration type values.
+        /// </summary>
+        public SYSTEM_POWER_STATE MinSleepDc;
+
+        /// <summary>
+        /// The maximum system power state (highest Sx value) to enter on a system sleep action when running on AC power, and when there
+        /// are outstanding latency requirements. This member must be one of the SYSTEM_POWER_STATE enumeration type values. If an
+        /// application calls RequestWakeupLatency with LT_LOWEST_LATENCY, <c>ReducedLatencySleepAc</c> is used in place of <c>MaxSleepAc</c>.
+        /// </summary>
+        public SYSTEM_POWER_STATE ReducedLatencySleepAc;
+
+        /// <summary>
+        /// The maximum system power state (highest Sx value) to enter on a system sleep action when running on battery power, and when
+        /// there are outstanding latency requirements. This member must be one of the SYSTEM_POWER_STATE enumeration type values. If an
+        /// application calls RequestWakeupLatency with LT_LOWEST_LATENCY, <c>ReducedLatencySleepAc</c> is used in place of <c>MaxSleepAc</c>.
+        /// </summary>
+        public SYSTEM_POWER_STATE ReducedLatencySleepDc;
+
+        /// <summary>This member is ignored.</summary>
+        public uint DozeTimeoutAc;
+
+        /// <summary>This member is ignored.</summary>
+        public uint DozeTimeoutDc;
+
+        /// <summary>
+        /// Time to wait between entering the suspend state and entering the hibernate sleeping state when the system is running on AC
+        /// power, in seconds. A value of zero indicates never hibernate.
+        /// </summary>
+        public uint DozeS4TimeoutAc;
+
+        /// <summary>
+        /// Time to wait between entering the suspend state and entering the hibernate sleeping state when the system is running on
+        /// battery power, in seconds. A value of zero indicates never hibernate.
+        /// </summary>
+        public uint DozeS4TimeoutDc;
+
+        /// <summary>
+        /// The minimum throttle setting allowed before being over-throttled when the system is running on AC power. Thermal conditions
+        /// would be the only reason for going below the minimum setting. When the processor is over-throttled, the system will initiate
+        /// the <c>OverThrottledAc</c> policy. Note that the power policy manager has a hard-coded policy to initiate a
+        /// CriticalShutdownOff whenever any thermal zone indicates a critical thermal condition. Range: 0-100.
+        /// </summary>
+        public byte MinThrottleAc;
+
+        /// <summary>
+        /// The minimum throttle setting allowed before being over-throttled when the system is running on battery power. Thermal
+        /// conditions would be the only reason for going below the minimum setting. When the processor is over-throttled, the system
+        /// will initiate the <c>OverThrottledDc</c> policy. Note that the power policy manager has a hard-coded policy to initiate a
+        /// CriticalShutdownOff whenever any thermal zone indicates a critical thermal condition. Range: 0-100.
+        /// </summary>
+        public byte MinThrottleDc;
+
+        /// <summary>Reserved.</summary>
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+        private readonly byte[] pad1;
+
+        /// <summary>
+        /// A POWER_ACTION_POLICY structure that defines the action to take when a processor has become over-throttled (as defined by the
+        /// <c>MinThrottleAc</c> member) when the system is running on AC power.
+        /// </summary>
+        public POWER_ACTION_POLICY OverThrottledAc;
+
+        /// <summary>
+        /// A POWER_ACTION_POLICY structure that defines the action to take when a processor has become over-throttled (as defined by the
+        /// <c>MinThrottleDc</c> member) when the system is running on battery power.
+        /// </summary>
+        public POWER_ACTION_POLICY OverThrottledDc;
+    }
+
+    /// <summary>Contains information used to set the system power state.</summary>
+    // https://docs.microsoft.com/en-us/windows/desktop/api/winnt/ns-winnt-power_action_policy typedef struct { POWER_ACTION Action;
+    // DWORD Flags; DWORD EventCode; } POWER_ACTION_POLICY, *PPOWER_ACTION_POLICY;
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    public struct POWER_ACTION_POLICY
+    {
+        /// <summary>The requested system power state. This member must be one of the POWER_ACTION enumeration type values.</summary>
+        public POWER_ACTION Action;
+
+        /// <summary>
+        /// <para>A flag that controls how to switch the power state. This member can be one or more of the following values.</para>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Value</term>
+        /// <term>Meaning</term>
+        /// </listheader>
+        /// <item>
+        /// <term>POWER_ACTION_CRITICAL 0x80000000</term>
+        /// <term>Forces a critical suspension.</term>
+        /// </item>
+        /// <item>
+        /// <term>POWER_ACTION_DISABLE_WAKES 0x40000000</term>
+        /// <term>Disables all wake events.</term>
+        /// </item>
+        /// <item>
+        /// <term>POWER_ACTION_LIGHTEST_FIRST 0x10000000</term>
+        /// <term>Uses the first lightest available sleep state.</term>
+        /// </item>
+        /// <item>
+        /// <term>POWER_ACTION_LOCK_CONSOLE 0x20000000</term>
+        /// <term>Requires entry of the system password upon resume from one of the system standby states.</term>
+        /// </item>
+        /// <item>
+        /// <term>POWER_ACTION_OVERRIDE_APPS 0x00000004</term>
+        /// <term>Has no effect.</term>
+        /// </item>
+        /// <item>
+        /// <term>POWER_ACTION_QUERY_ALLOWED 0x00000001</term>
+        /// <term>Has no effect.</term>
+        /// </item>
+        /// <item>
+        /// <term>POWER_ACTION_UI_ALLOWED 0x00000002</term>
+        /// <term>
+        /// Applications can prompt the user for directions on how to prepare for suspension. Sets bit 0 in the Flags parameter passed in
+        /// the lParam parameter of WM_POWERBROADCAST.
+        /// </term>
+        /// </item>
+        /// </list>
+        /// </summary>
+        public PowerActionFlags Flags;
+
+        /// <summary>
+        /// <para>The level of user notification. This member can be one or more of the following values.</para>
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Value</term>
+        /// <term>Meaning</term>
+        /// </listheader>
+        /// <item>
+        /// <term>POWER_FORCE_TRIGGER_RESET 0x80000000</term>
+        /// <term>Clears a user power button press.</term>
+        /// </item>
+        /// <item>
+        /// <term>POWER_LEVEL_USER_NOTIFY_EXEC 0x00000004</term>
+        /// <term>Specifies a program to be executed.</term>
+        /// </item>
+        /// <item>
+        /// <term>POWER_LEVEL_USER_NOTIFY_SOUND 0x00000002</term>
+        /// <term>User notified using sound.</term>
+        /// </item>
+        /// <item>
+        /// <term>POWER_LEVEL_USER_NOTIFY_TEXT 0x00000001</term>
+        /// <term>User notified using the UI.</term>
+        /// </item>
+        /// <item>
+        /// <term>POWER_USER_NOTIFY_BUTTON 0x00000008</term>
+        /// <term>Indicates that the power action is in response to a user power button press.</term>
+        /// </item>
+        /// <item>
+        /// <term>POWER_USER_NOTIFY_SHUTDOWN 0x00000010</term>
+        /// <term>Indicates a power action of shutdown/off.</term>
+        /// </item>
+        /// </list>
+        /// </summary>
+        public EventCode EventCode;
+    }
+
+    /// <summary>Action to perform on a power event.</summary>
+    [Flags]
+    public enum PowerActionFlags : uint
+    {
+        /// <summary>Has no effect.</summary>
+        POWER_ACTION_QUERY_ALLOWED = 0x00000001,
+        /// <summary>Applications can prompt the user for directions on how to prepare for suspension. Sets bit 0 in the Flags parameter passed in
+        /// the lParam parameter of WM_POWERBROADCAST.</summary>
+        POWER_ACTION_UI_ALLOWED = 0x00000002,
+        /// <summary>Has no effect.</summary>
+        POWER_ACTION_OVERRIDE_APPS = 0x00000004,
+        /// <summary/>
+        POWER_ACTION_HIBERBOOT = 0x00000008,
+        /// <summary/>
+        POWER_ACTION_USER_NOTIFY = 0x00000010,
+        /// <summary/>
+        POWER_ACTION_DOZE_TO_HIBERNATE = 0x00000020,
+        /// <summary/>
+        POWER_ACTION_ACPI_CRITICAL = 0x01000000,
+        /// <summary/>
+        POWER_ACTION_ACPI_USER_NOTIFY = 0x02000000,
+        /// <summary/>
+        POWER_ACTION_DIRECTED_DRIPS = 0x04000000,
+        /// <summary/>
+        POWER_ACTION_PSEUDO_TRANSITION = 0x08000000,
+        /// <summary>Uses the first lightest available sleep state.</summary>
+        POWER_ACTION_LIGHTEST_FIRST = 0x10000000,
+        /// <summary>Requires entry of the system password upon resume from one of the system standby states.</summary>
+        POWER_ACTION_LOCK_CONSOLE = 0x20000000,
+        /// <summary>Disables all wake events.</summary>
+        POWER_ACTION_DISABLE_WAKES = 0x40000000,
+        /// <summary>Forces a critical suspension.</summary>
+        POWER_ACTION_CRITICAL = 0x80000000,
+    }
+
+    /// <summary>The level of user notification.</summary>
+    [Flags]
+    public enum EventCode : uint
+    {
+        /// <summary>Clears a user power button press.</summary>
+        POWER_FORCE_TRIGGER_RESET = 0x80000000,
+
+        /// <summary>Specifies a program to be executed.</summary>
+        POWER_LEVEL_USER_NOTIFY_EXEC = 0x00000004,
+
+        /// <summary>User notified using sound.</summary>
+        POWER_LEVEL_USER_NOTIFY_SOUND = 0x00000002,
+
+        /// <summary>User notified using the UI.</summary>
+        POWER_LEVEL_USER_NOTIFY_TEXT = 0x00000001,
+
+        /// <summary>Indicates that the power action is in response to a user power button press.</summary>
+        POWER_USER_NOTIFY_BUTTON = 0x00000008,
+
+        /// <summary>Indicates a power action of shutdown/off.</summary>
+        POWER_USER_NOTIFY_SHUTDOWN = 0x00000010,
+    }
+    
+    /// <summary>
+    /// <para>
+    /// Contains information about system battery drain policy settings. This structure is part of the GLOBAL_USER_POWER_POLICY structure.
+    /// </para>
+    /// </summary>
+    // https://docs.microsoft.com/en-us/windows/desktop/api/WinNT/ns-winnt-system_power_level typedef struct { BOOLEAN Enable; BYTE
+    // Spare[3]; DWORD BatteryLevel; POWER_ACTION_POLICY PowerPolicy; SYSTEM_POWER_STATE MinSystemState; } SYSTEM_POWER_LEVEL, *PSYSTEM_POWER_LEVEL;
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    public struct SYSTEM_POWER_LEVEL
+    {
+        /// <summary>
+        /// <para>If this member is <c>TRUE</c>, the alarm should be activated when the battery discharges below the value set in <c>BatteryLevel</c>.</para>
+        /// </summary>
+        [MarshalAs(UnmanagedType.U1)] public bool Enable;
+
+        /// <summary>
+        /// <para>Reserved.</para>
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+        private readonly byte[] Spare;
+
+        /// <summary>
+        /// <para>The battery capacity for this battery discharge policy, expressed as a percentage.</para>
+        /// </summary>
+        public uint BatteryLevel;
+
+        /// <summary>
+        /// <para>A POWER_ACTION_POLICY structure that defines the action to take for this battery discharge policy.</para>
+        /// </summary>
+        public POWER_ACTION_POLICY PowerPolicy;
+
+        /// <summary>
+        /// <para>
+        /// The minimum system sleep state to enter when the battery discharges below the value set in <c>BatteryLevel</c>. This member
+        /// must be one of the SYSTEM_POWER_STATE enumeration type values.
+        /// </para>
+        /// </summary>
+        public SYSTEM_POWER_STATE MinSystemState;
+    }
+
+    /// <summary>
+    /// <para>Defines values that are used to specify system power action types.</para>
+    /// </summary>
+    // https://docs.microsoft.com/en-us/windows/desktop/api/WinNT/ne-winnt-power_action typedef enum { PowerActionNone,
+    // PowerActionReserved, PowerActionSleep, PowerActionHibernate, PowerActionShutdown, PowerActionShutdownReset,
+    // PowerActionShutdownOff, PowerActionWarmEject, PowerActionDisplayOff } *PPOWER_ACTION;
+    public enum POWER_ACTION
+    {
+        /// <summary>No system power action.</summary>
+        PowerActionNone,
+
+        /// <summary>Reserved; do not use.</summary>
+        PowerActionReserved,
+
+        /// <summary>Sleep.</summary>
+        PowerActionSleep,
+
+        /// <summary>Hibernate.</summary>
+        PowerActionHibernate,
+
+        /// <summary>Shutdown.</summary>
+        PowerActionShutdown,
+
+        /// <summary>Shutdown and reset.</summary>
+        PowerActionShutdownReset,
+
+        /// <summary>Shutdown and power off.</summary>
+        PowerActionShutdownOff,
+
+        /// <summary>Warm eject.</summary>
+        PowerActionWarmEject,
+
+        /// <summary/>
+        PowerActionDisplayOff,
+    }
+
     public static class SettingIdLookup
     {
         public static Dictionary<SettingSubgroup, Guid> SettingSubgroupGuids = new Dictionary<SettingSubgroup, Guid>
