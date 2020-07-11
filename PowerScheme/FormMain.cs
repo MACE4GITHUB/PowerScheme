@@ -10,10 +10,10 @@
         private readonly IPowerSchemeService _power;
         private readonly ViewService _viewService;
 
-        public FormMain()
+        public FormMain(IPowerSchemeService power)
         {
             InitializeComponent();
-            _power = new PowerSchemeService();
+            _power = power;
 
             var executorMainService = new ExecutorRunAsService("admin");
 

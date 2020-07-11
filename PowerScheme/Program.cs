@@ -1,4 +1,5 @@
 ﻿using FormAutoClose;
+using PowerScheme.Configuration;
 using PowerScheme.Languages;
 using RunAs;
 using System;
@@ -22,9 +23,13 @@ namespace PowerScheme
             var roleAdmin = User.IsUserAdministrator();
             if (roleAdmin) OnceApplication();
 
+            var applicationModule = new ApplicationModule();
+            CompositionRoot.Wire(applicationModule);
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormMain());
+            Application.Run(CompositionRoot.Resolve<FormMain>());
+            applicationModule.Dispose();
         }
 
         internal static void OnceApplication()
