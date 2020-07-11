@@ -79,6 +79,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"D:\Portable\ILMergeGUI\ILMerge.exe" /internalize /ndebug /copyattrs /targetplatform:4.0,"C:\Windows\Microsoft.NET\Framework64\v4.0.30319" /out:"$(SolutionDir)PowerScheme\Resources\RegWriter.exe" $(TargetPath) "$(TargetDir)RegistryManager.dll"</PostBuildEvent>
+    <PostBuildEvent>"%ILMerge%" /internalize /ndebug /copyattrs /targetplatform:4.0,"C:\Windows\Microsoft.NET\Framework64\v4.0.30319" /out:"$(SolutionDir)PowerScheme\Resources\RegWriter.exe" $(TargetPath) "$(TargetDir)RegistryManager.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>
