@@ -5,7 +5,7 @@ namespace PowerScheme.Model
 {
     public class AppInfo
     {
-        private FileVersionInfo _fileVersionInfo;
+        private readonly FileVersionInfo _fileVersionInfo;
 
         public string CompanyName { get; }
         public string ProductName { get; }
