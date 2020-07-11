@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.ComponentModel;
-using System.Text;
-using Microsoft.Win32;
 
 namespace RegistryManager.Model
 {
-    [Serializable]
     public struct RegistryParam
     {
         private const string HKEY_CLASSES_ROOT = "HKEY_CLASSES_ROOT";
@@ -17,6 +15,7 @@ namespace RegistryManager.Model
         private const string HKEY_USERS = "HKEY_USERS";
 
         private const string DELIMITER = "|&|";
+        private const string DELIMITER_STRINGS = "|s|";
 
         private RegistryValueKind _registryValueKind;
 
@@ -51,7 +50,8 @@ namespace RegistryManager.Model
 
         public override string ToString()
         {
-            return $"{RegistryHive}{DELIMITER}{Path}{DELIMITER}{Section}{DELIMITER}{Name}{DELIMITER}{RegistryValueKind}{DELIMITER}{Value}";
+            var value = CalculateStringValue(Value, RegistryValueKind);
+            return $"{RegistryHive}{DELIMITER}{Path}{DELIMITER}{Section}{DELIMITER}{Name}{DELIMITER}{RegistryValueKind}{DELIMITER}{value}";
         }
 
         public static RegistryParam FromString(string v)
@@ -64,7 +64,8 @@ namespace RegistryManager.Model
             }
 
             var registryValueKind = (RegistryValueKind) Enum.Parse(typeof(RegistryValueKind), param[4]);
-            var value = CalculateTypeValue(param[5], registryValueKind);
+            var value = CalculateTypedValue(param[5], registryValueKind);
+
             var registryParam = new RegistryParam
             {
                 RegistryHive = (RegistryHive)Enum.Parse(typeof(RegistryHive), param[0]),
@@ -103,31 +104,42 @@ namespace RegistryManager.Model
             }
         }
 
-        private static object CalculateTypeValue(string value, RegistryValueKind registryValueKind)
+        private static object CalculateTypedValue(string value, RegistryValueKind registryValueKind)
         {
             switch (registryValueKind)
             {
                 case RegistryValueKind.String:
-                    return value;
                 case RegistryValueKind.ExpandString:
-                    break;
-                case RegistryValueKind.Binary:
-                    break;
+                    return value;
                 case RegistryValueKind.DWord:
                     return int.Parse(value);
-                case RegistryValueKind.MultiString:
-                    break;
                 case RegistryValueKind.QWord:
                     return uint.Parse(value);
-                case RegistryValueKind.Unknown:
-                    break;
-                case RegistryValueKind.None:
-                    break;
+                case RegistryValueKind.Binary:
+                    return value.DecodeToBytes();
+                case RegistryValueKind.MultiString:
+                    return value.SplitByString(DELIMITER_STRINGS);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(registryValueKind), registryValueKind, null);
             }
+        }
 
-            return value;
+        private static string CalculateStringValue(object value, RegistryValueKind registryValueKind)
+        {
+            switch (registryValueKind)
+            {
+                case RegistryValueKind.String:
+                case RegistryValueKind.ExpandString:
+                case RegistryValueKind.DWord:
+                case RegistryValueKind.QWord:
+                    return value.ToString();
+                case RegistryValueKind.Binary:
+                    return ((byte[])value).EncodeToString();
+                case RegistryValueKind.MultiString:
+                    return string.Join(DELIMITER_STRINGS, (string[])value);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(registryValueKind), registryValueKind, null);
+            }
         }
 
         private string CalculateRegistryHive()
