@@ -1,10 +1,10 @@
 ﻿using PowerManagerAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using PowerScheme.EventsArgs;
 using PowerScheme.Model;
 using PowerScheme.Settings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PowerScheme.Services
 {
@@ -74,8 +74,15 @@ namespace PowerScheme.Services
             return result;
         }
 
-        public void SetActivePowerScheme(IPowerScheme powerScheme)
+        /// <summary>
+        /// Set the Active Power Scheme.
+        /// </summary>
+        /// <param name="powerScheme"></param>
+        /// <param name="isForce">Need to apply new AC & DC values</param>
+        public void SetActivePowerScheme(IPowerScheme powerScheme, bool isForce = false)
         {
+            if (powerScheme.Guid == ActivePowerScheme.Guid && !isForce) return;
+            
             PowerManager.SetActivePlan(powerScheme.Guid);
             OnActivePowerSchemeChanged(new PowerSchemeEventArgs(powerScheme));
         }
@@ -131,7 +138,7 @@ namespace PowerScheme.Services
                 settingLid.ApplyValues();
             }
 
-            SetActivePowerScheme(activeScheme);
+            SetActivePowerScheme(activeScheme, true);
         }
 
         public void CreateMediaPowerScheme(string name, string description = null) =>

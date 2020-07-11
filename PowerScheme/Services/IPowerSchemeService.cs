@@ -14,7 +14,13 @@ namespace PowerScheme.Services
         IPowerScheme FirstAnyPowerScheme { get; }
 
         Watchers Watchers { get; }
-        void SetActivePowerScheme(IPowerScheme powerScheme);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="powerScheme"></param>
+        /// <param name="isForce">Need to apply new AC & DC values</param>
+        void SetActivePowerScheme(IPowerScheme powerScheme, bool isForce = false);
 
         bool IsNeedAdminAccessForChangePowerScheme();
 
