@@ -76,8 +76,6 @@ namespace PowerScheme.Services
 
         public void SetActivePowerScheme(IPowerScheme powerScheme)
         {
-            if (powerScheme.Guid == ActivePowerScheme.Guid) return;
-
             PowerManager.SetActivePlan(powerScheme.Guid);
             OnActivePowerSchemeChanged(new PowerSchemeEventArgs(powerScheme));
         }
@@ -122,6 +120,8 @@ namespace PowerScheme.Services
 
         public void SetLid(int value)
         {
+            var activeScheme = ActivePowerScheme;
+
             var listGuid = AllPowerSchemes.Select(p => p.Guid);
             var powerSchemeDCACValues = new PowerSchemeDCACValues(value, value);
 
@@ -130,6 +130,8 @@ namespace PowerScheme.Services
                 var settingLid = new PowerSchemeLid(guid, powerSchemeDCACValues);
                 settingLid.ApplyValues();
             }
+
+            SetActivePowerScheme(activeScheme);
         }
 
         public void CreateMediaPowerScheme(string name, string description = null) =>
