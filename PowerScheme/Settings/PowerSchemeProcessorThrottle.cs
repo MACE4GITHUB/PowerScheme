@@ -6,8 +6,8 @@ namespace PowerScheme.Settings
 {
     public class PowerSchemeProcessorThrottle : BaseMinMaxPowerSchemeValues
     {
-        private PowerSchemeDCACValues _minState;
-        private PowerSchemeDCACValues _maxState;
+        private readonly PowerSchemeDCACValues _minState;
+        private readonly PowerSchemeDCACValues _maxState;
 
         public PowerSchemeProcessorThrottle(Guid guid, PowerSchemeDCACValues minState, PowerSchemeDCACValues maxState) :
             base(guid)

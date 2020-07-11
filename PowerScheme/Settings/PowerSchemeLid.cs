@@ -5,7 +5,7 @@ namespace PowerScheme.Settings
 {
     public class PowerSchemeLid: BaseStatePowerSchemeValues
     {
-        private PowerSchemeDCACValues _DCACValues;
+        private readonly PowerSchemeDCACValues _DCACValues;
 
         public PowerSchemeLid(Guid powerSchemeGuid, PowerSchemeDCACValues DCACValues) : base(powerSchemeGuid)
         {

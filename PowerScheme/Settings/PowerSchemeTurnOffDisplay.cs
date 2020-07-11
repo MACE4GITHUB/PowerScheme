@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PowerManagerAPI;
+﻿using PowerManagerAPI;
+using System;
 
 namespace PowerScheme.Settings
 {
     public class PowerSchemeTurnOffDisplay : BaseStatePowerSchemeValues
     {
-        private PowerSchemeDCACValues _DCACValues;
+        private readonly PowerSchemeDCACValues _DCACValues;
 
         public PowerSchemeTurnOffDisplay(Guid powerSchemeGuid, PowerSchemeDCACValues DCACValues) : base(powerSchemeGuid)
         {
@@ -20,6 +16,6 @@ namespace PowerScheme.Settings
             => SettingSubgroup.VIDEO_SUBGROUP;
 
         public override PowerSchemeValues State
-            => new PowerSchemeValues(Setting.VIDEOIDLE, _DCACValues.DCSettings, _DCACValues.ACSettings); // 300/7200
+            => new PowerSchemeValues(Setting.VIDEOIDLE, _DCACValues.DCSettings, _DCACValues.ACSettings);
     }
 }
