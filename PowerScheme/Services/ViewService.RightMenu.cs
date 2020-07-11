@@ -45,6 +45,13 @@ namespace PowerScheme.Services
         private const string ADD_MEDIA_TYPICAL_SCHEME_MENU = "AddMediaTypicalSchemeToolStripMenuItem";
         private const string ADD_SIMPLE_TYPICAL_SCHEME_MENU = "AddSimpleTypicalSchemeToolStripMenuItem";
 
+        private readonly Dictionary<string, string> ImageLidOn = new Dictionary<string, string>  { 
+            { LID_NOTHING_MENU, "Nothing" },  
+            { LID_SLEEP_MENU, "Sleep" },  
+            { LID_HIBERNATE_MENU, "Hibernate" },  
+            { LID_SHUTDOWN_MENU, "Shutdown" },  
+        };
+
         private void BuildRightMenu() =>
             _form.InvokeIfRequired(BuildContextRightMenu);
 
@@ -237,7 +244,7 @@ namespace PowerScheme.Services
             var item = new ToolStripMenuItem
             {
                 Name = LIDON_DROP_DOWN_MENU,
-                Text = Language.WhenICloseTheLid
+                Text = Language.WhenICloseTheLid                
             };
 
             var lidItems = new List<ToolStripMenuItem>();

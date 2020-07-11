@@ -144,14 +144,17 @@
         {
             if (!_power.IsMobilePlatformRole()) return;
 
-            var any = _power.FirstAnyPowerScheme.Guid;
+            var any = _power.ActivePowerScheme.Guid;
             var valueLidOn = RegistryService.GetLidOption(any);
             var lidItems = ViewModel.ContextRightMenu.Items[LIDON_DROP_DOWN_MENU] as ToolStripMenuItem;
+            var name = string.Empty;
             foreach (ToolStripMenuItem lidStripMenuItem in lidItems.DropDownItems)
             {
-                var @checked = valueLidOn == (int)lidStripMenuItem.Tag;
+                var @checked = valueLidOn == (int)lidStripMenuItem.Tag;                
                 lidStripMenuItem.Image = GetImage(@checked ? RADIO_ON_ICON : RADIO_OFF_ICON);
+                if (@checked) name = lidStripMenuItem.Name;
             }
+            ViewModel.ContextRightMenu.Items[LIDON_DROP_DOWN_MENU].Image = GetImage(ImageLidOn[name]);
         }
 
         private void CheckMenu(ToolStripItem item, bool @checked)

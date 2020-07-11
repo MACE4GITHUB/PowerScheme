@@ -145,9 +145,6 @@ namespace PowerScheme.Services
         private IEnumerable<IPowerScheme> AllPowerSchemes
             => DefaultPowerSchemes.Concat(UserPowerSchemes);
 
-        private bool IsAnyPowerSchemes
-            => AllPowerSchemes.Any();
-
         private void CreateTypicalPowerScheme(Guid source, Guid destination, string name, string description = null)
         {
             var isExistsTypicalPowerScheme = IsExistsTypicalPowerScheme(destination);

@@ -103,6 +103,16 @@ namespace PowerScheme.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Hibernate {
+            get {
+                object obj = ResourceManager.GetObject("Hibernate", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap High {
             get {
                 object obj = ResourceManager.GetObject("High", resourceCulture);
@@ -126,6 +136,16 @@ namespace PowerScheme.Properties {
         public static System.Drawing.Bitmap Media {
             get {
                 object obj = ResourceManager.GetObject("Media", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Nothing {
+            get {
+                object obj = ResourceManager.GetObject("Nothing", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -193,9 +213,29 @@ namespace PowerScheme.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Shutdown {
+            get {
+                object obj = ResourceManager.GetObject("Shutdown", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Simple {
             get {
                 object obj = ResourceManager.GetObject("Simple", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Sleep {
+            get {
+                object obj = ResourceManager.GetObject("Sleep", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

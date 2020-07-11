@@ -3,7 +3,7 @@
     /// <summary>
     /// Contains common registry related utility methods.
     /// </summary>
-    public static class Utils
+    public static class StringExtentions
     {
         /// <summary>
         /// Split the given string by a string.
