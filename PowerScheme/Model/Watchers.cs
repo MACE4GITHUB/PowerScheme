@@ -1,9 +1,9 @@
-﻿using System;
-
-namespace PowerScheme.Model
+﻿namespace PowerScheme.Model
 {
-    using Services;
     using RegistryManager;
+    using Services;
+    using System;
+
     public class Watchers
     {
         public IRegistryWatcher ActivePowerScheme
@@ -17,7 +17,7 @@ namespace PowerScheme.Model
             if (!ActivePowerScheme.IsMonitoring) ActivePowerScheme.Start();
             if (!PowerSchemes.IsMonitoring) PowerSchemes.Start();
         }
-        
+
         public void Stop()
         {
             if (ActivePowerScheme.IsMonitoring) ActivePowerScheme.Stop();
@@ -31,7 +31,7 @@ namespace PowerScheme.Model
 
             Stop();
             action();
-            
+
             if (tempW1) ActivePowerScheme.Start();
             if (tempW2) PowerSchemes.Start();
         }
