@@ -2,19 +2,12 @@
 
 namespace PowerScheme.Model
 {
-    public class ViewModel
+    public class ViewModel : IViewModel
     {
-        public ViewModel(NotifyIcon notifyIcon, ContextMenuStrip contextLeftMenu, ContextMenuStrip contextRightMenu)
-        {
-            NotifyIcon = notifyIcon;
-            ContextLeftMenu = contextLeftMenu;
-            ContextRightMenu = contextRightMenu;
-        }
+        public NotifyIcon NotifyIcon { get; } = new NotifyIcon();
 
-        public NotifyIcon NotifyIcon { get; }
+        public ContextMenuStrip ContextLeftMenu { get; } = new ContextMenuStrip();
 
-        public ContextMenuStrip ContextLeftMenu { get; }
-
-        public ContextMenuStrip ContextRightMenu { get; }
+        public ContextMenuStrip ContextRightMenu { get; } = new ContextMenuStrip();
     }
 }

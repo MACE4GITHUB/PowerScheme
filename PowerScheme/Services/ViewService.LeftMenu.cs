@@ -1,23 +1,21 @@
-﻿using PowerScheme.Utility;
+﻿using PowerScheme.Model;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using PowerScheme.Model;
+using PowerScheme.Utility;
 using static PowerScheme.Utility.TrayIcon;
 
 namespace PowerScheme.Services
 {
     partial class ViewService
     {
-        private void BuildLeftMenu() =>
-            _form.InvokeIfRequired(BuildContextLeftMenu);
+        private void BuildLeftMenu() 
+            => _viewModel.ContextLeftMenu.InvokeIfRequired(BuildContextLeftMenu);
 
         private void BuildContextLeftMenu()
         {
             ClearContextLeftMenu();
 
-            var stripLeftMenuItems = new List<ToolStripItem>();
             foreach (var powerScheme in _power.DefaultPowerSchemes)
             {
                 var item = new ToolStripMenuItem
@@ -29,49 +27,48 @@ namespace PowerScheme.Services
 
                 item.Click += ItemMenuPowerOnClick;
 
-                stripLeftMenuItems.Add(item);
+                _viewModel.ContextLeftMenu.Items.Add(item);
             }
 
-            if (_power.UserPowerSchemes.Any())
+            if (!_power.UserPowerSchemes.Any()) return;
+
+            _viewModel.ContextLeftMenu.Items.Add(new ToolStripSeparator());
+
+            foreach (var powerScheme in _power.UserPowerSchemes)
             {
-                stripLeftMenuItems.Add(new ToolStripSeparator());
-
-                foreach (var powerScheme in _power.UserPowerSchemes)
+                var item = new ToolStripMenuItem
                 {
-                    var item = new ToolStripMenuItem
-                    {
-                        Tag = powerScheme,
-                        Text = powerScheme.Name,
-                        Image = GetImage(powerScheme.Image)
-                    };
+                    Tag = powerScheme,
+                    Text = powerScheme.Name,
+                    Image = GetImage(powerScheme.Image)
+                };
 
-                    item.Click += ItemMenuPowerOnClick;
+                item.Click += ItemMenuPowerOnClick;
 
-                    stripLeftMenuItems.Add(item);
-                }
+                _viewModel.ContextLeftMenu.Items.Add(item);
             }
 
-            var stripLeftMenuItemsArray = stripLeftMenuItems.ToArray();
-            ViewModel.ContextLeftMenu.Items.AddRange(stripLeftMenuItemsArray);
         }
 
         private void ClearContextLeftMenu()
         {
-            if (ViewModel.ContextLeftMenu.Items.Count <= 0) return;
+            if (_viewModel.ContextLeftMenu.Items.Count <= 0) return;
 
             UnsubscribeFromContextLeftMenu();
 
-            ViewModel.ContextLeftMenu.Items.Clear();
+            _viewModel.ContextLeftMenu.Items.Clear();
         }
 
         private void UnsubscribeFromContextLeftMenu()
         {
-            foreach (ToolStripItem toolStripItem in ViewModel.ContextLeftMenu.Items)
+            for (var index = _viewModel.ContextLeftMenu.Items.Count - 1; index >= 0; index--)
             {
+                ToolStripItem toolStripItem = _viewModel.ContextLeftMenu.Items[index];
                 toolStripItem.Click -= ItemMenuPowerOnClick;
                 toolStripItem.Tag = null;
                 toolStripItem.Text = null;
                 toolStripItem.Image = null;
+                toolStripItem.Dispose();
             }
         }
 
@@ -82,6 +79,5 @@ namespace PowerScheme.Services
 
             _power.SetActivePowerScheme(powerScheme);
         }
-
     }
 }

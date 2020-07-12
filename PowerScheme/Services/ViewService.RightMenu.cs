@@ -1,15 +1,15 @@
-﻿using PowerScheme.Utility;
+﻿using RunAs.Common.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using RunAs.Common.Utils;
-using static PowerScheme.Program;
+using PowerScheme.Utility;
+using static PowerScheme.Languages.Lang;
 using static PowerScheme.Utility.TrayIcon;
 
 namespace PowerScheme.Services
 {
-    partial class ViewService
+    partial class ViewService 
     {
         private const string RESTORE_ICON = "Restore";
         private const string CPL_WINDOWS_ICON = "Panel";
@@ -45,35 +45,35 @@ namespace PowerScheme.Services
         private const string ADD_MEDIA_TYPICAL_SCHEME_MENU = "AddMediaTypicalSchemeToolStripMenuItem";
         private const string ADD_SIMPLE_TYPICAL_SCHEME_MENU = "AddSimpleTypicalSchemeToolStripMenuItem";
 
-        private readonly Dictionary<string, string> ImageLidOn = new Dictionary<string, string>  { 
-            { LID_NOTHING_MENU, "Nothing" },  
-            { LID_SLEEP_MENU, "Sleep" },  
-            { LID_HIBERNATE_MENU, "Hibernate" },  
-            { LID_SHUTDOWN_MENU, "Shutdown" },  
+        private readonly Dictionary<string, string> _imageLidOn = new Dictionary<string, string>  {
+            { LID_NOTHING_MENU, "Nothing" },
+            { LID_SLEEP_MENU, "Sleep" },
+            { LID_HIBERNATE_MENU, "Hibernate" },
+            { LID_SHUTDOWN_MENU, "Shutdown" },
         };
 
         private void BuildRightMenu() =>
-            _form.InvokeIfRequired(BuildContextRightMenu);
+            _viewModel.ContextRightMenu.InvokeIfRequired(BuildContextRightMenu);
 
         private void BuildContextRightMenu()
         {
-            ViewModel.ContextRightMenu.Items.Clear();
+            _viewModel.ContextRightMenu.Items.Clear();
 
-            ViewModel.ContextRightMenu.Items.Add(MenuItemSettings());
-            ViewModel.ContextRightMenu.Items.Add(MenuItemSepatator());
+            _viewModel.ContextRightMenu.Items.Add(MenuItemSettings());
+            _viewModel.ContextRightMenu.Items.Add(MenuItemSepatator());
 
-            ViewModel.ContextRightMenu.Items.Add(MenuItemStartWithWindows());
+            _viewModel.ContextRightMenu.Items.Add(MenuItemStartWithWindows());
 
-            if (_power.IsHibernate())
-                ViewModel.ContextRightMenu.Items.Add(MenuItemHibernate());
+            if (_power.IsHibernate)
+                _viewModel.ContextRightMenu.Items.Add(MenuItemHibernate());
 
-            ViewModel.ContextRightMenu.Items.Add(MenuItemSleep());
+            _viewModel.ContextRightMenu.Items.Add(MenuItemSleep());
 
-            if (_power.IsMobilePlatformRole())
-                ViewModel.ContextRightMenu.Items.Add(MenuItemLidOn());
+            if (_power.IsMobilePlatformRole)
+                _viewModel.ContextRightMenu.Items.Add(MenuItemLidOn());
 
-            ViewModel.ContextRightMenu.Items.Add(MenuItemSepatator());
-            ViewModel.ContextRightMenu.Items.Add(MenuItemExit());
+            _viewModel.ContextRightMenu.Items.Add(MenuItemSepatator());
+            _viewModel.ContextRightMenu.Items.Add(MenuItemExit());
         }
 
 
@@ -244,7 +244,7 @@ namespace PowerScheme.Services
             var item = new ToolStripMenuItem
             {
                 Name = LIDON_DROP_DOWN_MENU,
-                Text = Language.WhenICloseTheLid                
+                Text = Language.WhenICloseTheLid
             };
 
             var lidItems = new List<ToolStripMenuItem>();
@@ -320,38 +320,17 @@ namespace PowerScheme.Services
 
         private void ItemCreateTypicalSchemes_Click(object sender, EventArgs e)
         {
-            CreateTypicalSchemes();
-        }
-
-        private void CreateTypicalSchemes()
-        {
-            void CreateSchemes()
-            {
-                CreateMediaPowerScheme();
-                CreateStablePowerScheme();
-                CreateSimplePowerScheme();
-            }
-
-            _power.Watchers.RaiseActionWithoutWatchers(CreateSchemes);
+            _power.CreateTypicalSchemes();
         }
 
         private void ItemMediaScheme_Click(object sender, EventArgs e)
-            => CreateMediaPowerScheme();
+            => _power.CreateMediaPowerScheme();
 
         private void ItemStableScheme_Click(object sender, EventArgs e)
-            => CreateStablePowerScheme();
+            => _power.CreateStablePowerScheme();
 
         private void ItemSimpleScheme_Click(object sender, EventArgs e)
-            => CreateSimplePowerScheme();
-
-        private void CreateMediaPowerScheme()
-            => _power.CreateMediaPowerScheme(Language.MediaName, Language.MediaDescription);
-
-        private void CreateStablePowerScheme()
-            => _power.CreateStablePowerScheme(Language.StableName, Language.StableDescription);
-
-        private void CreateSimplePowerScheme()
-            => _power.CreateSimplePowerScheme(Language.SimpleName, Language.SimpleDescription);
+            => _power.CreateSimplePowerScheme();
 
         private static void ItemCplScheme_Click(object sender, EventArgs e)
         {
@@ -360,7 +339,7 @@ namespace PowerScheme.Services
 
         private void ExitOnClick(object sender, EventArgs e)
         {
-            ViewModel.NotifyIcon.Visible = false;
+            _viewModel.NotifyIcon.Visible = false;
             Environment.Exit(0);
         }
 
@@ -407,12 +386,12 @@ namespace PowerScheme.Services
 
         private void UnsubscribeFromContextRightMenu()
         {
-            ViewModel.ContextLeftMenu.Items[STARTUP_ON_WINDOWS_MENU].Click -= StartWithWindowsOnClick;
-            ViewModel.ContextLeftMenu.Items[SHOW_HIBERNATE_OPTION_MENU].Click -= HibernateOnClick;
-            ViewModel.ContextLeftMenu.Items[SHOW_SLEEP_OPTION_MENU].Click -= SleepOnClick;
-            ViewModel.ContextLeftMenu.Items[EXIT_MENU].Click -= ExitOnClick;
+            _viewModel.ContextLeftMenu.Items[STARTUP_ON_WINDOWS_MENU].Click -= StartWithWindowsOnClick;
+            _viewModel.ContextLeftMenu.Items[SHOW_HIBERNATE_OPTION_MENU].Click -= HibernateOnClick;
+            _viewModel.ContextLeftMenu.Items[SHOW_SLEEP_OPTION_MENU].Click -= SleepOnClick;
+            _viewModel.ContextLeftMenu.Items[EXIT_MENU].Click -= ExitOnClick;
 
-            if (!(ViewModel.ContextRightMenu.Items[SETTINGS_DROP_DOWN_MENU] is ToolStripMenuItem settingsToolStripMenuItem)) return;
+            if (!(_viewModel.ContextRightMenu.Items[SETTINGS_DROP_DOWN_MENU] is ToolStripMenuItem settingsToolStripMenuItem)) return;
 
             settingsToolStripMenuItem.DropDownItems[RESTORE_DEFAULT_POWER_SCHEMES_MENU].Click -= RestoreDefaultPowerSchemes_Click;
             settingsToolStripMenuItem.DropDownItems[CPL_SCHEME_WINDOWS_MENU].Click -= ItemCplScheme_Click;

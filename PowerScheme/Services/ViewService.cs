@@ -6,40 +6,30 @@
     using System.Drawing;
     using System.Reflection;
     using System.Windows.Forms;
-    using Utility;
-    using static Program;
     using static Utility.TrayIcon;
 
-    public partial class ViewService : IDisposable
+    public partial class ViewService : IViewService, IDisposable
     {
         private const string SHOW_CONTEXT_MENU = "ShowContextMenu";
         private const string CHECK_ICON = "Check";
         private const string STOP_ICON = "Stop";
-
+        private readonly IViewModel _viewModel;
         private readonly IPowerSchemeService _power;
-        private readonly Form _form;
 
-        public ViewService(Form form, ViewModel viewModel, IPowerSchemeService power)
+        public ViewService(IViewModel viewModel, IPowerSchemeService power)
         {
-            _form = form;
+            _viewModel = viewModel;
             _power = power;
-            ViewModel = viewModel;
-
-            FirstStart();
         }
-        
-        public ViewModel ViewModel { get; }
 
         public void Start()
         {
             _power.Watchers.PowerSchemes.Changed += ChangedPowerSchemes;
             _power.Watchers.ActivePowerScheme.Changed += ChangedActivePowerScheme;
 
-            _form.InvokeIfRequired(() =>
-            {
-                ViewModel.NotifyIcon.MouseClick += NotifyIcon_MouseClick;
-                ViewModel.NotifyIcon.Visible = true;
-            });
+            _viewModel.NotifyIcon.MouseClick += NotifyIcon_MouseClick;
+            _viewModel.NotifyIcon.Visible = true;
+            _viewModel.NotifyIcon.ContextMenuStrip = _viewModel.ContextLeftMenu;
 
             BuildMenu();
             UpdateIcon();
@@ -52,32 +42,11 @@
             _power.Watchers.PowerSchemes.Changed -= ChangedPowerSchemes;
             _power.Watchers.ActivePowerScheme.Changed -= ChangedActivePowerScheme;
 
-            _form.InvokeIfRequired(() =>
-            {
-                _form.Icon = GetIcon(STOP_ICON);
-                ViewModel.NotifyIcon.Icon = null;
-                ViewModel.NotifyIcon.Text = string.Empty;
-                ViewModel.NotifyIcon.Visible = false;
-                ViewModel.NotifyIcon.MouseClick -= NotifyIcon_MouseClick;
-            });
+            _viewModel.NotifyIcon.Icon = GetIcon(STOP_ICON);
+            _viewModel.NotifyIcon.Text = string.Empty;
+            _viewModel.NotifyIcon.MouseClick -= NotifyIcon_MouseClick;
 
             _power.Watchers.Stop();
-        }
-
-        private void FirstStart()
-        {
-            void ShowFirstStartDialog()
-            {
-                var result = MessageBox.Show(Language.FirstStartDescription, Language.FirstStartCaption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (result != DialogResult.Yes) return;
-                _power.Watchers.RaiseActionWithoutWatchers(CreateTypicalSchemes);
-            }
-
-            var entryViewService = new EntryViewService
-            {
-                ActionIsFirstStart = ShowFirstStartDialog
-            };
-            entryViewService.ExecuteActionIsFirstStart();
         }
 
         private void ChangedActivePowerScheme(object sender, RegistryChangedEventArgs e)
@@ -91,12 +60,8 @@
             var image = activePowerScheme.Image;
             var icon = GetIcon(image);
 
-            _form.InvokeIfRequired(() =>
-            {
-                _form.Icon = icon;
-                ViewModel.NotifyIcon.Icon = icon;
-                ViewModel.NotifyIcon.Text = activePowerScheme.Name;
-            });
+            _viewModel.NotifyIcon.Icon = icon;
+            _viewModel.NotifyIcon.Text = activePowerScheme.Name;
         }
 
         private void ChangedPowerSchemes(object sender, RegistryChangedEventArgs e)
@@ -112,49 +77,49 @@
 
         private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
-            ViewModel.NotifyIcon.ContextMenuStrip =
-                e.Button == MouseButtons.Right ?
-                    ViewModel.ContextRightMenu :
-                    ViewModel.ContextLeftMenu;
+            _viewModel.NotifyIcon.ContextMenuStrip =
+            e.Button == MouseButtons.Right ?
+                _viewModel.ContextRightMenu :
+                _viewModel.ContextLeftMenu;
 
             if (e.Button == MouseButtons.Right)
             {
                 CheckMenu(
-                    ViewModel.ContextRightMenu.Items[STARTUP_ON_WINDOWS_MENU],
+                    _viewModel.ContextRightMenu.Items[STARTUP_ON_WINDOWS_MENU],
                     RegistryService.IsRunOnStartup);
 
-                if (_power.IsHibernate())
+                if (_power.IsHibernate)
                     CheckMenu(
-                    ViewModel.ContextRightMenu.Items[SHOW_HIBERNATE_OPTION_MENU],
+                    _viewModel.ContextRightMenu.Items[SHOW_HIBERNATE_OPTION_MENU],
                     RegistryService.IsShowHibernateOption);
 
                 CheckMenu(
-                    ViewModel.ContextRightMenu.Items[SHOW_SLEEP_OPTION_MENU],
+                    _viewModel.ContextRightMenu.Items[SHOW_SLEEP_OPTION_MENU],
                     RegistryService.IsShowSleepOption);
 
                 CheckLid();
             }
 
             var mi = typeof(NotifyIcon).GetMethod(SHOW_CONTEXT_MENU, BindingFlags.Instance | BindingFlags.NonPublic);
-            mi?.Invoke(ViewModel.NotifyIcon, null);
-            ViewModel.NotifyIcon.ContextMenuStrip = null;
+            mi?.Invoke(_viewModel.NotifyIcon, null);
+            _viewModel.NotifyIcon.ContextMenuStrip = null;
         }
 
         private void CheckLid()
         {
-            if (!_power.IsMobilePlatformRole()) return;
+            if (!_power.IsMobilePlatformRole) return;
 
             var any = _power.ActivePowerScheme.Guid;
             var valueLidOn = RegistryService.GetLidOption(any);
-            var lidItems = ViewModel.ContextRightMenu.Items[LIDON_DROP_DOWN_MENU] as ToolStripMenuItem;
+            var lidItems = _viewModel.ContextRightMenu.Items[LIDON_DROP_DOWN_MENU] as ToolStripMenuItem;
             var name = string.Empty;
             foreach (ToolStripMenuItem lidStripMenuItem in lidItems.DropDownItems)
             {
-                var @checked = valueLidOn == (int)lidStripMenuItem.Tag;                
+                var @checked = valueLidOn == (int)lidStripMenuItem.Tag;
                 lidStripMenuItem.Image = GetImage(@checked ? RADIO_ON_ICON : RADIO_OFF_ICON);
                 if (@checked) name = lidStripMenuItem.Name;
             }
-            ViewModel.ContextRightMenu.Items[LIDON_DROP_DOWN_MENU].Image = GetImage(ImageLidOn[name]);
+            _viewModel.ContextRightMenu.Items[LIDON_DROP_DOWN_MENU].Image = GetImage(_imageLidOn[name]);
         }
 
         private void CheckMenu(ToolStripItem item, bool @checked)

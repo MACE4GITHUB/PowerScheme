@@ -1,4 +1,5 @@
 ﻿using Ninject.Modules;
+using PowerScheme.Model;
 using PowerScheme.Services;
 
 namespace PowerScheme.Configuration
@@ -7,8 +8,9 @@ namespace PowerScheme.Configuration
     {
         public override void Load()
         {
-            Bind<FormMain>().ToSelf().InSingletonScope();
             Bind<IPowerSchemeService>().To<PowerSchemeService>().InSingletonScope();
+            Bind<IViewService>().To<ViewService>().InSingletonScope();
+            Bind<IViewModel>().To<ViewModel>().InSingletonScope();
         }
     }
 }
