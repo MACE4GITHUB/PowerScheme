@@ -80,16 +80,11 @@
     <Compile Include="Configuration\ApplicationModule.cs" />
     <Compile Include="Configuration\CompositionRoot.cs" />
     <Compile Include="EventsArgs\PowerSchemeEventArgs.cs" />
-    <Compile Include="FormMain.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormMain.Designer.cs">
-      <DependentUpon>FormMain.cs</DependentUpon>
-    </Compile>
     <Compile Include="Languages\Lang.cs" />
     <Compile Include="Languages\LangRu.cs" />
     <Compile Include="Model\AppInfo.cs" />
     <Compile Include="Model\IPowerScheme.cs" />
+    <Compile Include="Model\IViewModel.cs" />
     <Compile Include="Model\ViewModel.cs" />
     <Compile Include="Model\Watchers.cs" />
     <Compile Include="Model\PowerScheme.cs" />
@@ -100,9 +95,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Services\EntryViewService.cs" />
+    <Compile Include="Services\EntryService.cs" />
     <Compile Include="Services\ExecutorRunAsService.cs" />
     <Compile Include="Services\ExecutorRegistryService.cs" />
+    <Compile Include="Services\IViewService.cs" />
     <Compile Include="Services\ViewService.LeftMenu.cs" />
     <Compile Include="Services\ViewService.RightMenu.cs" />
     <Compile Include="Settings\BaseMinMaxPowerSchemeValues.cs" />
@@ -124,9 +120,6 @@
     <Compile Include="Utility\Paths.cs" />
     <Compile Include="Utility\Strings.cs" />
     <Compile Include="Utility\TrayIcon.cs" />
-    <EmbeddedResource Include="FormMain.resx">
-      <DependentUpon>FormMain.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
