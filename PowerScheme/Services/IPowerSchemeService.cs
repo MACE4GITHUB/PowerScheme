@@ -22,23 +22,25 @@ namespace PowerScheme.Services
         /// <param name="isForce">Need to apply new AC & DC values</param>
         void SetActivePowerScheme(IPowerScheme powerScheme, bool isForce = false);
 
-        bool IsNeedAdminAccessForChangePowerScheme();
+        bool IsNeedAdminAccessForChangePowerScheme { get; }
+
+        bool IsMobilePlatformRole { get; }
+
+        bool IsHibernate { get; }
+
+        bool IsSleep { get; }
 
         void RestoreDefaultPowerSchemes();
 
-        bool IsMobilePlatformRole();
-
-        bool IsHibernate();
-
-        bool IsSleep();
-
         void DeleteTypicalScheme();
 
-        void CreateStablePowerScheme(string name, string description = null);
+        void CreateTypicalSchemes();
 
-        void CreateMediaPowerScheme(string name, string description = null);
+        void CreateStablePowerScheme();
 
-        void CreateSimplePowerScheme(string name, string description = null);
+        void CreateMediaPowerScheme();
+
+        void CreateSimplePowerScheme();
 
         void SetLid(int value);
 

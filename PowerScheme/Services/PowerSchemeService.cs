@@ -1,13 +1,15 @@
-﻿using PowerManagerAPI;
-using PowerScheme.EventsArgs;
-using PowerScheme.Model;
-using PowerScheme.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using static PowerScheme.Languages.Lang;
 
 namespace PowerScheme.Services
 {
+    using PowerManagerAPI;
+    using EventsArgs;
+    using Model;
+    using Settings;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class PowerSchemeService : IPowerSchemeService
     {
         private static readonly Guid HIGH_SCHEME_GUID = new Guid("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
@@ -17,6 +19,8 @@ namespace PowerScheme.Services
         private static readonly Guid STABLE_SCHEME_GUID = new Guid("fa0cd8f1-1300-4710-820b-00e8e75f31f8");
         private static readonly Guid MEDIA_SCHEME_GUID = new Guid("fcab38a3-7e4c-4a75-8483-f522befb9c58");
         private static readonly Guid SIMPLE_SCHEME_GUID = new Guid("fa8d915c-65de-4bba-9569-3c2e77ea68b6");
+
+        private const string UNKNOWN_ICON = "Unknown";
 
         private static readonly Dictionary<Guid, string> _nativesGuid = new Dictionary<Guid, string>
         {
@@ -58,20 +62,23 @@ namespace PowerScheme.Services
             }
         }
 
-        public bool IsNeedAdminAccessForChangePowerScheme()
+        public bool IsNeedAdminAccessForChangePowerScheme
         {
-            var result = false;
-
-            try
+            get
             {
-                PowerManager.SetActivePlan(ActivePowerScheme.Guid);
-            }
-            catch (Exception)
-            {
-                result = true;
-            }
+                var result = false;
 
-            return result;
+                try
+                {
+                    PowerManager.SetActivePlan(ActivePowerScheme.Guid);
+                }
+                catch (Exception)
+                {
+                    result = true;
+                }
+
+                return result;
+            }
         }
 
         /// <summary>
@@ -82,7 +89,7 @@ namespace PowerScheme.Services
         public void SetActivePowerScheme(IPowerScheme powerScheme, bool isForce = false)
         {
             if (powerScheme.Guid == ActivePowerScheme.Guid && !isForce) return;
-            
+
             PowerManager.SetActivePlan(powerScheme.Guid);
             OnActivePowerSchemeChanged(new PowerSchemeEventArgs(powerScheme));
         }
@@ -93,13 +100,13 @@ namespace PowerScheme.Services
         public void RestoreDefaultPowerSchemes()
             => Watchers.RaiseActionWithoutWatchers(PowerManager.RestoreDefaultPlans);
 
-        public bool IsMobilePlatformRole()
+        public bool IsMobilePlatformRole
             => PowerManager.IsMobilePlatformRole();
 
-        public bool IsHibernate()
+        public bool IsHibernate
             => PowerManager.IsHibernate();
 
-        public bool IsSleep()
+        public bool IsSleep
             => PowerManager.IsSleep();
 
         public void DeleteTypicalScheme()
@@ -114,17 +121,6 @@ namespace PowerScheme.Services
                 PowerManager.DeletePlan(guid);
             }
         }
-
-        public void CreateStablePowerScheme(string name, string description = null)
-        {
-            CreateTypicalPowerScheme(HIGH_SCHEME_GUID, STABLE_SCHEME_GUID,
-                name, description);
-
-            var settings = new PowerSchemeSettings(STABLE_SCHEME_GUID);
-
-            settings.ApplyDefaultValues();
-        }
-
         public void SetLid(int value)
         {
             var activeScheme = ActivePowerScheme;
@@ -141,13 +137,35 @@ namespace PowerScheme.Services
             SetActivePowerScheme(activeScheme, true);
         }
 
-        public void CreateMediaPowerScheme(string name, string description = null) =>
-            CreateTypicalPowerScheme(BALANCE_SCHEME_GUID, MEDIA_SCHEME_GUID,
-                name, description);
+        public void CreateTypicalSchemes()
+        {
+            void CreateTypicalSchemesIn()
+            {
+                CreateMediaPowerScheme();
+                CreateStablePowerScheme();
+                CreateSimplePowerScheme();
+            }
 
-        public void CreateSimplePowerScheme(string name, string description = null) =>
+            Watchers.RaiseActionWithoutWatchers(CreateTypicalSchemesIn);
+        }
+
+        public void CreateStablePowerScheme()
+        {
+            CreateTypicalPowerScheme(HIGH_SCHEME_GUID, STABLE_SCHEME_GUID,
+                Language.StableName, Language.StableDescription);
+
+            var settings = new PowerSchemeSettings(STABLE_SCHEME_GUID);
+
+            settings.ApplyDefaultValues();
+        }
+        
+        public void CreateMediaPowerScheme() =>
+            CreateTypicalPowerScheme(BALANCE_SCHEME_GUID, MEDIA_SCHEME_GUID,
+                Language.MediaName, Language.MediaDescription);
+
+        public void CreateSimplePowerScheme() =>
             CreateTypicalPowerScheme(LOW_SCHEME_GUID, SIMPLE_SCHEME_GUID,
-                name, description);
+                Language.SimpleName, Language.SimpleDescription);
 
         private IEnumerable<IPowerScheme> AllPowerSchemes
             => DefaultPowerSchemes.Concat(UserPowerSchemes);
@@ -199,7 +217,7 @@ namespace PowerScheme.Services
             }
             else
             {
-                image = null;
+                image = UNKNOWN_ICON;
             }
 
             return new Model.PowerScheme(guid, isNative, image);
