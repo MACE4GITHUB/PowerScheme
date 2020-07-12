@@ -2,9 +2,12 @@
 
 namespace PowerScheme.Languages
 {
+
     public class Lang
     {
-        public static Lang SetLanguage()
+        public static Lang Language { get; } = GetLanguage();
+
+        public static Lang GetLanguage()
         {
             var currentCulture = CultureInfo.CurrentCulture.Name;
             if (currentCulture == "ru-RU")
@@ -15,13 +18,13 @@ namespace PowerScheme.Languages
             return new Lang();
         }
 
-        public virtual string Exit 
+        public virtual string Exit
             => "Exit";
 
-        public virtual string StartupOnWindows 
+        public virtual string StartupOnWindows
             => "Run automatically at startup in Windows";
 
-        public virtual string RestoreDefaultPowerSchemesName 
+        public virtual string RestoreDefaultPowerSchemesName
             => "Restore default Windows PowerSchemes";
 
         public virtual string RestoreDefaultPowerSchemesDescription
@@ -95,7 +98,7 @@ namespace PowerScheme.Languages
 
         public virtual string ApplicationLatter
             => "This application does not run on the current Windows version. Works on Vista and latter.";
-        
+
         public virtual string FirstStartCaption
             => "First start";
 
