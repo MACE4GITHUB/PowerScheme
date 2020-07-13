@@ -53,14 +53,17 @@ namespace PowerScheme.Services
             var value = GetSettings<int>(RegLidOption(guid));
             return !ExistsSettings(RegLidOption(guid)) ? 1 : value;
         }
-        
+
         public static bool IsFirstStart(string company, string product)
         {
             return !ExistsSettings(RegAppSettings(company, product));
         }
 
-        public static bool IsExistsTypicalPowerScheme(Guid guid)
-            => GetSettings<string>(RegTypicalPowerSchemes(guid)) != null;
+        public static bool ExistsTypicalPowerScheme(Guid guid)
+            => GetSettings<string>(RegPowerSchemes(guid)) != null;
+
+        public static bool ExistsDefaultPowerScheme(Guid guid)
+            => GetSettings<string>(RegPowerSchemes(guid,true)) != null;
 
         private static IEnumerable<string> DefaultPowerSchemes => GetSubKeys(RegDefaultPowerSchemes);
 
@@ -159,11 +162,13 @@ namespace PowerScheme.Services
                 Name = "Description",
             };
 
-        private static RegistryParam RegTypicalPowerSchemes(Guid guid) =>
+        private static RegistryParam RegPowerSchemes(Guid guid, bool isDefault = false) =>
             new RegistryParam()
             {
                 RegistryHive = RegistryHive.LocalMachine,
-                Path = @"SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes",
+                Path = @"SYSTEM\CurrentControlSet\Control\Power\User" +
+                       (isDefault ? @"\Default" : "") +
+                       @"\PowerSchemes",
                 Section = guid.ToString()
             };
 
