@@ -41,11 +41,26 @@
         public override string CreateStableScheme
             => "Создать стабильную схему";
 
+        public override string DeleteStableScheme
+            => "Удалить стабильную схему";
+
         public override string CreateMediaScheme
             => "Создать схему для просмотра фильмов";
 
+        public override string DeleteMediaScheme
+            => "Удалить схему для просмотра фильмов";
+
         public override string CreateSimpleScheme
             => "Создать схему энергосбережения";
+
+        public override string DeleteSimpleScheme
+            => "Удалить схему энергосбережения";
+
+        public override string CreateExtremeScheme
+            => "Создать схему экстремальной производительности";
+
+        public override string DeleteExtremeScheme
+            => "Удалить схему экстремальной производительности";
 
         public override string MediaName
             => "Медиа";
@@ -64,6 +79,12 @@
 
         public override string SimpleDescription
             => "Энергосбережение";
+
+        public override string ExtremeName
+            => "Экстремальная";
+
+        public override string ExtremeDescription
+            => "Максимальная производительность";
 
         public override string ShutDown
             => "Выключить компьютер";
@@ -88,10 +109,11 @@
             => "Первый запуск";
 
         public override string FirstStartDescription
-            => $"Создать типовые схемы электропитания ({StableName}, {MediaName}, {SimpleName})? " +
+            => $"Создать типовые схемы электропитания ({StableName}, {MediaName}, {SimpleName}, {ExtremeName}*)? " +
                $"\n\n {StableName} - схема на основе Высокая производительность.\n Частота постоянная. \n Для повседневных не критических задач." +
                $"\n\n {MediaName} - схема на основе Сбалансированная. \n Частота переменная. \n Для просмотра видео, прослушивания аудио."+
                $"\n\n {SimpleName} - схема на основе Экономия энергии. \n Частота переменная, преимущественно низкая. \n Для просмотра интернет."+
+               $"\n\n {ExtremeName}* - схема на основе Максимальная производительность. \n Частота постоянная максимальная. \n Для игр, обработки видео и т.п. Можно установить только для Windows 10 и выше."+
                $"\n\n При нажатии \"Нет\" типовые схемы можно будет создать позже из меню \"Настройки\".";
 
     }

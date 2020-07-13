@@ -10,7 +10,7 @@ namespace PowerScheme.Languages
         public static Lang GetLanguage()
         {
             var currentCulture = CultureInfo.CurrentCulture.Name;
-            if (currentCulture == "ru-RU")
+            if ((currentCulture == "ru-RU"))
             {
                 return new LangRu();
             }
@@ -57,11 +57,26 @@ namespace PowerScheme.Languages
         public virtual string CreateStableScheme
             => "Create stable scheme";
 
+        public virtual string DeleteStableScheme
+            => "Delete stable scheme";
+
         public virtual string CreateMediaScheme
             => "Create media scheme";
 
+        public virtual string DeleteMediaScheme
+            => "Delete media scheme";
+
         public virtual string CreateSimpleScheme
             => "Create simple scheme";
+
+        public virtual string DeleteSimpleScheme
+            => "Delete simple scheme";
+
+        public virtual string CreateExtremeScheme
+            => "Create extreme scheme";
+        
+        public virtual string DeleteExtremeScheme
+            => "Delete extreme scheme";
 
         public virtual string MediaName
             => "Media";
@@ -80,6 +95,12 @@ namespace PowerScheme.Languages
 
         public virtual string SimpleDescription
             => "Power saver";
+
+        public virtual string ExtremeName
+            => "Extreme";
+
+        public virtual string ExtremeDescription
+            => "Ultimate CPU Speed";
 
         public virtual string ShutDown
             => "Shut down";
@@ -103,6 +124,6 @@ namespace PowerScheme.Languages
             => "First start";
 
         public virtual string FirstStartDescription
-            => $"Create typical power schemes ({StableName}, {MediaName}, {SimpleName})?";
+            => $"Create typical power schemes {StableName}, {MediaName}, {SimpleName}, ({ExtremeName} only Windows 10 and later)?";
     }
 }

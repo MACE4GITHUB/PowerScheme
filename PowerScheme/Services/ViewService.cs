@@ -1,4 +1,6 @@
-﻿namespace PowerScheme.Services
+﻿using System.Linq;
+
+namespace PowerScheme.Services
 {
     using Model;
     using RegistryManager.EventsArgs;
@@ -84,20 +86,7 @@
 
             if (e.Button == MouseButtons.Right)
             {
-                CheckMenu(
-                    _viewModel.ContextRightMenu.Items[STARTUP_ON_WINDOWS_MENU],
-                    RegistryService.IsRunOnStartup);
-
-                if (_power.IsHibernate)
-                    CheckMenu(
-                    _viewModel.ContextRightMenu.Items[SHOW_HIBERNATE_OPTION_MENU],
-                    RegistryService.IsShowHibernateOption);
-
-                CheckMenu(
-                    _viewModel.ContextRightMenu.Items[SHOW_SLEEP_OPTION_MENU],
-                    RegistryService.IsShowSleepOption);
-
-                CheckLid();
+                UpdateContextRightMenu();
             }
 
             var mi = typeof(NotifyIcon).GetMethod(SHOW_CONTEXT_MENU, BindingFlags.Instance | BindingFlags.NonPublic);
@@ -105,9 +94,34 @@
             _viewModel.NotifyIcon.ContextMenuStrip = null;
         }
 
+        private void UpdateContextRightMenu()
+        {
+            CheckMenu(
+                _viewModel.ContextRightMenu.Items[STARTUP_ON_WINDOWS_MENU],
+                RegistryService.IsRunOnStartup);
+
+            if (_power.ExistsHibernate)
+                CheckMenu(
+                    _viewModel.ContextRightMenu.Items[SHOW_HIBERNATE_OPTION_MENU],
+                    RegistryService.IsShowHibernateOption);
+
+            CheckMenu(
+                _viewModel.ContextRightMenu.Items[SHOW_SLEEP_OPTION_MENU],
+                RegistryService.IsShowSleepOption);
+
+            if (_viewModel.ContextRightMenu.Items[SETTINGS_DROP_DOWN_MENU] is ToolStripMenuItem settingsToolStripMenuItem)
+            {
+                settingsToolStripMenuItem.DropDownItems[DELETE_TYPICAL_SCHEMES_MENU].Visible = _power.UserPowerSchemes.Any();
+                settingsToolStripMenuItem.DropDownItems[ADD_TYPICAL_SCHEMES_MENU].Visible = !_power.ExistsAllTypicalScheme;
+                UpdateItemsTypicalScheme();
+            }
+
+            CheckLid();
+        }
+
         private void CheckLid()
         {
-            if (!_power.IsMobilePlatformRole) return;
+            if (!_power.ExistsMobilePlatformRole) return;
 
             var any = _power.ActivePowerScheme.Guid;
             var valueLidOn = RegistryService.GetLidOption(any);
@@ -119,7 +133,7 @@
                 lidStripMenuItem.Image = GetImage(@checked ? RADIO_ON_ICON : RADIO_OFF_ICON);
                 if (@checked) name = lidStripMenuItem.Name;
             }
-            _viewModel.ContextRightMenu.Items[LIDON_DROP_DOWN_MENU].Image = GetImage(_imageLidOn[name]);
+            _viewModel.ContextRightMenu.Items[LIDON_DROP_DOWN_MENU].Image = GetImage(IMAGE_LID_ON[name]);
         }
 
         private void CheckMenu(ToolStripItem item, bool @checked)
