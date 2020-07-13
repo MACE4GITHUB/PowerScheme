@@ -1,39 +1,41 @@
-﻿using static PowerScheme.Languages.Lang;
-
-namespace PowerScheme.Services
+﻿namespace PowerScheme.Services
 {
-    using PowerManagerAPI;
     using EventsArgs;
     using Model;
+    using PowerManagerAPI;
     using Settings;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using static Languages.Lang;
 
     public class PowerSchemeService : IPowerSchemeService
     {
         private static readonly Guid HIGH_SCHEME_GUID = new Guid("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
         private static readonly Guid BALANCE_SCHEME_GUID = new Guid("381b4222-f694-41f0-9685-ff5bb260df2e");
         private static readonly Guid LOW_SCHEME_GUID = new Guid("a1841308-3541-4fab-bc81-f71556f20b4a");
+        private static readonly Guid ULTIMATE_SCHEME_GUID = new Guid("e9a42b02-d5df-448d-aa00-03f14749eb61");
 
         private static readonly Guid STABLE_SCHEME_GUID = new Guid("fa0cd8f1-1300-4710-820b-00e8e75f31f8");
         private static readonly Guid MEDIA_SCHEME_GUID = new Guid("fcab38a3-7e4c-4a75-8483-f522befb9c58");
         private static readonly Guid SIMPLE_SCHEME_GUID = new Guid("fa8d915c-65de-4bba-9569-3c2e77ea68b6");
+        private static readonly Guid EXTREME_SCHEME_GUID = new Guid("f384acfa-ed71-4607-bf8e-747d56402f0c");
 
         private const string UNKNOWN_ICON = "Unknown";
 
-        private static readonly Dictionary<Guid, string> _nativesGuid = new Dictionary<Guid, string>
+        private static readonly Dictionary<Guid, string> NATIVES_GUID = new Dictionary<Guid, string>
         {
             {HIGH_SCHEME_GUID, "High"},
             {BALANCE_SCHEME_GUID, "Balance"},
             {LOW_SCHEME_GUID, "Low"}
         };
 
-        private static readonly Dictionary<Guid, string> _typicalGuid = new Dictionary<Guid, string>
+        private static readonly Dictionary<Guid, string> TYPICAL_GUID = new Dictionary<Guid, string>
         {
             {STABLE_SCHEME_GUID, "Stable"},
             {MEDIA_SCHEME_GUID, "Media"},
-            {SIMPLE_SCHEME_GUID, "Simple"}
+            {SIMPLE_SCHEME_GUID, "Simple"},
+            {EXTREME_SCHEME_GUID, "Extreme"}
         };
 
         public PowerSchemeService()
@@ -42,13 +44,10 @@ namespace PowerScheme.Services
         }
 
         public IEnumerable<IPowerScheme> DefaultPowerSchemes
-            => _nativesGuid.Keys.Select(NewPowerScheme);
+            => NATIVES_GUID.Keys.Select(NewPowerScheme);
 
         public IEnumerable<IPowerScheme> UserPowerSchemes
             => RegistryService.UserPowerSchemes.Select(g => NewPowerScheme(Guid.Parse(g)));
-
-        public IPowerScheme FirstAnyPowerScheme
-            => AllPowerSchemes.FirstOrDefault();
 
         private IEnumerable<IPowerScheme> PowerSchemes
         => DefaultPowerSchemes.Union(UserPowerSchemes);
@@ -100,19 +99,22 @@ namespace PowerScheme.Services
         public void RestoreDefaultPowerSchemes()
             => Watchers.RaiseActionWithoutWatchers(PowerManager.RestoreDefaultPlans);
 
-        public bool IsMobilePlatformRole
+        public bool CanCreateExtremePowerScheme
+            => RegistryService.ExistsDefaultPowerScheme(ULTIMATE_SCHEME_GUID);
+
+        public bool ExistsMobilePlatformRole
             => PowerManager.IsMobilePlatformRole();
 
-        public bool IsHibernate
+        public bool ExistsHibernate
             => PowerManager.IsHibernate();
 
-        public bool IsSleep
+        public bool ExistsSleep
             => PowerManager.IsSleep();
 
-        public void DeleteTypicalScheme()
+        public void DeleteAllTypicalScheme()
         {
             var activeGuid = ActivePowerScheme.Guid;
-            foreach (var guid in _typicalGuid.Keys.Where(RegistryService.IsExistsTypicalPowerScheme))
+            foreach (var guid in TYPICAL_GUID.Keys.Where(RegistryService.ExistsTypicalPowerScheme))
             {
                 if (guid == activeGuid)
                 {
@@ -121,6 +123,24 @@ namespace PowerScheme.Services
                 PowerManager.DeletePlan(guid);
             }
         }
+
+        public bool ExistsAllTypicalScheme =>
+            !TYPICAL_GUID.Keys.Select(s => s.ToString())
+                .Except(RegistryService.UserPowerSchemes).Any();
+
+        public void DeleteTypicalScheme(Guid guid)
+        {
+            if (!ExistsTypicalPowerScheme(guid)) return;
+
+            var activeGuid = ActivePowerScheme.Guid;
+
+            if (guid == activeGuid)
+            {
+                SetActivePowerScheme(BALANCE_SCHEME_GUID);
+            }
+            PowerManager.DeletePlan(guid);
+        }
+
         public void SetLid(int value)
         {
             var activeScheme = ActivePowerScheme;
@@ -144,6 +164,8 @@ namespace PowerScheme.Services
                 CreateMediaPowerScheme();
                 CreateStablePowerScheme();
                 CreateSimplePowerScheme();
+                CreateExtremePowerScheme();
+                SetActivePowerScheme(STABLE_SCHEME_GUID);
             }
 
             Watchers.RaiseActionWithoutWatchers(CreateTypicalSchemesIn);
@@ -158,21 +180,52 @@ namespace PowerScheme.Services
 
             settings.ApplyDefaultValues();
         }
-        
+
+        public void DeleteStablePowerScheme()
+            => DeleteTypicalScheme(STABLE_SCHEME_GUID);
+
         public void CreateMediaPowerScheme() =>
             CreateTypicalPowerScheme(BALANCE_SCHEME_GUID, MEDIA_SCHEME_GUID,
                 Language.MediaName, Language.MediaDescription);
 
+        public void DeleteMediaPowerScheme()
+            => DeleteTypicalScheme(MEDIA_SCHEME_GUID);
+
         public void CreateSimplePowerScheme() =>
             CreateTypicalPowerScheme(LOW_SCHEME_GUID, SIMPLE_SCHEME_GUID,
                 Language.SimpleName, Language.SimpleDescription);
+
+        public void DeleteSimplePowerScheme()
+            => DeleteTypicalScheme(SIMPLE_SCHEME_GUID);
+
+        public void CreateExtremePowerScheme()
+        {
+            if (CanCreateExtremePowerScheme)
+                CreateTypicalPowerScheme(ULTIMATE_SCHEME_GUID, EXTREME_SCHEME_GUID,
+                    Language.ExtremeName, Language.ExtremeDescription);
+        }
+
+        public bool ExistsStablePowerScheme
+            => ExistsTypicalPowerScheme(STABLE_SCHEME_GUID);
+
+        public bool ExistsMediaPowerScheme
+            => ExistsTypicalPowerScheme(MEDIA_SCHEME_GUID);
+
+        public bool ExistsSimplePowerScheme
+            => ExistsTypicalPowerScheme(SIMPLE_SCHEME_GUID);
+
+        public bool ExistsExtremePowerScheme
+            => ExistsTypicalPowerScheme(EXTREME_SCHEME_GUID);
+
+        public void DeleteExtremePowerScheme()
+            => DeleteTypicalScheme(EXTREME_SCHEME_GUID);
 
         private IEnumerable<IPowerScheme> AllPowerSchemes
             => DefaultPowerSchemes.Concat(UserPowerSchemes);
 
         private void CreateTypicalPowerScheme(Guid source, Guid destination, string name, string description = null)
         {
-            var isExistsTypicalPowerScheme = IsExistsTypicalPowerScheme(destination);
+            var isExistsTypicalPowerScheme = ExistsTypicalPowerScheme(destination);
             if (isExistsTypicalPowerScheme) return;
             PowerManager.DuplicatePlan(source, destination);
 
@@ -182,8 +235,8 @@ namespace PowerScheme.Services
             PowerManager.SetPlanDescription(destination, description);
         }
 
-        private static bool IsExistsTypicalPowerScheme(Guid guid)
-            => RegistryService.IsExistsTypicalPowerScheme(guid);
+        private static bool ExistsTypicalPowerScheme(Guid guid)
+            => RegistryService.ExistsTypicalPowerScheme(guid);
 
         public Watchers Watchers { get; } = new Watchers();
 
@@ -195,10 +248,10 @@ namespace PowerScheme.Services
         }
 
         private bool ContainsNative(Guid guid) =>
-            _nativesGuid.Keys.Contains(guid);
+            NATIVES_GUID.Keys.Contains(guid);
 
         private bool ContainsTypical(Guid guid) =>
-            _typicalGuid.Keys.Contains(guid);
+            TYPICAL_GUID.Keys.Contains(guid);
 
         private Model.PowerScheme NewPowerScheme(Guid guid)
         {
@@ -209,11 +262,11 @@ namespace PowerScheme.Services
 
             if (isNative)
             {
-                image = _nativesGuid[guid];
+                image = NATIVES_GUID[guid];
             }
             else if (isTypical)
             {
-                image = _typicalGuid[guid];
+                image = TYPICAL_GUID[guid];
             }
             else
             {

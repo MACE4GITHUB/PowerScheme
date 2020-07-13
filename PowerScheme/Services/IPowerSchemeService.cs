@@ -11,8 +11,6 @@ namespace PowerScheme.Services
         IEnumerable<IPowerScheme> DefaultPowerSchemes { get; }
         IEnumerable<IPowerScheme> UserPowerSchemes { get; }
 
-        IPowerScheme FirstAnyPowerScheme { get; }
-
         Watchers Watchers { get; }
 
         /// <summary>
@@ -24,23 +22,41 @@ namespace PowerScheme.Services
 
         bool IsNeedAdminAccessForChangePowerScheme { get; }
 
-        bool IsMobilePlatformRole { get; }
+        bool ExistsMobilePlatformRole { get; }
 
-        bool IsHibernate { get; }
+        bool ExistsHibernate { get; }
 
-        bool IsSleep { get; }
+        bool ExistsSleep { get; }
+
+        bool CanCreateExtremePowerScheme { get; }
+
+        bool ExistsStablePowerScheme { get; }
+        bool ExistsMediaPowerScheme { get; }
+        bool ExistsSimplePowerScheme { get; }
+        bool ExistsExtremePowerScheme { get; }
+        bool ExistsAllTypicalScheme { get; }
 
         void RestoreDefaultPowerSchemes();
 
-        void DeleteTypicalScheme();
+        void DeleteAllTypicalScheme();
 
         void CreateTypicalSchemes();
 
         void CreateStablePowerScheme();
 
+        void DeleteStablePowerScheme();
+
         void CreateMediaPowerScheme();
 
+        void DeleteMediaPowerScheme();
+
         void CreateSimplePowerScheme();
+
+        void DeleteSimplePowerScheme();
+
+        void CreateExtremePowerScheme();
+
+        void DeleteExtremePowerScheme();
 
         void SetLid(int value);
 
