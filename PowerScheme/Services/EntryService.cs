@@ -43,13 +43,13 @@ namespace PowerScheme.Services
             ValidateFirstStart();
         }
 
-        public bool IsValidateOs { get; set; } = true;
+        private bool IsValidateOs { get; set; } = true;
 
-        public bool IsValidateOnceApplication { get; set; } = true;
+        private bool IsValidateOnceApplication { get; set; } = true;
 
-        public bool IsValidateFirstStart { get; set; } = true;
+        private bool IsValidateFirstStart { get; set; } = true;
 
-        public bool IsValidateAdmin { get; set; } = true;
+        private bool IsValidateAdmin { get; set; } = true;
 
         public Mutex Mutex { get; private set; }
 
