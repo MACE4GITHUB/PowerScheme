@@ -13,39 +13,23 @@ namespace PowerSchemeServiceAPI.Model
         /// </summary>
         /// <param name="guid"></param>
         /// <param name="isNative"></param>
-        /// <param name="image"></param>
-        public PowerScheme(Guid guid, bool isNative, string image)
+        /// <param name="pictureName"></param>
+        public PowerScheme(Guid guid, bool isNative, string pictureName)
         {
             Guid = guid;
             IsNative = isNative;
-            Image = image;
+            PictureName = pictureName;
         }
 
         /// <summary>
         /// Gets or sets PowerScheme Name
         /// </summary>
-        public string Name
-        {
-            get => PowerManager.GetPlanName(Guid);
-            set
-            {
-                if (IsNative) return;
-                //
-            }
-        }
+        public string Name => PowerManager.GetPlanName(Guid);
 
         /// <summary>
         /// Gets or sets PowerScheme Description
         /// </summary>
-        public string Description
-        {
-            get => PowerManager.GetPlanDescription(Guid);
-            set
-            {
-                if (IsNative) return;
-                //
-            }
-        }
+        public string Description => PowerManager.GetPlanDescription(Guid);
 
         /// <summary>
         /// Gets true if PowerScheme is native (High, Balance, Low), otherwise false
@@ -55,14 +39,7 @@ namespace PowerSchemeServiceAPI.Model
         /// <summary>
         /// Gets true if PowerScheme is active, otherwise false
         /// </summary>
-        public bool IsActive
-        {
-            get => PowerManager.GetActivePlan() == Guid;
-            set
-            {
-                //
-            }
-        }
+        public bool IsActive => PowerManager.GetActivePlan() == Guid;
 
         /// <summary>
         /// Gets PowerScheme Guid 
@@ -70,8 +47,8 @@ namespace PowerSchemeServiceAPI.Model
         public Guid Guid { get; }
 
         /// <summary>
-        /// Gets or sets PowerScheme Image
+        /// Gets or sets PowerScheme PictureName
         /// </summary>
-        public string Image { get; set; }
+        public string PictureName { get; set; }
     }
 }

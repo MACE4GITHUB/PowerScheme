@@ -7,12 +7,12 @@ namespace PowerSchemeServiceAPI.Model
         /// <summary>
         /// Gets or sets PowerScheme Name
         /// </summary>
-        string Name { get; set; }
+        string Name { get; }
 
         /// <summary>
         /// Gets or sets PowerScheme Description
         /// </summary>
-        string Description { get; set; }
+        string Description { get; }
 
         /// <summary>
         /// Gets true if PowerScheme is native (High, Balance, Low), otherwise false
@@ -22,7 +22,7 @@ namespace PowerSchemeServiceAPI.Model
         /// <summary>
         /// Gets true if PowerScheme is active, otherwise false
         /// </summary>
-        bool IsActive { get; set; }
+        bool IsActive { get; }
 
         /// <summary>
         /// Gets PowerScheme Guid 
@@ -30,8 +30,8 @@ namespace PowerSchemeServiceAPI.Model
         Guid Guid { get; }
 
         /// <summary>
-        /// Gets or sets PowerScheme Image
+        /// Gets or sets PowerScheme PictureName
         /// </summary>
-        string Image { get; set; }
+        string PictureName { get; set; }
     }
 }
