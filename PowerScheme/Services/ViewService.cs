@@ -4,14 +4,13 @@
     using PowerSchemeServiceAPI;
     using RegistryManager;
     using RegistryManager.EventsArgs;
-    using System;
     using System.Drawing;
     using System.Linq;
     using System.Reflection;
     using System.Windows.Forms;
     using static Utility.TrayIcon;
 
-    public partial class ViewService : IViewService, IDisposable
+    public partial class ViewService : IViewService
     {
         private const string SHOW_CONTEXT_MENU = "ShowContextMenu";
         private const string CHECK_ICON = "Check";
@@ -50,6 +49,8 @@
             _viewModel.NotifyIcon.MouseClick -= NotifyIcon_MouseClick;
 
             _power.Watchers.Stop();
+            UnsubscribeFromContextLeftMenu();
+            UnsubscribeFromContextRightMenu();
         }
 
         private void ChangedActivePowerScheme(object sender, RegistryChangedEventArgs e)
@@ -60,7 +61,7 @@
         private void UpdateIcon()
         {
             var activePowerScheme = _power.ActivePowerScheme;
-            var image = activePowerScheme.Image;
+            var image = activePowerScheme.PictureName;
             var icon = GetIcon(image);
 
             _viewModel.NotifyIcon.Icon = icon;
@@ -147,31 +148,5 @@
         {
             return @checked ? GetImage(CHECK_ICON) : null;
         }
-
-        #region IDisposable Support
-        private bool disposedValue = false;
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposedValue) { return; }
-            if (disposing)
-            {
-                Stop();
-                UnsubscribeFromContextLeftMenu();
-                UnsubscribeFromContextRightMenu();
-            }
-
-            disposedValue = true;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-
-            //No destructor so isn't required (yet)            
-            // GC.SuppressFinalize(this); 
-        }
-
-        #endregion
     }
 }
