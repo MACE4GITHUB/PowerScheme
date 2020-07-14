@@ -84,10 +84,12 @@ namespace RunAs.Common.Utils
             //   throw new SecurityException("Already have administrator privileges.");
 
 
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.UseShellExecute = true;
-            startInfo.FileName = path;
-            startInfo.WindowStyle = windowStyle;
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                UseShellExecute = true, 
+                FileName = path, 
+                WindowStyle = windowStyle
+            };
 
             // only do this for Vista+ since xp has an older runas dialog
             // also, runas set to false will assume that the application has a manifest and so we don't need this
