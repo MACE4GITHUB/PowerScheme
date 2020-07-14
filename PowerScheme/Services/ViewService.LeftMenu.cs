@@ -1,8 +1,8 @@
-﻿using PowerScheme.Model;
+﻿using PowerScheme.Utility;
+using PowerSchemeServiceAPI.Model;
 using System;
 using System.Linq;
 using System.Windows.Forms;
-using PowerScheme.Utility;
 using static PowerScheme.Utility.TrayIcon;
 
 namespace PowerScheme.Services

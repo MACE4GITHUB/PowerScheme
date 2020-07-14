@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Resources;
+using Common;
 using RunAs.Common.Utils;
 
 namespace RunAs.Common.Services

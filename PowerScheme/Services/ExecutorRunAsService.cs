@@ -1,9 +1,7 @@
-﻿using PowerScheme.Properties;
+﻿using Common;
+using PowerScheme.Properties;
 using RunAs.Common.Services;
 using System;
-using System.Diagnostics;
-using System.IO;
-using PowerScheme.Utility;
 
 namespace PowerScheme.Services
 {

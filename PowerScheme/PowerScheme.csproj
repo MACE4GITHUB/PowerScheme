@@ -79,15 +79,9 @@
   <ItemGroup>
     <Compile Include="Configuration\ApplicationModule.cs" />
     <Compile Include="Configuration\CompositionRoot.cs" />
-    <Compile Include="EventsArgs\PowerSchemeEventArgs.cs" />
-    <Compile Include="Languages\Lang.cs" />
-    <Compile Include="Languages\LangRu.cs" />
     <Compile Include="Model\AppInfo.cs" />
-    <Compile Include="Model\IPowerScheme.cs" />
     <Compile Include="Model\IViewModel.cs" />
     <Compile Include="Model\ViewModel.cs" />
-    <Compile Include="Model\Watchers.cs" />
-    <Compile Include="Model\PowerScheme.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -97,29 +91,12 @@
     </Compile>
     <Compile Include="Services\EntryService.cs" />
     <Compile Include="Services\ExecutorRunAsService.cs" />
-    <Compile Include="Services\ExecutorRegistryService.cs" />
     <Compile Include="Services\IViewService.cs" />
     <Compile Include="Services\ViewService.LeftMenu.cs" />
     <Compile Include="Services\ViewService.RightMenu.cs" />
-    <Compile Include="Settings\BaseMinMaxPowerSchemeValues.cs" />
-    <Compile Include="Settings\IApplicable.cs" />
-    <Compile Include="Settings\PowerSchemeDCACValues.cs" />
-    <Compile Include="Settings\PowerSchemeLid.cs" />
-    <Compile Include="Settings\PowerSchemeWiFi.cs" />
-    <Compile Include="Settings\PowerSchemeValues.cs" />
-    <Compile Include="Settings\BaseStatePowerSchemeValues.cs" />
-    <Compile Include="Settings\PowerSchemeProcessorThrottle.cs" />
-    <Compile Include="Settings\PowerSchemeSettings.cs" />
-    <Compile Include="Settings\PowerSchemeTurnOffDisplay.cs" />
-    <Compile Include="Settings\PowerSchemeSleep.cs" />
     <Compile Include="Utility\Image.cs" />
-    <Compile Include="Services\IPowerSchemeService.cs" />
-    <Compile Include="Services\PowerSchemeService.cs" />
-    <Compile Include="Services\RegistryService.cs" />
     <Compile Include="Services\ViewService.cs" />
     <Compile Include="Utility\Invoker.cs" />
-    <Compile Include="Utility\Paths.cs" />
-    <Compile Include="Utility\Strings.cs" />
     <Compile Include="Utility\TrayIcon.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
@@ -167,13 +144,25 @@
     <Content Include="Start.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{220D6BE3-3CE1-4683-8980-7C25D5F77BB3}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FormAutoClose\FormAutoClose.csproj">
       <Project>{9B901C5D-1720-42C0-ADBD-C58F19B47248}</Project>
       <Name>FormAutoClose</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Languages\Languages.csproj">
+      <Project>{FC9D0998-254A-46A3-AC5B-317F80150175}</Project>
+      <Name>Languages</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PowerManagerAPI\PowerManagerAPI.csproj">
       <Project>{11d90b11-3c6e-4c27-ac3e-f4a84b992628}</Project>
       <Name>PowerManagerAPI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PowerSchemeServiceAPI\PowerSchemeServiceAPI.csproj">
+      <Project>{8FF837D7-65A5-4404-B1D6-C98AD12FB627}</Project>
+      <Name>PowerSchemeServiceAPI</Name>
     </ProjectReference>
     <ProjectReference Include="..\RegistryManager\RegistryManager.csproj">
       <Project>{0BA349FF-9FBB-45F8-87FC-9423CB283F33}</Project>
@@ -187,6 +176,6 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"%ILMerge%" /internalize /ndebug /copyattrs /targetplatform:4.0,"C:\Windows\Microsoft.NET\Framework64\v4.0.30319" /out:"$(TargetDir)Merge\PowerScheme.exe" $(TargetPath) "$(TargetDir)FormAutoClose.dll" "$(TargetDir)PowerManagerAPI.dll" "$(TargetDir)RegistryManager.dll" "$(TargetDir)RunAs.Common.dll" "$(TargetDir)Ninject.dll"</PostBuildEvent>
+    <PostBuildEvent>"%ILMerge%" /internalize /ndebug /copyattrs /targetplatform:4.0,"C:\Windows\Microsoft.NET\Framework64\v4.0.30319" /out:"$(TargetDir)Merge\PowerScheme.exe" $(TargetPath) "$(TargetDir)FormAutoClose.dll" "$(TargetDir)PowerManagerAPI.dll" "$(TargetDir)RegistryManager.dll" "$(TargetDir)RunAs.Common.dll" "$(TargetDir)Ninject.dll" "$(TargetDir)Common.dll" "$(TargetDir)Languages.dll" "$(TargetDir)PowerSchemeServiceAPI.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

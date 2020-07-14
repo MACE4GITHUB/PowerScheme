@@ -1,6 +1,7 @@
 ﻿using Ninject.Modules;
 using PowerScheme.Model;
 using PowerScheme.Services;
+using PowerSchemeServiceAPI;
 
 namespace PowerScheme.Configuration
 {

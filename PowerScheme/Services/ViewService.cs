@@ -1,11 +1,12 @@
-﻿using System.Linq;
-
-namespace PowerScheme.Services
+﻿namespace PowerScheme.Services
 {
     using Model;
+    using PowerSchemeServiceAPI;
+    using RegistryManager;
     using RegistryManager.EventsArgs;
     using System;
     using System.Drawing;
+    using System.Linq;
     using System.Reflection;
     using System.Windows.Forms;
     using static Utility.TrayIcon;

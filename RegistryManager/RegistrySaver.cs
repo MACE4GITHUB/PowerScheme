@@ -1,6 +1,7 @@
 ﻿using RegistryManager.Model;
 using System;
 using System.IO;
+using Common;
 
 namespace RegistryManager
 {

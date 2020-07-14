@@ -1,10 +1,12 @@
-﻿using PowerScheme.Utility;
+﻿using PowerScheme.Properties;
+using PowerScheme.Utility;
+using RegistryManager;
 using RunAs.Common.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using static PowerScheme.Languages.Lang;
+using Languages;
 using static PowerScheme.Utility.TrayIcon;
 
 namespace PowerScheme.Services
@@ -86,14 +88,14 @@ namespace PowerScheme.Services
             var itemDropDownSetting = new ToolStripMenuItem()
             {
                 Name = SETTINGS_DROP_DOWN_MENU,
-                Text = Language.Settings
+                Text = Language.Current.Settings
             };
 
             #region CplSchemeWindows
             var itemCplScheme = new ToolStripMenuItem()
             {
                 Name = CPL_SCHEME_WINDOWS_MENU,
-                Text = Language.PowerOptions,
+                Text = Language.Current.PowerOptions,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit,
                 Image = GetImage(CPL_WINDOWS_ICON)
             };
@@ -106,8 +108,8 @@ namespace PowerScheme.Services
             var itemRestore = new ToolStripMenuItem()
             {
                 Name = RESTORE_DEFAULT_POWER_SCHEMES_MENU,
-                Text = Language.RestoreDefaultPowerSchemesName,
-                ToolTipText = Language.RestoreDefaultPowerSchemesDescription,
+                Text = Language.Current.RestoreDefaultPowerSchemesName,
+                ToolTipText = Language.Current.RestoreDefaultPowerSchemesDescription,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit,
                 Image = GetImage(RESTORE_ICON)
             };
@@ -122,7 +124,7 @@ namespace PowerScheme.Services
             var itemTypicalSchemes = new ToolStripMenuItem()
             {
                 Name = ADD_TYPICAL_SCHEMES_MENU,
-                Text = Language.CreateTypicalSchemes,
+                Text = Language.Current.CreateTypicalSchemes,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit,
                 Image = GetImage(ADD_ICON)
             };
@@ -136,7 +138,7 @@ namespace PowerScheme.Services
             var itemDeleteTypicalSchemes = new ToolStripMenuItem()
             {
                 Name = DELETE_TYPICAL_SCHEMES_MENU,
-                Text = Language.DeleteTypicalSchemes,
+                Text = Language.Current.DeleteTypicalSchemes,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit,
                 Image = GetImage(DELETE_ICON)
             };
@@ -206,7 +208,7 @@ namespace PowerScheme.Services
             var item = new ToolStripMenuItem
             {
                 Name = STARTUP_ON_WINDOWS_MENU,
-                Text = Language.StartupOnWindows
+                Text = Language.Current.StartupOnWindows
             };
 
             item.Click += StartWithWindowsOnClick;
@@ -218,8 +220,8 @@ namespace PowerScheme.Services
             var item = new ToolStripMenuItem
             {
                 Name = SHOW_HIBERNATE_OPTION_MENU,
-                Text = Language.Hibernate,
-                ToolTipText = Language.HibernateDescription
+                Text = Language.Current.Hibernate,
+                ToolTipText = Language.Current.HibernateDescription
             };
 
             item.Click += HibernateOnClick;
@@ -231,8 +233,8 @@ namespace PowerScheme.Services
             var item = new ToolStripMenuItem
             {
                 Name = SHOW_SLEEP_OPTION_MENU,
-                Text = Language.Sleep,
-                ToolTipText = Language.SleepDescription
+                Text = Language.Current.Sleep,
+                ToolTipText = Language.Current.SleepDescription
             };
 
             item.Click += SleepOnClick;
@@ -244,7 +246,7 @@ namespace PowerScheme.Services
             var item = new ToolStripMenuItem
             {
                 Name = EXIT_MENU,
-                Text = Language.Exit
+                Text = Language.Current.Exit
             };
 
             item.Click += ExitOnClick;
@@ -259,7 +261,7 @@ namespace PowerScheme.Services
             var item = new ToolStripMenuItem
             {
                 Name = LIDON_DROP_DOWN_MENU,
-                Text = Language.WhenICloseTheLid
+                Text = Language.Current.WhenICloseTheLid
             };
             var itemsDropDown = item.DropDownItems;
 
@@ -267,7 +269,7 @@ namespace PowerScheme.Services
             {
                 Name = LID_NOTHING_MENU,
                 Tag = 0,
-                Text = Language.DoNothing,
+                Text = Language.Current.DoNothing,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit
             };
             lidItem.Click += LidOnClick;
@@ -277,7 +279,7 @@ namespace PowerScheme.Services
             {
                 Name = LID_SLEEP_MENU,
                 Tag = 1,
-                Text = Language.Sleep,
+                Text = Language.Current.Sleep,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit
             };
             lidItem.Click += LidOnClick;
@@ -287,7 +289,7 @@ namespace PowerScheme.Services
             {
                 Name = LID_HIBERNATE_MENU,
                 Tag = 2,
-                Text = Language.Hibernate,
+                Text = Language.Current.Hibernate,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit
             };
             lidItem.Click += LidOnClick;
@@ -297,7 +299,7 @@ namespace PowerScheme.Services
             {
                 Name = LID_SHUTDOWN_MENU,
                 Tag = 3,
-                Text = Language.ShutDown,
+                Text = Language.Current.ShutDown,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit
             };
             lidItem.Click += LidOnClick;
@@ -336,25 +338,25 @@ namespace PowerScheme.Services
 
             var existScheme = _power.ExistsStablePowerScheme;
             settingsToolStripMenuItem.DropDownItems[ACTION_STABLE_TYPICAL_SCHEME_MENU].Text =
-                existScheme ? Language.DeleteStableScheme : Language.CreateStableScheme;
+                existScheme ? Language.Current.DeleteStableScheme : Language.Current.CreateStableScheme;
             settingsToolStripMenuItem.DropDownItems[ACTION_STABLE_TYPICAL_SCHEME_MENU].Tag =
                 existScheme ? 0 : 1;
 
             existScheme = _power.ExistsMediaPowerScheme;
             settingsToolStripMenuItem.DropDownItems[ACTION_MEDIA_TYPICAL_SCHEME_MENU].Text =
-                existScheme ? Language.DeleteMediaScheme : Language.CreateMediaScheme;
+                existScheme ? Language.Current.DeleteMediaScheme : Language.Current.CreateMediaScheme;
             settingsToolStripMenuItem.DropDownItems[ACTION_MEDIA_TYPICAL_SCHEME_MENU].Tag =
                 existScheme ? 0 : 1;
 
             existScheme = _power.ExistsSimplePowerScheme;
             settingsToolStripMenuItem.DropDownItems[ACTION_SIMPLE_TYPICAL_SCHEME_MENU].Text =
-                existScheme ? Language.DeleteSimpleScheme : Language.CreateSimpleScheme;
+                existScheme ? Language.Current.DeleteSimpleScheme : Language.Current.CreateSimpleScheme;
             settingsToolStripMenuItem.DropDownItems[ACTION_SIMPLE_TYPICAL_SCHEME_MENU].Tag =
                 existScheme ? 0 : 1;
 
             existScheme = _power.ExistsExtremePowerScheme;
             settingsToolStripMenuItem.DropDownItems[ACTION_EXTREME_TYPICAL_SCHEME_MENU].Text =
-                existScheme ? Language.DeleteExtremeScheme : Language.CreateExtremeScheme;
+                existScheme ? Language.Current.DeleteExtremeScheme : Language.Current.CreateExtremeScheme;
             settingsToolStripMenuItem.DropDownItems[ACTION_SIMPLE_TYPICAL_SCHEME_MENU].Tag =
                 existScheme ? 0 : 1;
         }
@@ -447,7 +449,7 @@ namespace PowerScheme.Services
             if (!GetCheckedOption(sender, out var isChecked)) return;
 
             var value = isChecked ? 1 : 0;
-            RegistryService.SetSleepOption(value);
+            RegistryService.SetSleepOption(Resources.ResourceManager, value);
         }
 
         private void HibernateOnClick(object sender, EventArgs e)
@@ -455,7 +457,7 @@ namespace PowerScheme.Services
             if (!GetCheckedOption(sender, out var isChecked)) return;
 
             var value = isChecked ? 1 : 0;
-            RegistryService.SetHibernateOption(value);
+            RegistryService.SetHibernateOption(Resources.ResourceManager, value);
         }
 
         private static bool GetCheckedOption(object sender, out bool isChecked)

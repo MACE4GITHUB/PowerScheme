@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.ComponentModel;
+using Common;
 
 namespace RegistryManager.Model
 {

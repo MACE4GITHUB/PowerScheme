@@ -1,6 +1,10 @@
-﻿namespace PowerScheme.Services
+﻿using PowerSchemeServiceAPI;
+using RegistryManager;
+
+namespace PowerScheme.Services
 {
     using FormAutoClose;
+    using Languages;
     using Model;
     using Ninject;
     using RunAs;
@@ -9,7 +13,6 @@
     using System.Runtime.InteropServices;
     using System.Threading;
     using System.Windows.Forms;
-    using static Languages.Lang;
 
     public class EntryService : IDisposable
     {
@@ -85,7 +88,7 @@
             if (!IsValidateOs) return;
             if (IsValidOs) return;
 
-            IFormAutoClose formAutoClose = new MessageBoxAutoClose(Language.ApplicationLatter, Language.Error, 15);
+            IFormAutoClose formAutoClose = new MessageBoxAutoClose(Language.Current.ApplicationLatter, Language.Current.Error, 15);
             formAutoClose.Show();
 
             Environment.Exit(-2);
@@ -97,7 +100,7 @@
 
         private void ShowFirstStartDialog()
         {
-            var result = MessageBox.Show(Language.FirstStartDescription, Language.FirstStartCaption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show(Language.Current.FirstStartDescription, Language.Current.FirstStartCaption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result != DialogResult.Yes) return;
             Power.CreateTypicalSchemes();
         }
@@ -123,7 +126,7 @@
             }
             else
             {
-                IFormAutoClose formAutoClose = new MessageBoxAutoClose(Language.AlreadyRunning, Language.Error, 5);
+                IFormAutoClose formAutoClose = new MessageBoxAutoClose(Language.Current.AlreadyRunning, Language.Current.Error, 5);
                 formAutoClose.Show();
 
                 Environment.Exit(-1);
