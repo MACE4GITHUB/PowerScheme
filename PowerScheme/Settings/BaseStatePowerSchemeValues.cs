@@ -5,19 +5,17 @@ namespace PowerScheme.Settings
 {
     public abstract class BaseStatePowerSchemeValues: IApplicable
     {
-        public BaseStatePowerSchemeValues(Guid powerSchemeGuid)
+        protected BaseStatePowerSchemeValues(Guid powerSchemeGuid)
         {
             PowerSchemeGuid = powerSchemeGuid;
         }
 
-        //public virtual PowerSchemeValues defaultDCACValues { get; }
-        public virtual PowerSchemeValues State { get; }
+        protected virtual PowerSchemeValues State { get; }
 
-        public virtual SettingSubgroup SettingSubgroup { get; }
+        protected virtual SettingSubgroup SettingSubgroup { get; }
 
         public Guid PowerSchemeGuid { get; }
-
-
+        
         public void ApplyValues()
         {
             ApplyDCStateValues();

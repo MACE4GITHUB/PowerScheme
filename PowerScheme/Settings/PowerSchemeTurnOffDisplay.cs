@@ -12,10 +12,10 @@ namespace PowerScheme.Settings
             _DCACValues = DCACValues;
         }
 
-        public override SettingSubgroup SettingSubgroup
+        protected override SettingSubgroup SettingSubgroup
             => SettingSubgroup.VIDEO_SUBGROUP;
 
-        public override PowerSchemeValues State
+        protected override PowerSchemeValues State
             => new PowerSchemeValues(Setting.VIDEOIDLE, _DCACValues.DCSettings, _DCACValues.ACSettings);
     }
 }

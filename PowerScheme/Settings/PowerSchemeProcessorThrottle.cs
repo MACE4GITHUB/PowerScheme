@@ -1,6 +1,5 @@
-﻿using System;
-using PowerManagerAPI;
-using PowerScheme.Services;
+﻿using PowerManagerAPI;
+using System;
 
 namespace PowerScheme.Settings
 {
@@ -16,13 +15,13 @@ namespace PowerScheme.Settings
             _maxState = maxState;
         }
 
-        public override PowerSchemeValues MinState
-            => new PowerSchemeValues(Setting.PROCTHROTTLEMIN, _minState.DCSettings, _minState.ACSettings);  // 5/80
+        protected override PowerSchemeValues MinState
+            => new PowerSchemeValues(Setting.PROCTHROTTLEMIN, _minState.DCSettings, _minState.ACSettings);  
 
-        public override PowerSchemeValues MaxState
-            => new PowerSchemeValues(Setting.PROCTHROTTLEMAX, _maxState.DCSettings, _maxState.ACSettings); // 60/80
+        protected override PowerSchemeValues MaxState
+            => new PowerSchemeValues(Setting.PROCTHROTTLEMAX, _maxState.DCSettings, _maxState.ACSettings); 
 
-        public override SettingSubgroup SettingSubgroup
+        protected override SettingSubgroup SettingSubgroup
             => SettingSubgroup.PROCESSOR_SETTINGS_SUBGROUP;
     }
 }

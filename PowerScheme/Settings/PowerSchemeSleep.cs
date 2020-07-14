@@ -12,13 +12,13 @@ namespace PowerScheme.Settings
             _DCACValues = DCACValues;
         }
 
-        public override PowerSchemeValues State 
+        protected override PowerSchemeValues State 
             => new PowerSchemeValues(
                     Setting.STANDBYIDLE, 
                     _DCACValues.DCSettings, 
                     _DCACValues.ACSettings);
-           
-        public override SettingSubgroup SettingSubgroup
+
+        protected override SettingSubgroup SettingSubgroup
             => SettingSubgroup.SLEEP_SUBGROUP;
     }
 }

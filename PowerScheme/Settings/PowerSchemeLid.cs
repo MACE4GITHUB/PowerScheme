@@ -7,18 +7,26 @@ namespace PowerScheme.Settings
     {
         private readonly PowerSchemeDCACValues _DCACValues;
 
+        /// <summary>
+        /// <para>Do nothing - 0</para>
+        /// <para>Sleep - 1</para>
+        /// <para>Hibernate - 2</para>
+        /// <para>Shut down - 3</para> 
+        /// </summary>
+        /// <param name="powerSchemeGuid"></param>
+        /// <param name="DCACValues"></param>
         public PowerSchemeLid(Guid powerSchemeGuid, PowerSchemeDCACValues DCACValues) : base(powerSchemeGuid)
         {
             _DCACValues = DCACValues;
         }
 
-        public override PowerSchemeValues State 
+        protected override PowerSchemeValues State 
             => new PowerSchemeValues(
                     Setting.LIDACTION, 
                     _DCACValues.DCSettings, 
                     _DCACValues.ACSettings);
-           
-        public override SettingSubgroup SettingSubgroup
+
+        protected override SettingSubgroup SettingSubgroup
             => SettingSubgroup.SYSTEM_BUTTON_SUBGROUP;
     }
 }

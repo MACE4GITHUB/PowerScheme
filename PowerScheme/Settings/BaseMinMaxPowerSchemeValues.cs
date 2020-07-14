@@ -5,16 +5,16 @@ namespace PowerScheme.Settings
 {
     public abstract class BaseMinMaxPowerSchemeValues : IApplicable
     {
-        public BaseMinMaxPowerSchemeValues(Guid powerSchemeGuid)
+        protected BaseMinMaxPowerSchemeValues(Guid powerSchemeGuid)
         {
             PowerSchemeGuid = powerSchemeGuid;
         }
 
-        public virtual PowerSchemeValues MinState { get; set; }
+        protected virtual PowerSchemeValues MinState { get; set; }
 
-        public virtual PowerSchemeValues MaxState { get; set; }
+        protected virtual PowerSchemeValues MaxState { get; set; }
 
-        public virtual SettingSubgroup SettingSubgroup { get; }
+        protected virtual SettingSubgroup SettingSubgroup { get; }
 
         public Guid PowerSchemeGuid { get; }
 
