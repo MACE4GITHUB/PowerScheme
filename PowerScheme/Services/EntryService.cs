@@ -39,8 +39,8 @@ namespace PowerScheme.Services
         {
             ValidateOs();
             ValidateOnceApplication();
-            ValidateFirstStart();
             ValidateAdmin();
+            ValidateFirstStart();
         }
 
         public bool IsValidateOs { get; set; } = true;
