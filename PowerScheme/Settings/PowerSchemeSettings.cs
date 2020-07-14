@@ -22,6 +22,9 @@ namespace PowerScheme.Settings
         public PowerSchemeTurnOffDisplay TurnOffDisplay(Values values)
             => new PowerSchemeTurnOffDisplay(PowerSchemeGuid, values.State);
 
+        public PowerSchemeWiFi WiFi(Values values)
+            => new PowerSchemeWiFi(PowerSchemeGuid, values.State);
+
         public void ApplyDefaultValues()
         {
             var powerSchemeDefaultSettings = new PowerSchemeDefaultSettings();
@@ -32,7 +35,7 @@ namespace PowerScheme.Settings
             {
                 var set = (PowerSchemeSetting)Enum.Parse(typeSetting, name);
                 var mi = typeof(PowerSchemeSettings).GetMethod(name, BindingFlags.Instance | BindingFlags.Public);
-                var res = mi?.Invoke(this, new[] { ds[set] });
+                var res = mi?.Invoke(this, new object[] { ds[set] });
                 var applicable = res as IApplicable;
                 applicable?.ApplyValues();
             }
@@ -45,13 +48,11 @@ namespace PowerScheme.Settings
         {
             Settings = new Dictionary<PowerSchemeSetting, Values>()
             {
-                {PowerSchemeSetting.ProcessorThrottle,
-                    new Values( new PowerSchemeDCACValues(5, 85),
-                                new PowerSchemeDCACValues(60, 85))},
-                {PowerSchemeSetting.Sleep,
-                    new Values( new PowerSchemeDCACValues(900, 10800))},
-                {PowerSchemeSetting.TurnOffDisplay,
-                    new Values( new PowerSchemeDCACValues(300, 7200))}
+                {PowerSchemeSetting.ProcessorThrottle, new Values( new PowerSchemeDCACValues(5, 85),
+                                                                   new PowerSchemeDCACValues(60, 85))},
+                {PowerSchemeSetting.Sleep, new Values( new PowerSchemeDCACValues(900, 10800))},
+                {PowerSchemeSetting.TurnOffDisplay, new Values( new PowerSchemeDCACValues(300, 7200))},
+                {PowerSchemeSetting.WiFi, new Values( new PowerSchemeDCACValues(2, 2))}
             };
         }
 
@@ -83,6 +84,7 @@ namespace PowerScheme.Settings
     {
         ProcessorThrottle,
         Sleep,
-        TurnOffDisplay
+        TurnOffDisplay,
+        WiFi
     }
 }

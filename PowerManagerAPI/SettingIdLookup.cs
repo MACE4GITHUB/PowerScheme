@@ -29,7 +29,8 @@ namespace PowerManagerAPI
         VIDEO_SUBGROUP,
         BATTERY_SUBGROUP,
         SLEEP_SUBGROUP,
-        PCIEXPRESS_SETTINGS_SUBGROUP
+        PCIEXPRESS_SETTINGS_SUBGROUP,
+        WIFI_SUBGROUP
     }
 
     public enum Setting
@@ -54,7 +55,8 @@ namespace PowerManagerAPI
         RTCWAKE,
         STANDBYIDLE,
         ADAPTBRIGHT,
-        VIDEOIDLE
+        VIDEOIDLE,
+        WIFISAVER
     }
 
     public enum PowerPlatformRole
@@ -759,7 +761,8 @@ namespace PowerManagerAPI
             { SettingSubgroup.VIDEO_SUBGROUP,               new Guid("7516b95f-f776-4464-8c53-06167f40cc99") },
             { SettingSubgroup.BATTERY_SUBGROUP,             new Guid("e73a048d-bf27-4f12-9731-8b2076e8891f") },
             { SettingSubgroup.SLEEP_SUBGROUP,               new Guid("238C9FA8-0AAD-41ED-83F4-97BE242C8F20") },
-            { SettingSubgroup.PCIEXPRESS_SETTINGS_SUBGROUP, new Guid("501a4d13-42af-4429-9fd1-a8218c268e20") }
+            { SettingSubgroup.PCIEXPRESS_SETTINGS_SUBGROUP, new Guid("501a4d13-42af-4429-9fd1-a8218c268e20") },
+            { SettingSubgroup.WIFI_SUBGROUP,                new Guid("19cbb8fa-5279-450e-9fac-8a3d5fedd0c1") }
         };
 
         public static Dictionary<Setting, Guid> SettingGuids = new Dictionary<Setting, Guid>
@@ -784,7 +787,8 @@ namespace PowerManagerAPI
             { Setting.RTCWAKE,          new Guid("bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d") },
             { Setting.STANDBYIDLE,      new Guid("29f6c1db-86da-48c5-9fdb-f2b67b1f44da") },
             { Setting.ADAPTBRIGHT,      new Guid("fbd9aa66-9553-4097-ba44-ed6e9d65eab8") },
-            { Setting.VIDEOIDLE,        new Guid("3c0bc021-c8a8-4e07-a973-6b14cbcb2b7e") }
+            { Setting.VIDEOIDLE,        new Guid("3c0bc021-c8a8-4e07-a973-6b14cbcb2b7e") },
+            { Setting.WIFISAVER,        new Guid("12bbebe6-58d6-4636-95bb-3217ef867c1a") }
         };
     }
 }

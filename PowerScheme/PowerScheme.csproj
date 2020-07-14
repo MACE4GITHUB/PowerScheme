@@ -105,6 +105,7 @@
     <Compile Include="Settings\IApplicable.cs" />
     <Compile Include="Settings\PowerSchemeDCACValues.cs" />
     <Compile Include="Settings\PowerSchemeLid.cs" />
+    <Compile Include="Settings\PowerSchemeWiFi.cs" />
     <Compile Include="Settings\PowerSchemeValues.cs" />
     <Compile Include="Settings\BaseStatePowerSchemeValues.cs" />
     <Compile Include="Settings\PowerSchemeProcessorThrottle.cs" />
