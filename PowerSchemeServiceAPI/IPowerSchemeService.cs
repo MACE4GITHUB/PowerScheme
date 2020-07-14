@@ -1,20 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using PowerSchemeServiceAPI.EventsArgs;
-using PowerSchemeServiceAPI.Model;
-
-namespace PowerSchemeServiceAPI
+﻿namespace PowerSchemeServiceAPI
 {
+    using EventsArgs;
+    using Model;
+    using System;
+    using System.Collections.Generic;
+
     public interface IPowerSchemeService
     {
         IPowerScheme ActivePowerScheme { get; }
         IEnumerable<IPowerScheme> DefaultPowerSchemes { get; }
+        IEnumerable<IPowerScheme> TypicalPowerSchemes { get; }
         IEnumerable<IPowerScheme> UserPowerSchemes { get; }
 
         Watchers Watchers { get; }
 
         /// <summary>
-        /// 
+        /// Set the Active Power Scheme.
+        /// <para>isForce - Need to apply new AC & DC values</para>
         /// </summary>
         /// <param name="powerScheme"></param>
         /// <param name="isForce">Need to apply new AC & DC values</param>
@@ -27,13 +29,7 @@ namespace PowerSchemeServiceAPI
         bool ExistsHibernate { get; }
 
         bool ExistsSleep { get; }
-
-        bool CanCreateExtremePowerScheme { get; }
-
-        bool ExistsStablePowerScheme { get; }
-        bool ExistsMediaPowerScheme { get; }
-        bool ExistsSimplePowerScheme { get; }
-        bool ExistsExtremePowerScheme { get; }
+        
         bool ExistsAllTypicalScheme { get; }
 
         void RestoreDefaultPowerSchemes();
@@ -42,23 +38,13 @@ namespace PowerSchemeServiceAPI
 
         void CreateTypicalSchemes();
 
-        void CreateStablePowerScheme();
-
-        void DeleteStablePowerScheme();
-
-        void CreateMediaPowerScheme();
-
-        void DeleteMediaPowerScheme();
-
-        void CreateSimplePowerScheme();
-
-        void DeleteSimplePowerScheme();
-
-        void CreateExtremePowerScheme();
-
-        void DeleteExtremePowerScheme();
-
         void SetLid(int value);
+
+        string TextActionToggle(StatePowerScheme statePowerScheme);
+
+        StatePowerScheme StatePowerSchemeToggle(StatePowerScheme statePowerScheme);
+
+        void ActionPowerScheme(StatePowerScheme statePowerScheme);
 
         event EventHandler<PowerSchemeEventArgs> ActivePowerSchemeChanged;
 

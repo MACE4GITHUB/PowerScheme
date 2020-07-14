@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Languages;
+using PowerSchemeServiceAPI;
 using static PowerScheme.Utility.TrayIcon;
+using PowerSchemeServiceAPI.Model;
 
 namespace PowerScheme.Services
 {
@@ -17,11 +19,6 @@ namespace PowerScheme.Services
         private const string CPL_WINDOWS_ICON = "Panel";
         private const string ADD_ICON = "Add";
         private const string DELETE_ICON = "Delete";
-
-        private const string STABLE_ICON = "Stable";
-        private const string MEDIA_ICON = "Media";
-        private const string SIMPLE_ICON = "Simple";
-        private const string EXTREME_ICON = "Extreme";
 
         private const string RADIO_ON_ICON = "RadioOn";
         private const string RADIO_OFF_ICON = "RadioOff";
@@ -43,11 +40,6 @@ namespace PowerScheme.Services
         private const string CPL_SCHEME_WINDOWS_MENU = "CplSchemeWindowsToolStripMenuItem";
         private const string ADD_TYPICAL_SCHEMES_MENU = "AddTypicalSchemesToolStripMenuItem";
         private const string DELETE_TYPICAL_SCHEMES_MENU = "DeleteTypicalSchemesToolStripMenuItem";
-
-        private const string ACTION_STABLE_TYPICAL_SCHEME_MENU = "ActionStableTypicalSchemeToolStripMenuItem";
-        private const string ACTION_MEDIA_TYPICAL_SCHEME_MENU = "ActionMediaTypicalSchemeToolStripMenuItem";
-        private const string ACTION_SIMPLE_TYPICAL_SCHEME_MENU = "ActionSimpleTypicalSchemeToolStripMenuItem";
-        private const string ACTION_EXTREME_TYPICAL_SCHEME_MENU = "ActionExtremeTypicalSchemeToolStripMenuItem";
 
         private static readonly Dictionary<string, string> IMAGE_LID_ON = new Dictionary<string, string>  {
             { LID_NOTHING_MENU, "Nothing" },
@@ -149,58 +141,28 @@ namespace PowerScheme.Services
 
             itemDropDownSetting.DropDownItems.Add(new ToolStripSeparator());
 
-            #region AddStableFromHigh
-            var itemStableScheme = new ToolStripMenuItem()
+            foreach (var powerScheme in _power.TypicalPowerSchemes)
             {
-                Name = ACTION_STABLE_TYPICAL_SCHEME_MENU,
-                ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                Image = GetImage(STABLE_ICON)
-            };
-            itemStableScheme.Click += ItemStableScheme_Click;
-
-            itemDropDownSetting.DropDownItems.Add(itemStableScheme);
-            #endregion
-
-            #region AddMediaFromBalance
-            var itemMediaScheme = new ToolStripMenuItem()
-            {
-                Name = ACTION_MEDIA_TYPICAL_SCHEME_MENU,
-                ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                Image = GetImage(MEDIA_ICON)
-            };
-            itemMediaScheme.Click += ItemMediaScheme_Click;
-
-            itemDropDownSetting.DropDownItems.Add(itemMediaScheme);
-            #endregion
-
-            #region AddSimpleFromLow
-            var itemSimpleScheme = new ToolStripMenuItem()
-            {
-                Name = ACTION_SIMPLE_TYPICAL_SCHEME_MENU,
-                ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                Image = GetImage(SIMPLE_ICON)
-            };
-            itemSimpleScheme.Click += ItemSimpleScheme_Click;
-
-            itemDropDownSetting.DropDownItems.Add(itemSimpleScheme);
-            #endregion
-
-            #region AddExtremeFromUltimate
-            if (_power.CanCreateExtremePowerScheme)
-            {
-                var itemExtremeScheme = new ToolStripMenuItem()
+                var item = new ToolStripMenuItem
                 {
-                    Name = ACTION_EXTREME_TYPICAL_SCHEME_MENU,
+                    Tag = new StatePowerScheme(powerScheme, ActionWithPowerScheme.Create),
                     ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                    Image = GetImage(EXTREME_ICON)
+                    Image = GetImage(powerScheme.PictureName)
                 };
-                itemExtremeScheme.Click += ItemExtremeScheme_Click;
 
-                itemDropDownSetting.DropDownItems.Add(itemExtremeScheme);
+                item.Click += ItemMenuActionPowerOnClick;
+
+                itemDropDownSetting.DropDownItems.Add(item);
             }
-            #endregion
 
             return itemDropDownSetting;
+        }
+
+        private void ItemMenuActionPowerOnClick(object sender, EventArgs e)
+        {
+            if (!(sender is ToolStripMenuItem menu)) return;
+            if (!(menu.Tag is StatePowerScheme tag)) return;
+            _power.ActionPowerScheme(tag);
         }
 
         private ToolStripMenuItem MenuItemStartWithWindows()
@@ -312,7 +274,7 @@ namespace PowerScheme.Services
         {
             if (!(sender is ToolStripMenuItem item)) return;
             if (!(item.Tag is int value)) return;
-            var values = new int[] { 0, 1, 2, 3 };
+            var values = new[] { 0, 1, 2, 3 };
 
             if (!values.Contains(value)) return;
 
@@ -336,91 +298,21 @@ namespace PowerScheme.Services
             if (!(_viewModel.ContextRightMenu.Items[SETTINGS_DROP_DOWN_MENU] is ToolStripMenuItem settingsToolStripMenuItem)
             ) return;
 
-            var existScheme = _power.ExistsStablePowerScheme;
-            settingsToolStripMenuItem.DropDownItems[ACTION_STABLE_TYPICAL_SCHEME_MENU].Text =
-                existScheme ? Language.Current.DeleteStableScheme : Language.Current.CreateStableScheme;
-            settingsToolStripMenuItem.DropDownItems[ACTION_STABLE_TYPICAL_SCHEME_MENU].Tag =
-                existScheme ? 0 : 1;
+            foreach (var itemMenu in settingsToolStripMenuItem.DropDownItems)
+            {
+                if (!(itemMenu is ToolStripMenuItem item)) continue;
+                if (!(item.Tag is StatePowerScheme tag)) continue;
 
-            existScheme = _power.ExistsMediaPowerScheme;
-            settingsToolStripMenuItem.DropDownItems[ACTION_MEDIA_TYPICAL_SCHEME_MENU].Text =
-                existScheme ? Language.Current.DeleteMediaScheme : Language.Current.CreateMediaScheme;
-            settingsToolStripMenuItem.DropDownItems[ACTION_MEDIA_TYPICAL_SCHEME_MENU].Tag =
-                existScheme ? 0 : 1;
-
-            existScheme = _power.ExistsSimplePowerScheme;
-            settingsToolStripMenuItem.DropDownItems[ACTION_SIMPLE_TYPICAL_SCHEME_MENU].Text =
-                existScheme ? Language.Current.DeleteSimpleScheme : Language.Current.CreateSimpleScheme;
-            settingsToolStripMenuItem.DropDownItems[ACTION_SIMPLE_TYPICAL_SCHEME_MENU].Tag =
-                existScheme ? 0 : 1;
-
-            existScheme = _power.ExistsExtremePowerScheme;
-            settingsToolStripMenuItem.DropDownItems[ACTION_EXTREME_TYPICAL_SCHEME_MENU].Text =
-                existScheme ? Language.Current.DeleteExtremeScheme : Language.Current.CreateExtremeScheme;
-            settingsToolStripMenuItem.DropDownItems[ACTION_SIMPLE_TYPICAL_SCHEME_MENU].Tag =
-                existScheme ? 0 : 1;
+                item.Text = _power.TextActionToggle(tag);
+                item.Tag = _power.StatePowerSchemeToggle(tag);
+            }
         }
 
         private void ItemCreateTypicalSchemes_Click(object sender, EventArgs e)
         {
             _power.CreateTypicalSchemes();
         }
-
-        private void ItemMediaScheme_Click(object sender, EventArgs e)
-        {
-            if (!(sender is ToolStripMenuItem menu)) return;
-
-            ToggleSchemeClick(ref menu,
-                _power.CreateMediaPowerScheme,
-                _power.DeleteMediaPowerScheme
-            );
-        }
-
-        private void ItemStableScheme_Click(object sender, EventArgs e)
-        {
-            if (!(sender is ToolStripMenuItem menu)) return;
-
-            ToggleSchemeClick(ref menu,
-                _power.CreateStablePowerScheme,
-                _power.DeleteStablePowerScheme
-            );
-        }
-
-        private void ItemSimpleScheme_Click(object sender, EventArgs e)
-        {
-            if (!(sender is ToolStripMenuItem menu)) return;
-
-            ToggleSchemeClick(ref menu,
-                _power.CreateSimplePowerScheme,
-                _power.DeleteSimplePowerScheme
-            );
-        }
-
-        private void ItemExtremeScheme_Click(object sender, EventArgs e)
-        {
-            if (!(sender is ToolStripMenuItem menu)) return;
-
-            ToggleSchemeClick(ref menu,
-                _power.CreateExtremePowerScheme,
-                _power.DeleteExtremePowerScheme
-            );
-        }
-
-        private void ToggleSchemeClick(
-            ref ToolStripMenuItem menu, 
-            Action createScheme, Action deleteScheme)
-        {
-            var create = (int)menu.Tag == 1;
-            if (create)
-            {
-                createScheme();
-            }
-            else
-            {
-                deleteScheme();
-            }
-        }
-
+        
         private static void ItemCplScheme_Click(object sender, EventArgs e)
         {
             UACHelper.AttemptPrivilegeEscalation("powercfg.cpl");
@@ -486,12 +378,19 @@ namespace PowerScheme.Services
             settingsToolStripMenuItem.DropDownItems[CPL_SCHEME_WINDOWS_MENU].Click -= ItemCplScheme_Click;
             settingsToolStripMenuItem.DropDownItems[ADD_TYPICAL_SCHEMES_MENU].Click -= ItemCreateTypicalSchemes_Click;
             settingsToolStripMenuItem.DropDownItems[DELETE_TYPICAL_SCHEMES_MENU].Click -= ItemDeleteTypicalSchemes_Click;
-            settingsToolStripMenuItem.DropDownItems[ACTION_STABLE_TYPICAL_SCHEME_MENU].Click -= ItemStableScheme_Click;
-            settingsToolStripMenuItem.DropDownItems[ACTION_MEDIA_TYPICAL_SCHEME_MENU].Click -= ItemMediaScheme_Click;
-            settingsToolStripMenuItem.DropDownItems[ACTION_SIMPLE_TYPICAL_SCHEME_MENU].Click -= ItemSimpleScheme_Click;
 
-            if (_power.CanCreateExtremePowerScheme)
-                settingsToolStripMenuItem.DropDownItems[ACTION_EXTREME_TYPICAL_SCHEME_MENU].Click -= ItemExtremeScheme_Click;
+            foreach (var itemMenu in settingsToolStripMenuItem.DropDownItems)
+            {
+                if (!(itemMenu is ToolStripMenuItem item)) continue;
+
+                item.Text = null;
+                item.Tag = null;
+                item.Click -= ItemMenuActionPowerOnClick;
+                item.Dispose();
+            }
+
+            settingsToolStripMenuItem.DropDownItems.Clear();
+            _viewModel.ContextLeftMenu.Items.Clear();
         }
     }
 }

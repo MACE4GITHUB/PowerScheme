@@ -1,12 +1,11 @@
-﻿namespace PowerScheme.Services
+﻿namespace PowerSchemeServiceAPI
 {
+    using EventsArgs;
     using Languages;
+    using Model;
     using PowerManagerAPI;
-    using PowerSchemeServiceAPI;
-    using PowerSchemeServiceAPI.EventsArgs;
-    using PowerSchemeServiceAPI.Model;
-    using PowerSchemeServiceAPI.Settings;
     using RegistryManager;
+    using Settings;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -40,13 +39,20 @@
             {EXTREME_SCHEME_GUID, "Extreme"}
         };
 
-        public PowerSchemeService()
-        {
-
-        }
-
         public IEnumerable<IPowerScheme> DefaultPowerSchemes
             => NATIVES_GUID.Keys.Select(NewPowerScheme);
+
+        public IEnumerable<IPowerScheme> TypicalPowerSchemes
+        {
+            get
+            {
+                var typicalGuid = TYPICAL_GUID.Keys.Select(NewPowerScheme);
+
+                return CanCreateExtremePowerScheme
+                    ? typicalGuid
+                    : typicalGuid.Take(3);
+            }
+        }
 
         public IEnumerable<IPowerScheme> UserPowerSchemes
             => RegistryService.UserPowerSchemes.Select(g => NewPowerScheme(Guid.Parse(g)));
@@ -82,11 +88,6 @@
             }
         }
 
-        /// <summary>
-        /// Set the Active Power Scheme.
-        /// </summary>
-        /// <param name="powerScheme"></param>
-        /// <param name="isForce">Need to apply new AC & DC values</param>
         public void SetActivePowerScheme(IPowerScheme powerScheme, bool isForce = false)
         {
             if (powerScheme.Guid == ActivePowerScheme.Guid && !isForce) return;
@@ -95,13 +96,13 @@
             OnActivePowerSchemeChanged(new PowerSchemeEventArgs(powerScheme));
         }
 
-        public void SetActivePowerScheme(Guid guid)
-            => SetActivePowerScheme((PowerSchemeServiceAPI.Model.PowerScheme)PowerSchemes.FirstOrDefault(p => p.Guid == guid));
+        private void SetActivePowerScheme(Guid guid)
+            => SetActivePowerScheme((PowerScheme)PowerSchemes.FirstOrDefault(p => p.Guid == guid));
 
         public void RestoreDefaultPowerSchemes()
             => Watchers.RaiseActionWithoutWatchers(PowerManager.RestoreDefaultPlans);
 
-        public bool CanCreateExtremePowerScheme
+        private bool CanCreateExtremePowerScheme
             => RegistryService.ExistsDefaultPowerScheme(ULTIMATE_SCHEME_GUID);
 
         public bool ExistsMobilePlatformRole
@@ -130,7 +131,7 @@
             !TYPICAL_GUID.Keys.Select(s => s.ToString())
                 .Except(RegistryService.UserPowerSchemes).Any();
 
-        public void DeleteTypicalScheme(Guid guid)
+        private void DeleteTypicalScheme(Guid guid)
         {
             if (!ExistsTypicalPowerScheme(guid)) return;
 
@@ -173,7 +174,7 @@
             Watchers.RaiseActionWithoutWatchers(CreateTypicalSchemesIn);
         }
 
-        public void CreateStablePowerScheme()
+        private void CreateStablePowerScheme()
         {
             CreateTypicalPowerScheme(HIGH_SCHEME_GUID, STABLE_SCHEME_GUID,
                 Language.Current.StableName, Language.Current.StableDescription);
@@ -183,44 +184,155 @@
             settings.ApplyDefaultValues();
         }
 
-        public void DeleteStablePowerScheme()
+        private void DeleteStablePowerScheme()
             => DeleteTypicalScheme(STABLE_SCHEME_GUID);
 
-        public void CreateMediaPowerScheme() =>
+        private void CreateMediaPowerScheme() =>
             CreateTypicalPowerScheme(BALANCE_SCHEME_GUID, MEDIA_SCHEME_GUID,
                 Language.Current.MediaName, Language.Current.MediaDescription);
 
-        public void DeleteMediaPowerScheme()
+        private void DeleteMediaPowerScheme()
             => DeleteTypicalScheme(MEDIA_SCHEME_GUID);
 
-        public void CreateSimplePowerScheme() =>
+        private void CreateSimplePowerScheme() =>
             CreateTypicalPowerScheme(LOW_SCHEME_GUID, SIMPLE_SCHEME_GUID,
                 Language.Current.SimpleName, Language.Current.SimpleDescription);
 
-        public void DeleteSimplePowerScheme()
+        private void DeleteSimplePowerScheme()
             => DeleteTypicalScheme(SIMPLE_SCHEME_GUID);
 
-        public void CreateExtremePowerScheme()
+        private void CreateExtremePowerScheme()
         {
             if (CanCreateExtremePowerScheme)
                 CreateTypicalPowerScheme(ULTIMATE_SCHEME_GUID, EXTREME_SCHEME_GUID,
                     Language.Current.ExtremeName, Language.Current.ExtremeDescription);
         }
 
-        public bool ExistsStablePowerScheme
+        private bool ExistsStablePowerScheme
             => ExistsTypicalPowerScheme(STABLE_SCHEME_GUID);
 
-        public bool ExistsMediaPowerScheme
+        private bool ExistsMediaPowerScheme
             => ExistsTypicalPowerScheme(MEDIA_SCHEME_GUID);
 
-        public bool ExistsSimplePowerScheme
+        private bool ExistsSimplePowerScheme
             => ExistsTypicalPowerScheme(SIMPLE_SCHEME_GUID);
 
-        public bool ExistsExtremePowerScheme
+        private bool ExistsExtremePowerScheme
             => ExistsTypicalPowerScheme(EXTREME_SCHEME_GUID);
 
-        public void DeleteExtremePowerScheme()
+        private void DeleteExtremePowerScheme()
             => DeleteTypicalScheme(EXTREME_SCHEME_GUID);
+
+        private StatePowerScheme ToggledStatePowerScheme(StatePowerScheme statePowerScheme, bool b)
+        {
+            return b ? new StatePowerScheme(statePowerScheme.PowerScheme, ActionWithPowerScheme.Delete)
+                     : new StatePowerScheme(statePowerScheme.PowerScheme, ActionWithPowerScheme.Create);
+
+        }
+
+        public StatePowerScheme StatePowerSchemeToggle(StatePowerScheme statePowerScheme)
+        {
+            var guid = statePowerScheme.PowerScheme.Guid;
+
+            if (guid == STABLE_SCHEME_GUID)
+            {
+                return ToggledStatePowerScheme(statePowerScheme, ExistsStablePowerScheme);
+            }
+
+            if (guid == MEDIA_SCHEME_GUID)
+            {
+                return ToggledStatePowerScheme(statePowerScheme, ExistsMediaPowerScheme);
+            }
+
+            if (guid == SIMPLE_SCHEME_GUID)
+            {
+                return ToggledStatePowerScheme(statePowerScheme, ExistsSimplePowerScheme);
+            }
+
+            if (guid == EXTREME_SCHEME_GUID)
+            {
+                return ToggledStatePowerScheme(statePowerScheme, ExistsExtremePowerScheme);
+            }
+
+            return null;
+        }
+
+        private void ApplyAction(ActionWithPowerScheme actionWithPowerScheme,
+            Action create, Action delete)
+        {
+            switch (actionWithPowerScheme)
+            {
+                case ActionWithPowerScheme.Create:
+                    create();
+                    break;
+                case ActionWithPowerScheme.Delete:
+                    delete();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public void ActionPowerScheme(StatePowerScheme statePowerScheme)
+        {
+            var guid = statePowerScheme.PowerScheme.Guid;
+            var value = (ActionWithPowerScheme)statePowerScheme.Value;
+
+            if (guid == STABLE_SCHEME_GUID)
+            {
+                ApplyAction(value, CreateStablePowerScheme, DeleteStablePowerScheme);
+            }
+
+            if (guid == MEDIA_SCHEME_GUID)
+            {
+                ApplyAction(value, CreateMediaPowerScheme, DeleteMediaPowerScheme);
+            }
+
+            if (guid == SIMPLE_SCHEME_GUID)
+            {
+                ApplyAction(value, CreateSimplePowerScheme, DeleteSimplePowerScheme);
+            }
+
+            if (guid == EXTREME_SCHEME_GUID)
+            {
+                ApplyAction(value, CreateExtremePowerScheme, DeleteExtremePowerScheme);
+            }
+        }
+
+        public string TextActionToggle(StatePowerScheme statePowerScheme)
+        {
+            var guid = statePowerScheme.PowerScheme.Guid;
+
+            if (guid == STABLE_SCHEME_GUID)
+            {
+                return ExistsStablePowerScheme
+                    ? Language.Current.DeleteStableScheme
+                    : Language.Current.CreateStableScheme;
+            }
+
+            if (guid == MEDIA_SCHEME_GUID)
+            {
+                return ExistsMediaPowerScheme
+                    ? Language.Current.DeleteMediaScheme
+                    : Language.Current.CreateMediaScheme;
+            }
+
+            if (guid == SIMPLE_SCHEME_GUID)
+            {
+                return ExistsSimplePowerScheme
+                    ? Language.Current.DeleteSimpleScheme
+                    : Language.Current.CreateSimpleScheme;
+            }
+
+            if (guid == EXTREME_SCHEME_GUID)
+            {
+                return ExistsExtremePowerScheme
+                    ? Language.Current.DeleteExtremeScheme
+                    : Language.Current.CreateExtremeScheme;
+            }
+
+            return null;
+        }
 
         private IEnumerable<IPowerScheme> AllPowerSchemes
             => DefaultPowerSchemes.Concat(UserPowerSchemes);
@@ -255,7 +367,7 @@
         private bool ContainsTypical(Guid guid) =>
             TYPICAL_GUID.Keys.Contains(guid);
 
-        private PowerSchemeServiceAPI.Model.PowerScheme NewPowerScheme(Guid guid)
+        private PowerScheme NewPowerScheme(Guid guid)
         {
             var isNative = ContainsNative(guid);
             var isTypical = ContainsTypical(guid);
@@ -275,7 +387,7 @@
                 image = UNKNOWN_ICON;
             }
 
-            return new PowerSchemeServiceAPI.Model.PowerScheme(guid, isNative, image);
+            return new PowerScheme(guid, isNative, image);
         }
     }
 }

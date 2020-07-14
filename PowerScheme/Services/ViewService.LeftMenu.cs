@@ -9,7 +9,7 @@ namespace PowerScheme.Services
 {
     partial class ViewService
     {
-        private void BuildLeftMenu() 
+        private void BuildLeftMenu()
             => _viewModel.ContextLeftMenu.InvokeIfRequired(BuildContextLeftMenu);
 
         private void BuildContextLeftMenu()
@@ -20,9 +20,9 @@ namespace PowerScheme.Services
             {
                 var item = new ToolStripMenuItem
                 {
-                    Tag = powerScheme,
+                    Tag = new StatePowerScheme(powerScheme),
                     Text = powerScheme.Name,
-                    Image = GetImage(powerScheme.Image)
+                    Image = GetImage(powerScheme.PictureName)
                 };
 
                 item.Click += ItemMenuPowerOnClick;
@@ -38,9 +38,9 @@ namespace PowerScheme.Services
             {
                 var item = new ToolStripMenuItem
                 {
-                    Tag = powerScheme,
+                    Tag = new StatePowerScheme(powerScheme),
                     Text = powerScheme.Name,
-                    Image = GetImage(powerScheme.Image)
+                    Image = GetImage(powerScheme.PictureName)
                 };
 
                 item.Click += ItemMenuPowerOnClick;
@@ -55,8 +55,6 @@ namespace PowerScheme.Services
             if (_viewModel.ContextLeftMenu.Items.Count <= 0) return;
 
             UnsubscribeFromContextLeftMenu();
-
-            _viewModel.ContextLeftMenu.Items.Clear();
         }
 
         private void UnsubscribeFromContextLeftMenu()
@@ -70,14 +68,15 @@ namespace PowerScheme.Services
                 toolStripItem.Image = null;
                 toolStripItem.Dispose();
             }
+            _viewModel.ContextLeftMenu.Items.Clear();
         }
 
         private void ItemMenuPowerOnClick(object sender, EventArgs e)
         {
             if (!(sender is ToolStripMenuItem menu)) return;
-            if (!(menu.Tag is IPowerScheme powerScheme)) return;
+            if (!(menu.Tag is StatePowerScheme statePowerScheme)) return;
 
-            _power.SetActivePowerScheme(powerScheme);
+            _power.SetActivePowerScheme(statePowerScheme.PowerScheme);
         }
     }
 }
