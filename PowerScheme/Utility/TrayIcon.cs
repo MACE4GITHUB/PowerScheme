@@ -1,21 +1,21 @@
 ﻿namespace PowerScheme.Utility
 {
+    using Common;
     using System.Drawing;
     using static Image;
 
-    public static class TrayIcon
+    internal static class TrayIcon
     {
-        public static Icon GetIcon(string iconName)
+        public static Icon GetIcon(ImageItem iconName)
         {
             var bitmap = GetImage(iconName);
             var icon = bitmap.CreateIcon(IconSize.Pixels16X16);
             return icon;
         }
 
-        public static Bitmap GetImage(string imageName)
+        public static Bitmap GetImage(ImageItem imageName)
         {
-            if (string.IsNullOrEmpty(imageName)) imageName = "Unknown";
-            var resources = Properties.Resources.ResourceManager.GetObject(imageName);
+            var resources = Properties.Resources.ResourceManager.GetObject(imageName.ToString());
             var bitmap = resources as Bitmap;
             return bitmap;
         }

@@ -22,7 +22,7 @@ namespace PowerScheme.Services
                 {
                     Tag = new StatePowerScheme(powerScheme),
                     Text = powerScheme.Name,
-                    Image = GetImage(powerScheme.PictureName)
+                    Image = GetImage(powerScheme.Picture)
                 };
 
                 item.Click += ItemMenuPowerOnClick;
@@ -40,7 +40,7 @@ namespace PowerScheme.Services
                 {
                     Tag = new StatePowerScheme(powerScheme),
                     Text = powerScheme.Name,
-                    Image = GetImage(powerScheme.PictureName)
+                    Image = GetImage(powerScheme.Picture)
                 };
 
                 item.Click += ItemMenuPowerOnClick;

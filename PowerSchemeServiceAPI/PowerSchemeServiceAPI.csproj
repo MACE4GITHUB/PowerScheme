@@ -83,6 +83,10 @@
     <Compile Include="Settings\PowerSchemeWiFi.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{220D6BE3-3CE1-4683-8980-7C25D5F77BB3}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Languages\Languages.csproj">
       <Project>{FC9D0998-254A-46A3-AC5B-317F80150175}</Project>
       <Name>Languages</Name>

@@ -1,4 +1,5 @@
-﻿using PowerManagerAPI;
+﻿using Common;
+using PowerManagerAPI;
 using System;
 
 namespace PowerSchemeServiceAPI.Model
@@ -13,12 +14,12 @@ namespace PowerSchemeServiceAPI.Model
         /// </summary>
         /// <param name="guid"></param>
         /// <param name="isNative"></param>
-        /// <param name="pictureName"></param>
-        public PowerScheme(Guid guid, bool isNative, string pictureName)
+        /// <param name="picture"></param>
+        public PowerScheme(Guid guid, bool isNative, ImageItem picture)
         {
             Guid = guid;
             IsNative = isNative;
-            PictureName = pictureName;
+            Picture = picture;
         }
 
         /// <summary>
@@ -47,8 +48,8 @@ namespace PowerSchemeServiceAPI.Model
         public Guid Guid { get; }
 
         /// <summary>
-        /// Gets or sets PowerScheme PictureName
+        /// Gets or sets PowerScheme Picture
         /// </summary>
-        public string PictureName { get; set; }
+        public ImageItem Picture { get; set; }
     }
 }

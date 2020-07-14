@@ -79,8 +79,10 @@
   <ItemGroup>
     <Compile Include="Configuration\ApplicationModule.cs" />
     <Compile Include="Configuration\CompositionRoot.cs" />
+    <Compile Include="MenuLookup.cs" />
     <Compile Include="Model\AppInfo.cs" />
     <Compile Include="Model\IViewModel.cs" />
+    <Compile Include="Model\ViewMenu.cs" />
     <Compile Include="Model\ViewModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -94,7 +96,6 @@
     <Compile Include="Services\IViewService.cs" />
     <Compile Include="Services\ViewService.LeftMenu.cs" />
     <Compile Include="Services\ViewService.RightMenu.cs" />
-    <Compile Include="Utility\Image.cs" />
     <Compile Include="Services\ViewService.cs" />
     <Compile Include="Utility\Invoker.cs" />
     <Compile Include="Utility\TrayIcon.cs" />

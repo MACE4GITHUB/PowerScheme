@@ -1,5 +1,6 @@
 ﻿namespace PowerSchemeServiceAPI
 {
+    using Common;
     using EventsArgs;
     using Languages;
     using Model;
@@ -22,21 +23,19 @@
         private static readonly Guid SIMPLE_SCHEME_GUID = new Guid("fa8d915c-65de-4bba-9569-3c2e77ea68b6");
         private static readonly Guid EXTREME_SCHEME_GUID = new Guid("f384acfa-ed71-4607-bf8e-747d56402f0c");
 
-        private const string UNKNOWN_ICON = "Unknown";
-
-        private static readonly Dictionary<Guid, string> NATIVES_GUID = new Dictionary<Guid, string>
+        private static readonly Dictionary<Guid, ImageItem> NATIVES_GUID = new Dictionary<Guid, ImageItem>
         {
-            {HIGH_SCHEME_GUID, "High"},
-            {BALANCE_SCHEME_GUID, "Balance"},
-            {LOW_SCHEME_GUID, "Low"}
+            {HIGH_SCHEME_GUID, ImageItem.High},
+            {BALANCE_SCHEME_GUID, ImageItem.Balance},
+            {LOW_SCHEME_GUID, ImageItem.Low}
         };
 
-        private static readonly Dictionary<Guid, string> TYPICAL_GUID = new Dictionary<Guid, string>
+        private static readonly Dictionary<Guid, ImageItem> TYPICAL_GUID = new Dictionary<Guid, ImageItem>
         {
-            {STABLE_SCHEME_GUID, "Stable"},
-            {MEDIA_SCHEME_GUID, "Media"},
-            {SIMPLE_SCHEME_GUID, "Simple"},
-            {EXTREME_SCHEME_GUID, "Extreme"}
+            {STABLE_SCHEME_GUID, ImageItem.Stable},
+            {MEDIA_SCHEME_GUID, ImageItem.Media},
+            {SIMPLE_SCHEME_GUID, ImageItem.Simple},
+            {EXTREME_SCHEME_GUID, ImageItem.Extreme}
         };
 
         public IEnumerable<IPowerScheme> DefaultPowerSchemes
@@ -372,7 +371,7 @@
             var isNative = ContainsNative(guid);
             var isTypical = ContainsTypical(guid);
 
-            string image;
+            ImageItem image;
 
             if (isNative)
             {
@@ -384,7 +383,7 @@
             }
             else
             {
-                image = UNKNOWN_ICON;
+                image = ImageItem.Unknown;
             }
 
             return new PowerScheme(guid, isNative, image);

@@ -1,4 +1,5 @@
 ﻿using System;
+using Common;
 
 namespace PowerSchemeServiceAPI.Model
 {
@@ -30,8 +31,8 @@ namespace PowerSchemeServiceAPI.Model
         Guid Guid { get; }
 
         /// <summary>
-        /// Gets or sets PowerScheme PictureName
+        /// Gets or sets PowerScheme Picture
         /// </summary>
-        string PictureName { get; set; }
+        ImageItem Picture { get; set; }
     }
 }

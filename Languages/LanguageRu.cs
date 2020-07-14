@@ -17,20 +17,20 @@
         public override string Settings
             => "Настройки";
 
-        public override string Hibernate
+        public override string HibernateName
             => "Режим гибернации";
 
         public override string HibernateDescription
             => "Отображать в меню завершения работы";
 
-        public override string Sleep
+        public override string SleepName
             => "Режим сна";
 
         public override string SleepDescription
             => "Отображать в меню завершения работы";
 
         public override string PowerOptions
-            => "Панель Электропитания Windows";
+            => "Панель электропитания Windows";
 
         public override string CreateTypicalSchemes
             => "Создать типовые схемы";

@@ -1,97 +1,62 @@
-﻿using PowerScheme.Properties;
-using PowerScheme.Utility;
-using RegistryManager;
-using RunAs.Common.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using Languages;
-using PowerSchemeServiceAPI;
-using static PowerScheme.Utility.TrayIcon;
-using PowerSchemeServiceAPI.Model;
-
-namespace PowerScheme.Services
+﻿namespace PowerScheme.Services
 {
+    using Common;
+    using PowerSchemeServiceAPI;
+    using PowerSchemeServiceAPI.Model;
+    using Properties;
+    using RegistryManager;
+    using RunAs.Common.Utils;
+    using System;
+    using System.Linq;
+    using System.Windows.Forms;
+    using Utility;
+    using static MenuLookup;
+    using static Utility.TrayIcon;
+
     partial class ViewService
     {
-        private const string RESTORE_ICON = "Restore";
-        private const string CPL_WINDOWS_ICON = "Panel";
-        private const string ADD_ICON = "Add";
-        private const string DELETE_ICON = "Delete";
-
-        private const string RADIO_ON_ICON = "RadioOn";
-        private const string RADIO_OFF_ICON = "RadioOff";
-
-        private const string STARTUP_ON_WINDOWS_MENU = "StartupOnWindowsToolStripMenuItem";
-        private const string SHOW_HIBERNATE_OPTION_MENU = "ShowHibernateOptionToolStripMenuItem";
-        private const string SHOW_SLEEP_OPTION_MENU = "ShowSleepOptionToolStripMenuItem";
-        private const string EXIT_MENU = "ExitToolStripMenuItem";
-
-        private const string LIDON_DROP_DOWN_MENU = "LidOnToolStripMenuItem";
-        private const string LID_NOTHING_MENU = "LidNothingToolStripMenuItem";
-        private const string LID_SLEEP_MENU = "LidSleepToolStripMenuItem";
-        private const string LID_HIBERNATE_MENU = "LidHibernateToolStripMenuItem";
-        private const string LID_SHUTDOWN_MENU = "LidShutdownToolStripMenuItem";
-
-        private const string SETTINGS_DROP_DOWN_MENU = "SettingsToolStripMenuItem";
-
-        private const string RESTORE_DEFAULT_POWER_SCHEMES_MENU = "RestoreDefaultPowerSchemesToolStripMenuItem";
-        private const string CPL_SCHEME_WINDOWS_MENU = "CplSchemeWindowsToolStripMenuItem";
-        private const string ADD_TYPICAL_SCHEMES_MENU = "AddTypicalSchemesToolStripMenuItem";
-        private const string DELETE_TYPICAL_SCHEMES_MENU = "DeleteTypicalSchemesToolStripMenuItem";
-
-        private static readonly Dictionary<string, string> IMAGE_LID_ON = new Dictionary<string, string>  {
-            { LID_NOTHING_MENU, "Nothing" },
-            { LID_SLEEP_MENU, "Sleep" },
-            { LID_HIBERNATE_MENU, "Hibernate" },
-            { LID_SHUTDOWN_MENU, "Shutdown" },
-        };
-
         private void BuildRightMenu() =>
             _viewModel.ContextRightMenu.InvokeIfRequired(BuildContextRightMenu);
 
         private void BuildContextRightMenu()
         {
-            _viewModel.ContextRightMenu.Items.Clear();
+            ClearContextRightMenu();
 
-            _viewModel.ContextRightMenu.Items.Add(MenuItemSettings());
-            _viewModel.ContextRightMenu.Items.Add(MenuItemSepatator());
-
-            _viewModel.ContextRightMenu.Items.Add(MenuItemStartWithWindows());
-
-            if (_power.ExistsHibernate)
-                _viewModel.ContextRightMenu.Items.Add(MenuItemHibernate());
-
-            _viewModel.ContextRightMenu.Items.Add(MenuItemSleep());
-
-            if (_power.ExistsMobilePlatformRole)
-                _viewModel.ContextRightMenu.Items.Add(MenuItemLidOn());
-
-            _viewModel.ContextRightMenu.Items.Add(MenuItemSepatator());
-            _viewModel.ContextRightMenu.Items.Add(MenuItemExit());
+            AddMenuItemSettings();
+            AddMenuItemSepatator();
+            AddMenuItemStartWithWindows();
+            AddMenuItemHibernate();
+            AddMenuItemSleep();
+            AddMenuItemLid();
+            AddMenuItemSepatator();
+            AddMenuItemExit();
         }
 
+        private void ClearContextRightMenu()
+        {
+            if (_viewModel.ContextRightMenu.Items.Count <= 0) return;
 
+            UnsubscribeFromContextRightMenu();
+        }
         #region MenuItems
 
-        private ToolStripMenuItem MenuItemSettings()
+        private void AddMenuItemSettings()
         {
             var itemDropDownSetting = new ToolStripMenuItem()
             {
-                Name = SETTINGS_DROP_DOWN_MENU,
-                Text = Language.Current.Settings
+                Name = MenuItm.Settings.ToString(),
+                Text = MenuItems[MenuItm.Settings].Name
             };
 
             #region CplSchemeWindows
             var itemCplScheme = new ToolStripMenuItem()
             {
-                Name = CPL_SCHEME_WINDOWS_MENU,
-                Text = Language.Current.PowerOptions,
+                Name = MenuItm.ControlPanelSchemeWindows.ToString(),
+                Text = MenuItems[MenuItm.ControlPanelSchemeWindows].Name,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                Image = GetImage(CPL_WINDOWS_ICON)
+                Image = GetImage(MenuItems[MenuItm.ControlPanelSchemeWindows].Picture)
             };
-            itemCplScheme.Click += ItemCplScheme_Click;
+            itemCplScheme.Click += ItemCplSchemeOnClick;
 
             itemDropDownSetting.DropDownItems.Add(itemCplScheme);
             #endregion
@@ -99,13 +64,13 @@ namespace PowerScheme.Services
             #region RestoreDefaultWindows
             var itemRestore = new ToolStripMenuItem()
             {
-                Name = RESTORE_DEFAULT_POWER_SCHEMES_MENU,
-                Text = Language.Current.RestoreDefaultPowerSchemesName,
-                ToolTipText = Language.Current.RestoreDefaultPowerSchemesDescription,
+                Name = MenuItm.RestoreDefaultPowerSchemes.ToString(),
+                Text = MenuItems[MenuItm.RestoreDefaultPowerSchemes].Name,
+                ToolTipText = MenuItems[MenuItm.RestoreDefaultPowerSchemes].Description,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                Image = GetImage(RESTORE_ICON)
+                Image = GetImage(MenuItems[MenuItm.RestoreDefaultPowerSchemes].Picture)
             };
-            itemRestore.Click += RestoreDefaultPowerSchemes_Click;
+            itemRestore.Click += RestoreDefaultPowerSchemesOnClick;
 
             itemDropDownSetting.DropDownItems.Add(itemRestore);
             #endregion
@@ -115,12 +80,12 @@ namespace PowerScheme.Services
             #region AddTypicalSchemes
             var itemTypicalSchemes = new ToolStripMenuItem()
             {
-                Name = ADD_TYPICAL_SCHEMES_MENU,
-                Text = Language.Current.CreateTypicalSchemes,
+                Name = MenuItm.CreateTypicalSchemes.ToString(),
+                Text = MenuItems[MenuItm.CreateTypicalSchemes].Name,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                Image = GetImage(ADD_ICON)
+                Image = GetImage(MenuItems[MenuItm.CreateTypicalSchemes].Picture)
             };
-            itemTypicalSchemes.Click += ItemCreateTypicalSchemes_Click;
+            itemTypicalSchemes.Click += ItemCreateTypicalSchemesOnClick;
 
             itemDropDownSetting.DropDownItems.Add(itemTypicalSchemes);
             #endregion
@@ -129,12 +94,12 @@ namespace PowerScheme.Services
 
             var itemDeleteTypicalSchemes = new ToolStripMenuItem()
             {
-                Name = DELETE_TYPICAL_SCHEMES_MENU,
-                Text = Language.Current.DeleteTypicalSchemes,
+                Name = MenuItm.DeleteTypicalSchemes.ToString(),
+                Text = MenuItems[MenuItm.DeleteTypicalSchemes].Name,
                 ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                Image = GetImage(DELETE_ICON)
+                Image = GetImage(MenuItems[MenuItm.DeleteTypicalSchemes].Picture)
             };
-            itemDeleteTypicalSchemes.Click += ItemDeleteTypicalSchemes_Click;
+            itemDeleteTypicalSchemes.Click += ItemDeleteTypicalSchemesOnClick;
 
             itemDropDownSetting.DropDownItems.Add(itemDeleteTypicalSchemes);
             #endregion
@@ -147,7 +112,7 @@ namespace PowerScheme.Services
                 {
                     Tag = new StatePowerScheme(powerScheme, ActionWithPowerScheme.Create),
                     ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                    Image = GetImage(powerScheme.PictureName)
+                    Image = GetImage(powerScheme.Picture)
                 };
 
                 item.Click += ItemMenuActionPowerOnClick;
@@ -155,7 +120,7 @@ namespace PowerScheme.Services
                 itemDropDownSetting.DropDownItems.Add(item);
             }
 
-            return itemDropDownSetting;
+            _viewModel.ContextRightMenu.Items.Add(itemDropDownSetting);
         }
 
         private void ItemMenuActionPowerOnClick(object sender, EventArgs e)
@@ -165,109 +130,98 @@ namespace PowerScheme.Services
             _power.ActionPowerScheme(tag);
         }
 
-        private ToolStripMenuItem MenuItemStartWithWindows()
+        private void AddMenuItemStartWithWindows()
         {
             var item = new ToolStripMenuItem
             {
-                Name = STARTUP_ON_WINDOWS_MENU,
-                Text = Language.Current.StartupOnWindows
+                Name = MenuItm.StartupOnWindows.ToString(),
+                Text = MenuItems[MenuItm.StartupOnWindows].Name
             };
 
             item.Click += StartWithWindowsOnClick;
-            return item;
+            _viewModel.ContextRightMenu.Items.Add(item);
         }
 
-        private ToolStripMenuItem MenuItemHibernate()
+        private void AddMenuItemHibernate()
         {
+            if (!_power.ExistsHibernate) return;
+
             var item = new ToolStripMenuItem
             {
-                Name = SHOW_HIBERNATE_OPTION_MENU,
-                Text = Language.Current.Hibernate,
-                ToolTipText = Language.Current.HibernateDescription
+                Name = MenuItm.Hibernate.ToString(),
+                Text = MenuItems[MenuItm.Hibernate].Name,
+                ToolTipText = MenuItems[MenuItm.Hibernate].Description
             };
 
             item.Click += HibernateOnClick;
-            return item;
+            _viewModel.ContextRightMenu.Items.Add(item);
         }
 
-        private ToolStripMenuItem MenuItemSleep()
+        private void AddMenuItemSleep()
         {
             var item = new ToolStripMenuItem
             {
-                Name = SHOW_SLEEP_OPTION_MENU,
-                Text = Language.Current.Sleep,
-                ToolTipText = Language.Current.SleepDescription
+                Name = MenuItm.Sleep.ToString(),
+                Text = MenuItems[MenuItm.Sleep].Name,
+                ToolTipText = MenuItems[MenuItm.Sleep].Description
             };
 
             item.Click += SleepOnClick;
-            return item;
+            _viewModel.ContextRightMenu.Items.Add(item);
         }
 
-        private ToolStripMenuItem MenuItemExit()
+        private void AddMenuItemExit()
         {
             var item = new ToolStripMenuItem
             {
-                Name = EXIT_MENU,
-                Text = Language.Current.Exit
+                Name = MenuItm.Exit.ToString(),
+                Text = MenuItems[MenuItm.Exit].Name
             };
 
             item.Click += ExitOnClick;
-            return item;
+            _viewModel.ContextRightMenu.Items.Add(item);
         }
 
-        private ToolStripSeparator MenuItemSepatator()
-            => new ToolStripSeparator();
+        private void AddMenuItemSepatator()
+            => _viewModel.ContextRightMenu.Items.Add(new ToolStripSeparator());
 
-        private ToolStripMenuItem MenuItemLidOn()
+        private void AddMenuItemLid()
         {
+            if (!_power.ExistsMobilePlatformRole) return;
+
             var item = new ToolStripMenuItem
             {
-                Name = LIDON_DROP_DOWN_MENU,
-                Text = Language.Current.WhenICloseTheLid
+                Name = MenuItm.Lid.ToString(),
+                Text = MenuItems[MenuItm.Lid].Name
             };
             var itemsDropDown = item.DropDownItems;
 
-            var lidItem = new ToolStripMenuItem()
+            for (var i = 0; i < 4; i++)
             {
-                Name = LID_NOTHING_MENU,
-                Tag = 0,
-                Text = Language.Current.DoNothing,
-                ImageScaling = ToolStripItemImageScaling.SizeToFit
-            };
-            lidItem.Click += LidOnClick;
-            itemsDropDown.Add(lidItem);
+                var lidItem = new ToolStripMenuItem()
+                {
+                    Tag = i,
+                    Text = MenuItems.Where(mi =>
+                    {
+                        var isLidSubMenu = mi.Key.ToString().StartsWith("Lid_");
+                        if (!isLidSubMenu) return false;
+                        if (!(mi.Value.Tag is int value)) return false;
+                        return value == i;
+                    }).Select(mi => mi.Value.Name).FirstOrDefault(),
+                    ImageScaling = ToolStripItemImageScaling.SizeToFit,
+                    Image = GetImage(MenuItems.Where(mi =>
+                    {
+                        var isLidSubMenu = mi.Key.ToString().StartsWith("Lid_");
+                        if (!isLidSubMenu) return false;
+                        if (!(mi.Value.Tag is int value)) return false;
+                        return value == i;
+                    }).Select(mi => mi.Value.Picture).FirstOrDefault())
+                };
+                lidItem.Click += LidOnClick;
+                itemsDropDown.Add(lidItem);
+            }
 
-            lidItem = new ToolStripMenuItem()
-            {
-                Name = LID_SLEEP_MENU,
-                Tag = 1,
-                Text = Language.Current.Sleep,
-                ImageScaling = ToolStripItemImageScaling.SizeToFit
-            };
-            lidItem.Click += LidOnClick;
-            itemsDropDown.Add(lidItem);
-
-            lidItem = new ToolStripMenuItem()
-            {
-                Name = LID_HIBERNATE_MENU,
-                Tag = 2,
-                Text = Language.Current.Hibernate,
-                ImageScaling = ToolStripItemImageScaling.SizeToFit
-            };
-            lidItem.Click += LidOnClick;
-            itemsDropDown.Add(lidItem);
-
-            lidItem = new ToolStripMenuItem()
-            {
-                Name = LID_SHUTDOWN_MENU,
-                Tag = 3,
-                Text = Language.Current.ShutDown,
-                ImageScaling = ToolStripItemImageScaling.SizeToFit
-            };
-            lidItem.Click += LidOnClick;
-            itemsDropDown.Add(lidItem);
-
-            return item;
+            _viewModel.ContextRightMenu.Items.Add(item);
         }
 
         private void LidOnClick(object sender, EventArgs e)
@@ -283,7 +237,7 @@ namespace PowerScheme.Services
 
         #endregion
 
-        private void ItemDeleteTypicalSchemes_Click(object sender, EventArgs e)
+        private void ItemDeleteTypicalSchemesOnClick(object sender, EventArgs e)
         {
             void DeleteTypicalScheme()
             {
@@ -295,7 +249,7 @@ namespace PowerScheme.Services
 
         private void UpdateItemsTypicalScheme()
         {
-            if (!(_viewModel.ContextRightMenu.Items[SETTINGS_DROP_DOWN_MENU] is ToolStripMenuItem settingsToolStripMenuItem)
+            if (!(_viewModel.ContextRightMenu.Items[MenuItm.Settings.ToString()] is ToolStripMenuItem settingsToolStripMenuItem)
             ) return;
 
             foreach (var itemMenu in settingsToolStripMenuItem.DropDownItems)
@@ -308,12 +262,12 @@ namespace PowerScheme.Services
             }
         }
 
-        private void ItemCreateTypicalSchemes_Click(object sender, EventArgs e)
+        private void ItemCreateTypicalSchemesOnClick(object sender, EventArgs e)
         {
             _power.CreateTypicalSchemes();
         }
-        
-        private static void ItemCplScheme_Click(object sender, EventArgs e)
+
+        private static void ItemCplSchemeOnClick(object sender, EventArgs e)
         {
             UACHelper.AttemptPrivilegeEscalation("powercfg.cpl");
         }
@@ -324,7 +278,7 @@ namespace PowerScheme.Services
             Environment.Exit(0);
         }
 
-        private void RestoreDefaultPowerSchemes_Click(object sender, EventArgs e)
+        private void RestoreDefaultPowerSchemesOnClick(object sender, EventArgs e)
         {
             _power.RestoreDefaultPowerSchemes();
         }
@@ -361,23 +315,23 @@ namespace PowerScheme.Services
             if (!(menu.Tag is bool b)) return false;
             isChecked = !b;
             menu.Tag = isChecked;
-            menu.Image = isChecked ? GetImage(CHECK_ICON) : null;
+            menu.Image = isChecked ? GetImage(ImageItem.Check) : null;
             return true;
         }
 
         private void UnsubscribeFromContextRightMenu()
         {
-            _viewModel.ContextLeftMenu.Items[STARTUP_ON_WINDOWS_MENU].Click -= StartWithWindowsOnClick;
-            _viewModel.ContextLeftMenu.Items[SHOW_HIBERNATE_OPTION_MENU].Click -= HibernateOnClick;
-            _viewModel.ContextLeftMenu.Items[SHOW_SLEEP_OPTION_MENU].Click -= SleepOnClick;
-            _viewModel.ContextLeftMenu.Items[EXIT_MENU].Click -= ExitOnClick;
+            _viewModel.ContextLeftMenu.Items[MenuItm.StartupOnWindows.ToString()].Click -= StartWithWindowsOnClick;
+            _viewModel.ContextLeftMenu.Items[MenuItm.Hibernate.ToString()].Click -= HibernateOnClick;
+            _viewModel.ContextLeftMenu.Items[MenuItm.Sleep.ToString()].Click -= SleepOnClick;
+            _viewModel.ContextLeftMenu.Items[MenuItm.Exit.ToString()].Click -= ExitOnClick;
 
-            if (!(_viewModel.ContextRightMenu.Items[SETTINGS_DROP_DOWN_MENU] is ToolStripMenuItem settingsToolStripMenuItem)) return;
+            if (!(_viewModel.ContextRightMenu.Items[MenuItm.Settings.ToString()] is ToolStripMenuItem settingsToolStripMenuItem)) return;
 
-            settingsToolStripMenuItem.DropDownItems[RESTORE_DEFAULT_POWER_SCHEMES_MENU].Click -= RestoreDefaultPowerSchemes_Click;
-            settingsToolStripMenuItem.DropDownItems[CPL_SCHEME_WINDOWS_MENU].Click -= ItemCplScheme_Click;
-            settingsToolStripMenuItem.DropDownItems[ADD_TYPICAL_SCHEMES_MENU].Click -= ItemCreateTypicalSchemes_Click;
-            settingsToolStripMenuItem.DropDownItems[DELETE_TYPICAL_SCHEMES_MENU].Click -= ItemDeleteTypicalSchemes_Click;
+            settingsToolStripMenuItem.DropDownItems[MenuItm.RestoreDefaultPowerSchemes.ToString()].Click -= RestoreDefaultPowerSchemesOnClick;
+            settingsToolStripMenuItem.DropDownItems[MenuItm.ControlPanelSchemeWindows.ToString()].Click -= ItemCplSchemeOnClick;
+            settingsToolStripMenuItem.DropDownItems[MenuItm.CreateTypicalSchemes.ToString()].Click -= ItemCreateTypicalSchemesOnClick;
+            settingsToolStripMenuItem.DropDownItems[MenuItm.DeleteTypicalSchemes.ToString()].Click -= ItemDeleteTypicalSchemesOnClick;
 
             foreach (var itemMenu in settingsToolStripMenuItem.DropDownItems)
             {

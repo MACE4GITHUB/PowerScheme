@@ -33,13 +33,13 @@ namespace Languages
         public virtual string Settings
             => "Settings";
 
-        public virtual string Hibernate
+        public virtual string HibernateName
             => "Hibernate";
 
         public virtual string HibernateDescription
             => "Show in Power menu";
 
-        public virtual string Sleep
+        public virtual string SleepName
             => "Sleep";
 
         public virtual string SleepDescription
