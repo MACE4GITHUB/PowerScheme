@@ -14,20 +14,24 @@ namespace RunAs.Common.Utils
         /// Determines if current user has admin privileges.
         /// </summary>
         /// <returns>true if does, false if not.</returns>
-        public static bool HasAdminPrivileges()
+        public static bool HasAdminPrivileges
         {
-            bool isAdmin;
-            try
+            get
             {
-                var user = WindowsIdentity.GetCurrent();
-                var principal = new WindowsPrincipal(user);
-                isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
+                bool isAdmin;
+                try
+                {
+                    var user = WindowsIdentity.GetCurrent();
+                    var principal = new WindowsPrincipal(user);
+                    isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
+                }
+                catch (Exception)
+                {
+                    isAdmin = false;
+                }
+
+                return isAdmin;
             }
-            catch (Exception)
-            {
-                isAdmin = false;
-            }
-            return isAdmin;
         }
 
         /// <summary>
