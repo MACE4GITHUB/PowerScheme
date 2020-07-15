@@ -15,11 +15,12 @@ namespace PowerSchemeServiceAPI.Model
         /// <param name="guid"></param>
         /// <param name="isNative"></param>
         /// <param name="picture"></param>
-        public PowerScheme(Guid guid, bool isNative, ImageItem picture)
+        public PowerScheme(Guid guid, bool isNative, ImageItem picture, bool isVisible)
         {
             Guid = guid;
             IsNative = isNative;
             Picture = picture;
+            IsVisible = isVisible;
         }
 
         /// <summary>
@@ -36,6 +37,11 @@ namespace PowerSchemeServiceAPI.Model
         /// Gets true if PowerScheme is native (High, Balance, Low), otherwise false
         /// </summary>
         public bool IsNative { get; }
+
+        /// <summary>
+        /// Gets true if PowerScheme is visible, otherwise false
+        /// </summary>
+        public bool IsVisible { get; }
 
         /// <summary>
         /// Gets true if PowerScheme is active, otherwise false

@@ -25,6 +25,15 @@ namespace PowerSchemeServiceAPI.Settings
         public PowerSchemeWiFi WiFi(Values values)
             => new PowerSchemeWiFi(PowerSchemeGuid, values.State);
 
+        public PowerSchemeMultimediaPlay MultimediaPlay(Values values)
+            => new PowerSchemeMultimediaPlay(PowerSchemeGuid, values.State);
+
+        public PowerSchemeMultimediaShare MultimediaShare(Values values)
+            => new PowerSchemeMultimediaShare(PowerSchemeGuid, values.State);
+
+        public PowerSchemeMultimediaQuality MultimediaQuality(Values values)
+            => new PowerSchemeMultimediaQuality(PowerSchemeGuid, values.State);
+
         public void ApplyDefaultValues()
         {
             var powerSchemeDefaultSettings = new PowerSchemeDefaultSettings();
@@ -46,17 +55,35 @@ namespace PowerSchemeServiceAPI.Settings
     {
         public PowerSchemeDefaultSettings()
         {
-            Settings = new Dictionary<PowerSchemeSetting, Values>()
+
+
+            Settings = new Dictionary<PowerSchemeSetting, Values>
             {
                 {PowerSchemeSetting.ProcessorThrottle, new Values( new PowerSchemeDCACValues(5, 85),
                                                                    new PowerSchemeDCACValues(60, 85))},
-                {PowerSchemeSetting.Sleep, new Values( new PowerSchemeDCACValues(900, 10800))},
                 {PowerSchemeSetting.TurnOffDisplay, new Values( new PowerSchemeDCACValues(300, 7200))},
-                {PowerSchemeSetting.WiFi, new Values( new PowerSchemeDCACValues(2, 2))}
+                {PowerSchemeSetting.Sleep, new Values( new PowerSchemeDCACValues(900, 10800))},
+                {PowerSchemeSetting.WiFi, new Values( new PowerSchemeDCACValues(2, 2))},
+                {PowerSchemeSetting.MultimediaPlay, new Values( new PowerSchemeDCACValues(1, 1))},
+                {PowerSchemeSetting.MultimediaShare, new Values( new PowerSchemeDCACValues(2, 2))},
+                {PowerSchemeSetting.MultimediaQuality, new Values( new PowerSchemeDCACValues(1, 1))}
             };
         }
 
         public Dictionary<PowerSchemeSetting, Values> Settings { get; }
+
+        private Dictionary<PowerSchemeSetting, int[]> SettingsStable
+            => new Dictionary<PowerSchemeSetting, int[]>
+            {
+                {PowerSchemeSetting.ProcessorThrottle, new []{5,85,60,85}},
+                {PowerSchemeSetting.TurnOffDisplay, new []{300,7200}},
+                {PowerSchemeSetting.Sleep, new []{900,10800}},
+                {PowerSchemeSetting.WiFi, new []{2,2}},
+                {PowerSchemeSetting.MultimediaPlay, new []{1,1}},
+                {PowerSchemeSetting.MultimediaShare, new []{2,2}},
+                {PowerSchemeSetting.MultimediaQuality, new []{1,1}}
+            };
+
     }
 
     public class Values
@@ -85,6 +112,9 @@ namespace PowerSchemeServiceAPI.Settings
         ProcessorThrottle,
         Sleep,
         TurnOffDisplay,
-        WiFi
+        WiFi,
+        MultimediaPlay,
+        MultimediaShare,
+        MultimediaQuality
     }
 }

@@ -131,6 +131,7 @@
     <Content Include="Resources\Start.ico" />
     <None Include="Resources\Unknown.png" />
     <Content Include="Resources\Stop.png" />
+    <None Include="Resources\Ultimate.png" />
     <Content Include="Start.ico" />
   </ItemGroup>
   <ItemGroup>

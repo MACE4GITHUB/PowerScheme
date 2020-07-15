@@ -1,5 +1,5 @@
-﻿using System;
-using Common;
+﻿using Common;
+using System;
 
 namespace PowerSchemeServiceAPI.Model
 {
@@ -19,6 +19,11 @@ namespace PowerSchemeServiceAPI.Model
         /// Gets true if PowerScheme is native (High, Balance, Low), otherwise false
         /// </summary>
         bool IsNative { get; }
+
+        /// <summary>
+        /// Gets true if PowerScheme is visible, otherwise false
+        /// </summary>
+        bool IsVisible { get; }
 
         /// <summary>
         /// Gets true if PowerScheme is active, otherwise false

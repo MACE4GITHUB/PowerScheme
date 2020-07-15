@@ -5,7 +5,7 @@
     using Model;
     using System.Collections.Generic;
 
-    internal class MenuLookup
+    internal static class MenuLookup
     {
         internal static readonly Dictionary<MenuItm, ViewMenu> MenuItems = new Dictionary<MenuItm, ViewMenu>
         {

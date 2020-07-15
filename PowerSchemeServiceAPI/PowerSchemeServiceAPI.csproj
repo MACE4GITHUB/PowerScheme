@@ -60,8 +60,10 @@
     <Compile Include="IPowerSchemeService.cs" />
     <Compile Include="Model\IPowerScheme.cs" />
     <Compile Include="Model\PowerScheme.cs" />
+    <Compile Include="Model\PowerSchemeParams.cs" />
     <Compile Include="Model\StatePowerScheme.cs" />
     <Compile Include="Model\Watchers.cs" />
+    <Compile Include="PowerSchemeLookup.cs" />
     <Compile Include="PowerSchemeService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\BaseMinMaxPowerSchemeValues.cs" />
@@ -69,8 +71,11 @@
     <Compile Include="Settings\IApplicable.cs" />
     <Compile Include="Settings\PowerSchemeDCACValues.cs" />
     <Compile Include="Settings\PowerSchemeLid.cs" />
+    <Compile Include="Settings\PowerSchemeMultimediaQuality.cs" />
+    <Compile Include="Settings\PowerSchemeMultimediaPlay.cs" />
     <Compile Include="Settings\PowerSchemeProcessorThrottle.cs" />
     <Compile Include="Settings\PowerSchemeSettings.cs" />
+    <Compile Include="Settings\PowerSchemeMultimediaShare.cs" />
     <Compile Include="Settings\PowerSchemeSleep.cs" />
     <Compile Include="Settings\PowerSchemeTurnOffDisplay.cs" />
     <Compile Include="Settings\PowerSchemeValues.cs" />

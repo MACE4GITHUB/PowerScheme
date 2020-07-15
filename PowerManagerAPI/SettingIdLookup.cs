@@ -30,7 +30,8 @@ namespace PowerManagerAPI
         BATTERY_SUBGROUP,
         SLEEP_SUBGROUP,
         PCIEXPRESS_SETTINGS_SUBGROUP,
-        WIFI_SUBGROUP
+        WIFI_SUBGROUP,
+        MULTIMEDIA_SUBGROUP
     }
 
     public enum Setting
@@ -56,7 +57,10 @@ namespace PowerManagerAPI
         STANDBYIDLE,
         ADAPTBRIGHT,
         VIDEOIDLE,
-        WIFISAVER
+        WIFISAVER,
+        MULTPLAY,
+        MULTSHARE,
+        MULTQUALITY
     }
 
     public enum PowerPlatformRole
@@ -762,7 +766,8 @@ namespace PowerManagerAPI
             { SettingSubgroup.BATTERY_SUBGROUP,             new Guid("e73a048d-bf27-4f12-9731-8b2076e8891f") },
             { SettingSubgroup.SLEEP_SUBGROUP,               new Guid("238C9FA8-0AAD-41ED-83F4-97BE242C8F20") },
             { SettingSubgroup.PCIEXPRESS_SETTINGS_SUBGROUP, new Guid("501a4d13-42af-4429-9fd1-a8218c268e20") },
-            { SettingSubgroup.WIFI_SUBGROUP,                new Guid("19cbb8fa-5279-450e-9fac-8a3d5fedd0c1") }
+            { SettingSubgroup.WIFI_SUBGROUP,                new Guid("19cbb8fa-5279-450e-9fac-8a3d5fedd0c1") },
+            { SettingSubgroup.MULTIMEDIA_SUBGROUP,          new Guid("9596fb26-9850-41fd-ac3e-f7c3c00afd4b") }
         };
 
         public static Dictionary<Setting, Guid> SettingGuids = new Dictionary<Setting, Guid>
@@ -788,7 +793,10 @@ namespace PowerManagerAPI
             { Setting.STANDBYIDLE,      new Guid("29f6c1db-86da-48c5-9fdb-f2b67b1f44da") },
             { Setting.ADAPTBRIGHT,      new Guid("fbd9aa66-9553-4097-ba44-ed6e9d65eab8") },
             { Setting.VIDEOIDLE,        new Guid("3c0bc021-c8a8-4e07-a973-6b14cbcb2b7e") },
-            { Setting.WIFISAVER,        new Guid("12bbebe6-58d6-4636-95bb-3217ef867c1a") }
+            { Setting.WIFISAVER,        new Guid("12bbebe6-58d6-4636-95bb-3217ef867c1a") },
+            { Setting.MULTPLAY,         new Guid("34c7b99f-9a6d-4b3c-8dc7-b6693b78cef4") },
+            { Setting.MULTSHARE,        new Guid("03680956-93bc-4294-bba6-4e0f09bb717f") },
+            { Setting.MULTQUALITY,      new Guid("10778347-1370-4ee0-8bbd-33bdacaade49") }
         };
     }
 }
