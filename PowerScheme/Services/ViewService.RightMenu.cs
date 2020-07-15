@@ -246,8 +246,7 @@ namespace PowerScheme.Services
 
         private void UpdateItemsTypicalScheme()
         {
-            if (!(_viewModel.ContextRightMenu.Items[MenuItm.Settings.ToString()] is ToolStripMenuItem settingsToolStripMenuItem)
-            ) return;
+            if (!(_viewModel.ContextRightMenu.Items[MenuItm.Settings.ToString()] is ToolStripMenuItem settingsToolStripMenuItem)) return;
 
             foreach (var itemMenu in settingsToolStripMenuItem.DropDownItems)
             {
