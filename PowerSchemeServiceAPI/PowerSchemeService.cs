@@ -23,13 +23,15 @@
         {
             get
             {
-                var typicalGuid
-                    = SettingSchemes
-                        .Where(p => !p.Value.IsNative && p.Value.IsVisible);
+                if (CanCreateExtremePowerScheme)
+                {
+                    return SettingSchemes
+                        .Where(p => !p.Value.IsNative && p.Value.IsVisible)
+                        .Select(p => NewPowerScheme(p.Value));
+                }
 
-                return CanCreateExtremePowerScheme
-                    ? typicalGuid.Select(p => NewPowerScheme(p.Value))
-                    : typicalGuid.SkipWhile(p => p.Key == SettingScheme.Ultimate)
+                return SettingSchemes
+                    .Where(p => !p.Value.IsNative && p.Value.IsVisible && p.Key != SettingScheme.Extreme)
                     .Select(p => NewPowerScheme(p.Value));
             }
         }
@@ -102,10 +104,9 @@
                 .Where(p => !p.Value.IsNative && RegistryService.ExistsTypicalPowerScheme(p.Value.Guid))
                 .Select(p => p.Value.Guid))
             {
-                if (guid == activeGuid)
-                {
+                if (guid == activeGuid) 
                     SetActivePowerScheme(SettingSchemes[SettingScheme.Balance].Guid);
-                }
+
                 PowerManager.DeletePlan(guid);
             }
         }
