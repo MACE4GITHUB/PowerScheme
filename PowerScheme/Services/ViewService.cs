@@ -132,17 +132,12 @@ namespace PowerScheme.Services
             ImageItem pictureName = ImageItem.Unknown;
             foreach (ToolStripMenuItem lidStripMenuItem in lidItems.DropDownItems)
             {
-                var valueTag = (int)lidStripMenuItem.Tag;
+                var valueTag = (int)(Lid)lidStripMenuItem.Tag;
                 var @checked = valueLidOn == valueTag;
                 // Uncomment if you want to change the Image style
                 //lidStripMenuItem.Image = GetImage(@checked ? ImageItem.RadioOn : ImageItem.RadioOff);
                 if (@checked) pictureName = MenuItems.Where(mi =>
-                    {
-                        var isLidSubMenu = mi.Key.ToString().StartsWith("Lid_");
-                        if (!isLidSubMenu) return false;
-                        if (!(mi.Value.Tag is int value)) return false;
-                        return value == valueTag;
-                    }).Select(mi => mi.Value.Picture).FirstOrDefault();
+                    HasLidValue(mi, valueTag)).Select(mi => mi.Value.Picture).FirstOrDefault();
             }
             _viewModel.ContextRightMenu.Items[MenuItm.Lid.ToString()].Image = GetImage(pictureName);
         }

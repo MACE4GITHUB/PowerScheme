@@ -1,4 +1,6 @@
-﻿namespace PowerScheme.Utility
+﻿using Image = Common.Image;
+
+namespace PowerScheme.Utility
 {
     using Common;
     using System.Drawing;

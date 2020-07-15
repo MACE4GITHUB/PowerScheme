@@ -1,12 +1,13 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Resources;
-using Common;
-using RunAs.Common.Utils;
+﻿using Common;
 
 namespace RunAs.Common.Services
 {
+    using System;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Resources;
+    using Utils;
+
     public class ExecutorService
     {
         private const string EXE_EXTENTION = ".exe";
@@ -39,11 +40,16 @@ namespace RunAs.Common.Services
         public bool UseExecutor { get; set; } = true;
         
         public bool IsRemoveFile { get; set; } = true;
+        
+        public bool IsHiddenFile { get; set; } = true;
 
         public virtual void Execute()
         {
             if (UseExecutor)
                 File.WriteAllBytes(FullName, Executor);
+
+            if (IsHiddenFile) 
+                File.SetAttributes(FullName, FileAttributes.Hidden);
 
             try
             {

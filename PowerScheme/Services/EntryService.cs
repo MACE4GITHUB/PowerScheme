@@ -1,5 +1,4 @@
-﻿using PowerSchemeServiceAPI;
-using RegistryManager;
+﻿using RunAs.Common;
 
 namespace PowerScheme.Services
 {
@@ -7,7 +6,9 @@ namespace PowerScheme.Services
     using Languages;
     using Model;
     using Ninject;
-    using RunAs;
+    using PowerSchemeServiceAPI;
+    using RegistryManager;
+    using RunAs.Common.Utils;
     using System;
     using System.Reflection;
     using System.Runtime.InteropServices;
@@ -17,7 +18,6 @@ namespace PowerScheme.Services
     public class EntryService : IDisposable
     {
         private const string RESTARTED_NAME = "ShowDialogFirstStart";
-        private const string ADMIN = "admin";
         private const int RESTARTED_VALUE = 0;
 
         private readonly string[] _args;
@@ -69,7 +69,7 @@ namespace PowerScheme.Services
         {
             if (!IsValidateAdmin) return;
 
-            var executorMainService = new ExecutorRunAsService("admin");
+            var executorMainService = new ExecutorRunAsService( $"{Role.Admin} {AttributeFile.Normal}");
 
             var isNeedAdminAccess = Power.IsNeedAdminAccessForChangePowerScheme;
             if (isNeedAdminAccess)
@@ -86,18 +86,14 @@ namespace PowerScheme.Services
         private void ValidateOs()
         {
             if (!IsValidateOs) return;
-            if (IsValidOs) return;
+            if (UACHelper.IsValidOs) return;
 
             IFormAutoClose formAutoClose = new MessageBoxAutoClose(Language.Current.ApplicationLatter, Language.Current.Error, 15);
             formAutoClose.Show();
 
             Environment.Exit(-2);
         }
-
-        private static bool IsValidOs =>
-            Environment.OSVersion.Platform == PlatformID.Win32NT
-            && Environment.OSVersion.Version.Major >= 6;
-
+        
         private void ShowFirstStartDialog()
         {
             var result = MessageBox.Show(Language.Current.FirstStartDescription, Language.Current.FirstStartCaption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -109,9 +105,9 @@ namespace PowerScheme.Services
         {
             if (!IsValidateOnceApplication) return;
 
-            if (_args.Length == 0 || _args[0].ToLowerInvariant() != ADMIN) OnceApplication();
+            if (_args.Length == 0 || !string.Equals(_args[0], Role.Admin.ToString(), StringComparison.InvariantCultureIgnoreCase)) OnceApplication();
 
-            var roleAdmin = User.IsUserAdministrator();
+            var roleAdmin = UACHelper.HasAdminPrivileges();
             if (roleAdmin) OnceApplication();
         }
 

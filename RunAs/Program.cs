@@ -1,13 +1,17 @@
-﻿using RunAs.Common.Services;
+﻿using System;
+using RunAs.Common;
 
 namespace RunAs
 {
-    class Program
+    using Common.Services;
+
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var program = args[0];
             var arguments = args[1];
+            var isHidden = string.Equals(args[2], AttributeFile.Hidden.ToString(), StringComparison.InvariantCultureIgnoreCase);
 
             var executorService = new ExecutorService()
             {
@@ -15,11 +19,10 @@ namespace RunAs
                 Arguments = arguments,
                 UseExecutor = false,
                 IsWait = false,
-                IsRemoveFile = false
+                IsRemoveFile = false,
+                IsHiddenFile = isHidden
             };
             executorService.Execute();
         }
     }
-
-
 }

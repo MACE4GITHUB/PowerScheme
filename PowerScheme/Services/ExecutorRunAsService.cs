@@ -1,22 +1,19 @@
-﻿using Common;
-using PowerScheme.Properties;
-using RunAs.Common.Services;
-using System;
-
-namespace PowerScheme.Services
+﻿namespace PowerScheme.Services
 {
+    using Common;
+    using Properties;
+    using RunAs.Common.Services;
+    using System;
+
     public class ExecutorRunAsService : ExecutorService
     {
         private const string NAME = "RunAs";
-        private bool isExecuted;
+        private bool _isExecuted;
 
-        public string NameMainProgram
+        private string NameMainProgram
             => Paths.ApplicationNameWithoutExtension;
 
-        public ExecutorRunAsService() : this("")
-        { }
-
-        public ExecutorRunAsService(string arguments)
+        public ExecutorRunAsService(string arguments = "")
         {
             Name = NAME;
             Arguments = string.IsNullOrEmpty(arguments) 
@@ -27,11 +24,11 @@ namespace PowerScheme.Services
         
         public override void Execute()
         {
-            if (isExecuted)
+            if (_isExecuted)
                 throw new ArgumentNullException(nameof(NAME));
 
             base.Execute();
-            isExecuted = true;
+            _isExecuted = true;
         }
     }
 }

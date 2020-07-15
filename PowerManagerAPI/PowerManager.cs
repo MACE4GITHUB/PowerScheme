@@ -25,8 +25,7 @@ namespace PowerManagerAPI
         /// <returns>Guid of the currently active plan</returns>
         public static Guid GetActivePlan()
         {
-            IntPtr activePolicyGuidPtr;
-            var res = PowerGetActiveScheme(IntPtr.Zero, out activePolicyGuidPtr);
+            var res = PowerGetActiveScheme(IntPtr.Zero, out var activePolicyGuidPtr);
 
             if (res != (uint)ErrorCode.SUCCESS)
                 throw new Win32Exception((int)res);

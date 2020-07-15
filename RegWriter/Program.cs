@@ -1,13 +1,10 @@
-﻿using System;
-using System.IO;
-using RegistryManager;
-using RegistryManager.Model;
-
-namespace RegWriter
+﻿namespace RegWriter
 {
-    class Program
+    using RegistryManager;
+
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             if (args.Length != 2) return;
 

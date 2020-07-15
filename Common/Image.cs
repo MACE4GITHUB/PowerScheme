@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace PowerScheme.Utility
+namespace Common
 {
     public static class Image
     {

@@ -7,12 +7,12 @@ using PowerSchemeServiceAPI;
 
 namespace PowerScheme
 {
-    static class Program
+    internal static class Program
     {
         private static Mutex _mutexObj;
 
         [STAThread]
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var applicationModule = new ApplicationModule();
             CompositionRoot.Wire(applicationModule);
@@ -33,6 +33,7 @@ namespace PowerScheme
             viewService.Start();
 
             Application.Run();
+            _mutexObj.Dispose();
         }
     }
 }

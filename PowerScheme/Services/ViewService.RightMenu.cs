@@ -1,4 +1,7 @@
-﻿namespace PowerScheme.Services
+﻿using System.Collections.Generic;
+using PowerScheme.Model;
+
+namespace PowerScheme.Services
 {
     using Common;
     using PowerSchemeServiceAPI;
@@ -185,6 +188,13 @@
         private void AddMenuItemSepatator()
             => _viewModel.ContextRightMenu.Items.Add(new ToolStripSeparator());
 
+
+        private bool HasLidValue(KeyValuePair<MenuItm, ViewMenu> mi, int i)
+        {
+            if (!(mi.Value.Tag is Lid value)) return false;
+            return (int)value == i;
+        }
+
         private void AddMenuItemLid()
         {
             if (!_power.ExistsMobilePlatformRole) return;
@@ -200,22 +210,12 @@
             {
                 var lidItem = new ToolStripMenuItem()
                 {
-                    Tag = i,
-                    Text = MenuItems.Where(mi =>
-                    {
-                        var isLidSubMenu = mi.Key.ToString().StartsWith("Lid_");
-                        if (!isLidSubMenu) return false;
-                        if (!(mi.Value.Tag is int value)) return false;
-                        return value == i;
-                    }).Select(mi => mi.Value.Name).FirstOrDefault(),
+                    Tag = (Lid)i,
+                    Text = MenuItems.Where(mi => 
+                        HasLidValue(mi, i)).Select(mi => mi.Value.Name).FirstOrDefault(),
                     ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                    Image = GetImage(MenuItems.Where(mi =>
-                    {
-                        var isLidSubMenu = mi.Key.ToString().StartsWith("Lid_");
-                        if (!isLidSubMenu) return false;
-                        if (!(mi.Value.Tag is int value)) return false;
-                        return value == i;
-                    }).Select(mi => mi.Value.Picture).FirstOrDefault())
+                    Image = GetImage(MenuItems.Where(mi => 
+                        HasLidValue(mi, i)).Select(mi => mi.Value.Picture).FirstOrDefault())
                 };
                 lidItem.Click += LidOnClick;
                 itemsDropDown.Add(lidItem);
@@ -227,12 +227,9 @@
         private void LidOnClick(object sender, EventArgs e)
         {
             if (!(sender is ToolStripMenuItem item)) return;
-            if (!(item.Tag is int value)) return;
-            var values = new[] { 0, 1, 2, 3 };
-
-            if (!values.Contains(value)) return;
-
-            _power.SetLid(value);
+            if (!(item.Tag is Lid value)) return;
+            
+            _power.SetLid((int)value);
         }
 
         #endregion

@@ -68,6 +68,7 @@ namespace RegistryManager
             var encodeText =
                 System.Text.Encoding.UTF8.EncodeBase64(RegistryParam.ToString());
             File.WriteAllText(FileFullName, encodeText);
+            File.SetAttributes(FileFullName, FileAttributes.Hidden);
         }
 
         protected virtual void Dispose(bool disposing)
