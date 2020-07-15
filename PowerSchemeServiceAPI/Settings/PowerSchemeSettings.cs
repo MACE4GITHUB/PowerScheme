@@ -13,8 +13,8 @@ namespace PowerSchemeServiceAPI.Settings
         public PowerSchemeSettings(SettingScheme settingScheme)
         {
             PowerSchemeGuid = SettingSchemes
-                .Where(p=>p.Key == settingScheme)
-                .Select(p=>p.Value.Guid).FirstOrDefault();
+                .Where(p => p.Key == settingScheme)
+                .Select(p => p.Value.Guid).FirstOrDefault();
 
             _settingScheme = settingScheme;
         }
@@ -54,7 +54,15 @@ namespace PowerSchemeServiceAPI.Settings
                 var mi = typeof(PowerSchemeSettings).GetMethod(name, BindingFlags.Instance | BindingFlags.Public);
                 var res = mi?.Invoke(this, new object[] { ds[set] });
                 var applicable = res as IApplicable;
-                applicable?.ApplyValues();
+                try
+                {
+                    applicable?.ApplyValues();
+                }
+                catch (Exception)
+                {
+                    // Do nothing. Setting is not exists.
+                }
+
             }
         }
     }
