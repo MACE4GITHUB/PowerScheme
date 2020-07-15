@@ -3,9 +3,9 @@ using Common;
 
 namespace PowerSchemeServiceAPI.Model
 {
-    internal class PowerSchemeParams
+    internal class SettingSchemeParams
     {
-        public PowerSchemeParams(Guid guid, bool isNative, ImageItem image, bool isVisible = true)
+        public SettingSchemeParams(Guid guid, bool isNative, ImageItem image, bool isVisible = true)
         {
             Image = image;
             IsVisible = isVisible;

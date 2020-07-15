@@ -60,10 +60,10 @@
     <Compile Include="IPowerSchemeService.cs" />
     <Compile Include="Model\IPowerScheme.cs" />
     <Compile Include="Model\PowerScheme.cs" />
-    <Compile Include="Model\PowerSchemeParams.cs" />
+    <Compile Include="Model\SettingSchemeParams.cs" />
     <Compile Include="Model\StatePowerScheme.cs" />
     <Compile Include="Model\Watchers.cs" />
-    <Compile Include="PowerSchemeLookup.cs" />
+    <Compile Include="SettingSchemeLookup.cs" />
     <Compile Include="PowerSchemeService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\BaseMinMaxPowerSchemeValues.cs" />
