@@ -38,8 +38,8 @@ namespace PowerScheme.Services
         public void Start()
         {
             ValidateOs();
-            ValidateOnceApplication();
             ValidateAdmin();
+            ValidateOnceApplication();
             ValidateFirstStart();
         }
 
@@ -69,7 +69,7 @@ namespace PowerScheme.Services
         {
             if (!IsValidateAdmin) return;
 
-            var executorMainService = new ExecutorRunAsService( $"{Role.Admin} {AttributeFile.Normal}");
+            var executorMainService = new ExecutorRunAsService($"{Role.Admin} {AttributeFile.Normal}");
 
             var isNeedAdminAccess = Power.IsNeedAdminAccessForChangePowerScheme;
             if (isNeedAdminAccess)
@@ -93,7 +93,7 @@ namespace PowerScheme.Services
 
             Environment.Exit(-2);
         }
-        
+
         private void ShowFirstStartDialog()
         {
             var result = MessageBox.Show(Language.Current.FirstStartDescription, Language.Current.FirstStartCaption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -105,10 +105,7 @@ namespace PowerScheme.Services
         {
             if (!IsValidateOnceApplication) return;
 
-            if (_args.Length == 0 || !string.Equals(_args[0], Role.Admin.ToString(), StringComparison.InvariantCultureIgnoreCase)) OnceApplication();
-
-            var roleAdmin = UACHelper.HasAdminPrivileges();
-            if (roleAdmin) OnceApplication();
+            OnceApplication();
         }
 
         private void OnceApplication()
