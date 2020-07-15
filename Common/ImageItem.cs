@@ -14,6 +14,7 @@
         High,
         Balance,
         Low,
+        Ultimate,
         Stable,
         Media,
         Simple,
