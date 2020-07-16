@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-using PowerScheme.Model;
-
-namespace PowerScheme.Services
+﻿namespace PowerScheme.Services
 {
     using Common;
+    using Model;
     using PowerSchemeServiceAPI;
     using PowerSchemeServiceAPI.Model;
     using Properties;
     using RegistryManager;
     using RunAs.Common.Utils;
     using System;
+    using System.Collections.Generic;
+    using System.Drawing;
     using System.Linq;
     using System.Windows.Forms;
     using Utility;
@@ -211,10 +211,10 @@ namespace PowerScheme.Services
                 var lidItem = new ToolStripMenuItem()
                 {
                     Tag = (Lid)i,
-                    Text = MenuItems.Where(mi => 
+                    Text = MenuItems.Where(mi =>
                         HasLidValue(mi, i)).Select(mi => mi.Value.Name).FirstOrDefault(),
                     ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                    Image = GetImage(MenuItems.Where(mi => 
+                    Image = GetImage(MenuItems.Where(mi =>
                         HasLidValue(mi, i)).Select(mi => mi.Value.Picture).FirstOrDefault())
                 };
                 lidItem.Click += LidOnClick;
@@ -228,7 +228,7 @@ namespace PowerScheme.Services
         {
             if (!(sender is ToolStripMenuItem item)) return;
             if (!(item.Tag is Lid value)) return;
-            
+
             _power.SetLid((int)value);
         }
 
@@ -313,6 +313,62 @@ namespace PowerScheme.Services
             menu.Tag = isChecked;
             menu.Image = isChecked ? GetImage(ImageItem.Check) : null;
             return true;
+        }
+
+        private void CheckLid()
+        {
+            if (!(_viewModel.ContextRightMenu.Items[MenuItm.Lid.ToString()] is ToolStripMenuItem lidItems)) return;
+            if (!_power.ExistsMobilePlatformRole) return;
+
+            var any = _power.ActivePowerScheme.Guid;
+            var valueLidOn = RegistryService.GetLidOption(any);
+            var pictureName = ImageItem.Unknown;
+            foreach (ToolStripMenuItem lidStripMenuItem in lidItems.DropDownItems)
+            {
+                var valueTag = (int)(Lid)lidStripMenuItem.Tag;
+                var @checked = valueLidOn == valueTag;
+                // Uncomment if you want to change the Image style
+                //lidStripMenuItem.Image = GetImage(@checked ? ImageItem.RadioOn : ImageItem.RadioOff);
+                if (@checked) pictureName = MenuItems.Where(mi =>
+                    HasLidValue(mi, valueTag)).Select(mi => mi.Value.Picture).FirstOrDefault();
+            }
+            _viewModel.ContextRightMenu.Items[MenuItm.Lid.ToString()].Image = GetImage(pictureName);
+        }
+
+        private static void CheckMenu(ToolStripItem item, bool @checked)
+        {
+            item.Tag = @checked;
+            item.Image = GetImageIfCheck(@checked);
+        }
+
+        private static Bitmap GetImageIfCheck(bool @checked)
+        {
+            return @checked ? GetImage(ImageItem.Check) : null;
+        }
+
+        private void UpdateContextRightMenu()
+        {
+            CheckMenu(
+                _viewModel.ContextRightMenu.Items[MenuItm.StartupOnWindows.ToString()],
+                RegistryService.IsRunOnStartup);
+
+            if (_power.ExistsHibernate)
+                CheckMenu(
+                    _viewModel.ContextRightMenu.Items[MenuItm.Hibernate.ToString()],
+                    RegistryService.IsShowHibernateOption);
+
+            CheckMenu(
+                _viewModel.ContextRightMenu.Items[MenuItm.Sleep.ToString()],
+                RegistryService.IsShowSleepOption);
+
+            if (_viewModel.ContextRightMenu.Items[MenuItm.Settings.ToString()] is ToolStripMenuItem settingsToolStripMenuItem)
+            {
+                settingsToolStripMenuItem.DropDownItems[MenuItm.DeleteTypicalSchemes.ToString()].Visible = _power.UserPowerSchemes.Any();
+                settingsToolStripMenuItem.DropDownItems[MenuItm.CreateTypicalSchemes.ToString()].Visible = !_power.ExistsAllTypicalScheme;
+                UpdateItemsTypicalScheme();
+            }
+
+            CheckLid();
         }
 
         private void UnsubscribeFromContextRightMenu()

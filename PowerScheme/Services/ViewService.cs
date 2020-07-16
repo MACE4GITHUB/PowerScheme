@@ -1,19 +1,16 @@
-﻿using Common;
+﻿using System;
+using Common;
 
 namespace PowerScheme.Services
 {
     using Model;
     using PowerSchemeServiceAPI;
-    using RegistryManager;
     using RegistryManager.EventsArgs;
-    using System.Drawing;
-    using System.Linq;
     using System.Reflection;
     using System.Windows.Forms;
-    using static MenuLookup;
     using static Utility.TrayIcon;
 
-    public partial class ViewService : IViewService
+    public sealed partial class ViewService : IViewService
     {
         private const string SHOW_CONTEXT_MENU = "ShowContextMenu";
         private readonly IViewModel _viewModel;
@@ -32,7 +29,6 @@ namespace PowerScheme.Services
 
             _viewModel.NotifyIcon.MouseClick += NotifyIcon_MouseClick;
             _viewModel.NotifyIcon.Visible = true;
-            _viewModel.NotifyIcon.ContextMenuStrip = _viewModel.ContextLeftMenu;
 
             BuildMenu();
             UpdateIcon();
@@ -97,60 +93,9 @@ namespace PowerScheme.Services
             _viewModel.NotifyIcon.ContextMenuStrip = null;
         }
 
-        private void UpdateContextRightMenu()
+        public void Dispose()
         {
-            CheckMenu(
-                _viewModel.ContextRightMenu.Items[MenuItm.StartupOnWindows.ToString()],
-                RegistryService.IsRunOnStartup);
-
-            if (_power.ExistsHibernate)
-                CheckMenu(
-                    _viewModel.ContextRightMenu.Items[MenuItm.Hibernate.ToString()],
-                    RegistryService.IsShowHibernateOption);
-
-            CheckMenu(
-                _viewModel.ContextRightMenu.Items[MenuItm.Sleep.ToString()],
-                RegistryService.IsShowSleepOption);
-
-            if (_viewModel.ContextRightMenu.Items[MenuItm.Settings.ToString()] is ToolStripMenuItem settingsToolStripMenuItem)
-            {
-                settingsToolStripMenuItem.DropDownItems[MenuItm.DeleteTypicalSchemes.ToString()].Visible = _power.UserPowerSchemes.Any();
-                settingsToolStripMenuItem.DropDownItems[MenuItm.CreateTypicalSchemes.ToString()].Visible = !_power.ExistsAllTypicalScheme;
-                UpdateItemsTypicalScheme();
-            }
-
-            CheckLid();
-        }
-
-        private void CheckLid()
-        {
-            if (!_power.ExistsMobilePlatformRole) return;
-
-            var any = _power.ActivePowerScheme.Guid;
-            var valueLidOn = RegistryService.GetLidOption(any);
-            var lidItems = _viewModel.ContextRightMenu.Items[MenuItm.Lid.ToString()] as ToolStripMenuItem;
-            ImageItem pictureName = ImageItem.Unknown;
-            foreach (ToolStripMenuItem lidStripMenuItem in lidItems.DropDownItems)
-            {
-                var valueTag = (int)(Lid)lidStripMenuItem.Tag;
-                var @checked = valueLidOn == valueTag;
-                // Uncomment if you want to change the Image style
-                //lidStripMenuItem.Image = GetImage(@checked ? ImageItem.RadioOn : ImageItem.RadioOff);
-                if (@checked) pictureName = MenuItems.Where(mi =>
-                    HasLidValue(mi, valueTag)).Select(mi => mi.Value.Picture).FirstOrDefault();
-            }
-            _viewModel.ContextRightMenu.Items[MenuItm.Lid.ToString()].Image = GetImage(pictureName);
-        }
-
-        private void CheckMenu(ToolStripItem item, bool @checked)
-        {
-            item.Tag = @checked;
-            item.Image = GetImageIfCheck(@checked);
-        }
-
-        private Bitmap GetImageIfCheck(bool @checked)
-        {
-            return @checked ? GetImage(ImageItem.Check) : null;
+            _viewModel?.Dispose();
         }
     }
 }

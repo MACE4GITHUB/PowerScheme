@@ -1,8 +1,9 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
 namespace PowerScheme.Services
 {
-    public interface IViewService
+    public interface IViewService: IDisposable
     {
         void Start();
 
