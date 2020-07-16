@@ -60,7 +60,6 @@
     <Compile Include="IPowerSchemeService.cs" />
     <Compile Include="Model\IPowerScheme.cs" />
     <Compile Include="Model\PowerScheme.cs" />
-    <Compile Include="Model\SettingSchemeParams.cs" />
     <Compile Include="Model\StatePowerScheme.cs" />
     <Compile Include="Model\Watchers.cs" />
     <Compile Include="SettingSchemeLookup.cs" />

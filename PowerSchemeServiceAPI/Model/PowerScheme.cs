@@ -15,7 +15,8 @@ namespace PowerSchemeServiceAPI.Model
         /// <param name="guid"></param>
         /// <param name="isNative"></param>
         /// <param name="picture"></param>
-        public PowerScheme(Guid guid, bool isNative, ImageItem picture, bool isVisible)
+        /// <param name="isVisible"></param>
+        public PowerScheme(Guid guid, bool isNative, ImageItem picture, bool isVisible = true)
         {
             Guid = guid;
             IsNative = isNative;

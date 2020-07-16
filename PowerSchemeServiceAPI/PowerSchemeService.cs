@@ -17,7 +17,7 @@
         public IEnumerable<IPowerScheme> DefaultPowerSchemes
             => SettingSchemes
                 .Where(p => p.Value.IsNative && p.Value.IsVisible)
-                .Select(p => NewPowerScheme(p.Value));
+                .Select(p => p.Value);
 
         public IEnumerable<IPowerScheme> TypicalPowerSchemes
         {
@@ -27,12 +27,12 @@
                 {
                     return SettingSchemes
                         .Where(p => !p.Value.IsNative && p.Value.IsVisible)
-                        .Select(p => NewPowerScheme(p.Value));
+                        .Select(p => p.Value);
                 }
 
                 return SettingSchemes
                     .Where(p => !p.Value.IsNative && p.Value.IsVisible && p.Key != SettingScheme.Extreme)
-                    .Select(p => NewPowerScheme(p.Value));
+                    .Select(p => p.Value);
             }
         }
 
@@ -360,24 +360,15 @@
             ActivePowerSchemeChanged?.Invoke(this, e);
         }
 
-        private static PowerScheme NewPowerScheme(SettingSchemeParams settingSchemeParams)
-        {
-            return new PowerScheme(
-                settingSchemeParams.Guid,
-                settingSchemeParams.IsNative,
-                settingSchemeParams.Image,
-                settingSchemeParams.IsVisible);
-        }
-        private static PowerScheme NewPowerScheme(string guid)
+        private static IPowerScheme NewPowerScheme(string guid)
         {
             var powerSchemeParams =
                 SettingSchemes
                     .Where(p => p.Value.Guid.ToString() == guid)
                     .Select(p => p.Value).FirstOrDefault();
 
-            return powerSchemeParams != null
-                ? NewPowerScheme(powerSchemeParams)
-                : new PowerScheme(Guid.Parse(guid), false, ImageItem.Unknown, true);
+            return powerSchemeParams 
+                   ?? new PowerScheme(Guid.Parse(guid), false, ImageItem.Unknown, true);
         }
     }
 }
