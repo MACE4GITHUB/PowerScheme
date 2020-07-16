@@ -5,6 +5,7 @@
 
 *.txt
 *.exe
+*.bat
 
 # User-specific files
 *.rsuser
