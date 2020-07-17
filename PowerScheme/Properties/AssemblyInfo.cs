@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("PowerScheme")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Bulava")]
+[assembly: AssemblyCompany("Bulova")]
 [assembly: AssemblyProduct("PowerScheme")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyCopyright("Copyright ©  2020 Dmitriy Bulova")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -1,15 +1,37 @@
-﻿using System.Windows.Forms;
-
-namespace PowerScheme.Model
+﻿namespace PowerScheme.Model
 {
+    using PowerSchemeServiceAPI;
+    using System.Windows.Forms;
+
     public sealed class ViewModel : IViewModel
     {
+        public ViewModel(IPowerSchemeService power)
+        {
+            Power = power;
+            ContextLeftMenu = new LeftContextMenu(power);
+            ContextRightMenu = new RightContextMenu(power);
+        }
+
         public NotifyIcon NotifyIcon { get; } = new NotifyIcon();
 
-        public ContextMenuStrip ContextLeftMenu { get; } = new ContextMenuStrip();
+        public ContextMainMenu ContextLeftMenu { get; } 
 
-        public ContextMenuStrip ContextRightMenu { get; } = new ContextMenuStrip();
+        public ContextMainMenu ContextRightMenu { get; }
+
+        public void ClearAllMenu()
+        {
+            ContextLeftMenu.ClearMenu();
+            ContextRightMenu.ClearMenu();
+        }
         
+        public void BuildAllMenu()
+        {
+            ContextLeftMenu.BuildMenu();
+            ContextRightMenu.BuildMenu();
+        }
+
+        public IPowerSchemeService Power { get; }
+
         public void Dispose()
         {
             NotifyIcon?.Dispose();

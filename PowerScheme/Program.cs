@@ -33,8 +33,9 @@ namespace PowerScheme
             {
                 viewService.Start();
                 Application.Run();
-                _mutexObj.Dispose();
+                viewService.Stop();
             }
+            _mutexObj.Dispose();
         }
     }
 }
