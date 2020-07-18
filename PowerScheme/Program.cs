@@ -1,40 +1,34 @@
-﻿using PowerScheme.Configuration;
-using PowerScheme.Services;
-using PowerSchemeServiceAPI;
-using System;
-using System.Threading;
-using System.Windows.Forms;
+﻿using PowerScheme.Model;
 
 namespace PowerScheme
 {
+    using Configuration;
+    using PowerSchemeServiceAPI;
+    using Services;
+    using System;
+    using System.Threading;
+    using System.Windows.Forms;
+
     internal static class Program
     {
         private static Mutex _mutexObj;
 
         [STAThread]
-        private static void Main(string[] args)
+        private static void Main()
         {
             var applicationModule = new ApplicationModule();
             CompositionRoot.Wire(applicationModule);
 
-            using (var entry = new EntryService(args)
+            using (var entry = new EntryService(CompositionRoot.Resolve<IPowerSchemeService>()))
             {
-                Power = CompositionRoot.Resolve<IPowerSchemeService>()
-            })
-            {
-                entry.Start();
+                entry.Validate();
                 _mutexObj = entry.Mutex;
             }
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-
-            using (var viewService = CompositionRoot.Resolve<IViewService>())
-            {
-                viewService.Start();
-                Application.Run();
-                viewService.Stop();
-            }
+            Application.Run(new ViewService(CompositionRoot.Resolve<IViewModel>()));
+            
             _mutexObj.Dispose();
         }
     }
