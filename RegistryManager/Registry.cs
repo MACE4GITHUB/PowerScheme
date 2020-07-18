@@ -1,4 +1,6 @@
-﻿namespace RegistryManager
+﻿using Common;
+
+namespace RegistryManager
 {
     using Microsoft.Win32;
     using Model;
@@ -7,22 +9,28 @@
 
     public static class Registry
     {
-        public static T GetSettings<T>(RegistryParam registryParam)
+        public static Result<T> GetSettings<T>(RegistryParam registryParam)
         {
-            T regValue = default;
+            T regValue;
             using (var regKey = GetRegistryKey(registryParam))
             {
-                if (regKey == null) return regValue;
+                if (regKey == null) return Result<T>.Fail<T>("Registry Key is not found");
 
                 if (registryParam.Name != null)
-                    regValue = (T) regKey.GetValue(registryParam.Name, registryParam.Value);
+                {
+                    var value = regKey.GetValue(registryParam.Name, registryParam.Value);
+
+                    if (value == null) return Result<T>.Fail<T>("Registry Parameter is not found");
+
+                    regValue = (T)value;
+                }
                 else
                 {
                     var type = typeof(T).Name.ToLowerInvariant() == "string";
                     regValue = (T)(object)registryParam.Section;
                 }
             }
-            return regValue;
+            return Result<T>.Ok(regValue);
         }
 
         public static IEnumerable<string> GetSubKeys(RegistryParam registryParam)
@@ -83,9 +91,7 @@
                         : Microsoft.Win32.Registry.CurrentUser.OpenSubKey(registryParam.RegistrySubKey, writable);
                     break;
                 case RegistryHive.LocalMachine:
-                    regKey = create
-                        ? Microsoft.Win32.Registry.LocalMachine.CreateSubKey(registryParam.RegistrySubKey, writable)
-                        : Microsoft.Win32.Registry.LocalMachine.OpenSubKey(registryParam.RegistrySubKey, writable);
+                    regKey = RegistryKeyLocalMachine(registryParam, writable, create);
                     break;
                 case RegistryHive.Users:
                     regKey = create
@@ -114,6 +120,27 @@
             }
 
             return regKey;
+        }
+
+        private static RegistryKey RegistryKeyLocalMachine(RegistryParam registryParam, bool writable, bool create)
+        {
+            var regKey = RegistryKeyLocalMachineX(registryParam, writable, create, RegistryView.Registry64);
+
+            if (regKey != null) return regKey;
+
+            regKey = RegistryKeyLocalMachineX(registryParam, writable, create, RegistryView.Registry32);
+
+            return regKey;
+        }
+
+        private static RegistryKey RegistryKeyLocalMachineX(RegistryParam registryParam, bool writable, bool create, RegistryView registryView)
+        {
+            var localMachineKey =
+                RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView);
+
+            return create
+                ? localMachineKey.CreateSubKey(registryParam.RegistrySubKey, writable)
+                : localMachineKey.OpenSubKey(registryParam.RegistrySubKey, writable);
         }
     }
 }

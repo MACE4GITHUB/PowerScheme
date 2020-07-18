@@ -10,24 +10,56 @@ using static RegistryManager.Registry;
 
 namespace RegistryManager
 {
-    public class RegistryService
+    public static class RegistryService
     {
-        public static string GetActiveScheme()
+        public static bool IsRunOnStartup
         {
-            return GetSettings<string>(RegActivePowerScheme);
+            get
+            {
+                var result = GetSettings<string>(RegRunOnStartup);
+                if (result.IsError) return false;
+
+                var isPathCorrect =
+                    result.Data.Equals(Paths.ApplicationFullName, StringComparison.InvariantCultureIgnoreCase);
+
+                if (!isPathCorrect) SetStartup(true);
+
+                return true;
+            }
         }
 
-        public static bool IsRunOnStartup =>
-             GetSettings<string>(RegRunOnStartup) != null;
+        public static bool IsShowHibernateOption
+        {
+            get
+            {
+                var result = GetSettings<int>(RegShowHibernateOption);
+                if (result.IsError) return false;
 
-        public static bool IsShowHibernateOption =>
-            GetSettings<int>(RegShowHibernateOption) == 1;
+                return result.Data == 1;
+            }
+        }
 
-        public static bool IsShowSleepOption =>
-            GetSettings<int>(RegShowSleepOption) == 1;
+        public static bool IsShowSleepOption
+        {
+            get
+            {
+                var result = GetSettings<int>(RegShowSleepOption);
+                if (result.IsError) return true;
 
-        public static bool IsShowLockOption =>
-            GetSettings<int>(RegShowLockOption) == 1;
+                return result.Data == 1;
+            }
+        }
+
+        public static bool IsShowLockOption
+        {
+            get
+            {
+                var result = GetSettings<int>(RegShowLockOption);
+                if (result.IsError) return true;
+
+                return result.Data == 1;
+            }
+        }
 
 
         public static void SetStartup(bool isStart)
@@ -37,37 +69,36 @@ namespace RegistryManager
             if (isStart) SaveSetting(registryParam);
             else DeleteSetting(registryParam);
         }
-
-        public static string GetFriendlyNamePowerScheme(Guid guid)
-        {
-            return GetSettings<string>(RegFriendlyNamePowerSchemes(guid));
-        }
-
-        public static string GetDescriptionPowerScheme(Guid guid)
-        {
-            return GetSettings<string>(RegDescriptionPowerSchemes(guid));
-        }
-
+        
         public static int GetLidOption(Guid guid)
         {
-            var value = GetSettings<int>(RegLidOption(guid));
-            return !ExistsSettings(RegLidOption(guid)) ? 1 : value;
+            var result = GetSettings<int>(RegLidOption(guid));
+            return result.IsError ? 1 : result.Data;
         }
 
         public static bool IsFirstStart(string company, string product)
         {
-            return !ExistsSettings(RegAppSettings(company, product));
+            var result = GetSettings<int>(RegAppSettings(company, product));
+            if (result.IsError) return true;
+
+            return result.Data != 0;
         }
 
         public static bool ExistsTypicalPowerScheme(Guid guid)
-            => GetSettings<string>(RegPowerSchemes(guid)) != null;
+        {
+            var result = GetSettings<string>(RegPowerSchemes(guid));
+            return result.IsSuccess;
+        }
 
         public static bool ExistsDefaultPowerScheme(Guid guid)
-            => GetSettings<string>(RegPowerSchemes(guid,true)) != null;
+        {
+            var result = GetSettings<string>(RegPowerSchemes(guid, true));
+            return result.IsSuccess;
+        }
 
-        private static IEnumerable<string> DefaultPowerSchemes => GetSubKeys(RegDefaultPowerSchemes);
+        private static IEnumerable<string> DefaultPowerSchemes => GetSubKeys(RegPowerSchemes(true));
 
-        private static IEnumerable<string> CurrentPowerSchemes => GetSubKeys(RegCurrentPowerSchemes);
+        private static IEnumerable<string> CurrentPowerSchemes => GetSubKeys(RegPowerSchemes());
 
         public static IEnumerable<string> UserPowerSchemes => CurrentPowerSchemes.Except(DefaultPowerSchemes).ToArray();
 
@@ -78,7 +109,7 @@ namespace RegistryManager
             };
 
         public static RegistryWatcher<string> PowerSchemesRegistryWatcher()
-            => new RegistryWatcher<string>(RegCurrentPowerSchemes)
+            => new RegistryWatcher<string>(RegPowerSchemes())
             {
                 RegChangeNotifyFilter = RegChangeNotifyFilter.Key
             };
@@ -93,10 +124,9 @@ namespace RegistryManager
             SetRegistryValue(resourceManager, RegShowSleepOption, value);
         }
 
-        public static void SetAppSettings(string company, string product, string name, object value)
+        public static void SetAppSettings(string company, string product, object value)
         {
             var regAppSettings = RegAppSettings(company, product);
-            regAppSettings.Name = name;
             regAppSettings.Value = value;
             SaveSetting(regAppSettings);
         }
@@ -129,49 +159,21 @@ namespace RegistryManager
                 Value = PowerManager.GetActivePlan().ToString()
             };
 
-        private static RegistryParam RegDefaultPowerSchemes =>
-            new RegistryParam()
-            {
-                RegistryHive = RegistryHive.LocalMachine,
-                Path = @"SYSTEM\CurrentControlSet\Control\Power\User\Default",
-                Section = "PowerSchemes"
-            };
-
-        private static RegistryParam RegCurrentPowerSchemes =>
-            new RegistryParam()
-            {
-                RegistryHive = RegistryHive.LocalMachine,
-                Path = @"SYSTEM\CurrentControlSet\Control\Power\User",
-                Section = "PowerSchemes"
-            };
-
-        private static RegistryParam RegFriendlyNamePowerSchemes(Guid guid) =>
-            new RegistryParam()
-            {
-                RegistryHive = RegistryHive.LocalMachine,
-                Path = @"SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes",
-                Section = guid.ToString(),
-                Name = "FriendlyName",
-            };
-
-        private static RegistryParam RegDescriptionPowerSchemes(Guid guid) =>
-            new RegistryParam()
-            {
-                RegistryHive = RegistryHive.LocalMachine,
-                Path = @"SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes",
-                Section = guid.ToString(),
-                Name = "Description",
-            };
-
-        private static RegistryParam RegPowerSchemes(Guid guid, bool isDefault = false) =>
+        private static RegistryParam RegPowerSchemes(bool isDefault = false) =>
             new RegistryParam()
             {
                 RegistryHive = RegistryHive.LocalMachine,
                 Path = @"SYSTEM\CurrentControlSet\Control\Power\User" +
                        (isDefault ? @"\Default" : "") +
-                       @"\PowerSchemes",
-                Section = guid.ToString()
+                       @"\PowerSchemes"
             };
+
+        private static RegistryParam RegPowerSchemes(Guid guid, bool isDefault = false)
+        {
+            var regPowerSchemes = RegPowerSchemes(isDefault);
+            regPowerSchemes.Section = guid.ToString();
+            return regPowerSchemes;
+        }
 
         private static RegistryParam RegRunOnStartup =>
             new RegistryParam()
@@ -187,7 +189,8 @@ namespace RegistryManager
             {
                 RegistryHive = RegistryHive.CurrentUser,
                 Path = @"SOFTWARE\" + company,
-                Section = product
+                Section = product,
+                Name = "ShowDialogFirstStart"
             };
 
         private static RegistryParam RegStartup
