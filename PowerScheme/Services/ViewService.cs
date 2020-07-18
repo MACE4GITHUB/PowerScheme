@@ -1,12 +1,13 @@
-﻿namespace PowerScheme.Services
+﻿using System.Reflection;
+
+namespace PowerScheme.Services
 {
     using Model;
     using RegistryManager.EventsArgs;
-    using System.Reflection;
     using System.Windows.Forms;
     using static Utility.TrayIcon;
 
-    public sealed class ViewService : IViewService
+    public sealed class ViewService : ApplicationContext, IViewService
     {
         private const string SHOW_CONTEXT_MENU = "ShowContextMenu";
         private readonly IViewModel _viewModel;
@@ -14,6 +15,7 @@
         public ViewService(IViewModel viewModel)
         {
             _viewModel = viewModel;
+            Start();
         }
 
         public void Start()
@@ -21,6 +23,7 @@
             _viewModel.Power.Watchers.ActivePowerScheme.Changed += ChangedActivePowerScheme;
 
             _viewModel.NotifyIcon.MouseClick += NotifyIcon_MouseClick;
+
             _viewModel.NotifyIcon.Visible = true;
 
             UpdateIcon();
@@ -74,12 +77,15 @@
             var mi = typeof(NotifyIcon)
                 .GetMethod(SHOW_CONTEXT_MENU, BindingFlags.Instance | BindingFlags.NonPublic);
             mi?.Invoke(_viewModel.NotifyIcon, null);
+
             _viewModel.NotifyIcon.ContextMenuStrip = null;
         }
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
+            Stop();
             _viewModel?.Dispose();
+            base.Dispose(disposing);
         }
     }
 }
