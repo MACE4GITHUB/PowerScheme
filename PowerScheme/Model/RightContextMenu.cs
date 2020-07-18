@@ -83,7 +83,7 @@
 
             if (Items[MenuItm.Settings.ToString()] is ToolStripMenuItem settingsToolStripMenuItem)
             {
-                settingsToolStripMenuItem.DropDownItems[MenuItm.DeleteTypicalSchemes.ToString()].Visible = Power.UserPowerSchemes.Any();
+                settingsToolStripMenuItem.DropDownItems[MenuItm.DeleteTypicalSchemes.ToString()].Visible = Power.TypicalPowerSchemes.Any();
                 settingsToolStripMenuItem.DropDownItems[MenuItm.CreateTypicalSchemes.ToString()].Visible = !Power.ExistsAllTypicalScheme;
                 UpdateItemsTypicalScheme();
             }
@@ -191,8 +191,7 @@
             var info = new AppInfo();
             var item = new ToolStripMenuItem
             {
-                Text = $@"{info.ProductName} {info.ProductVersion}",
-                Enabled = false
+                Text = $@"{info.ProductName} {info.ProductVersion}"
             };
 
             Items.Add(item);

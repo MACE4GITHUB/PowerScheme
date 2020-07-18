@@ -1,8 +1,7 @@
-﻿using PowerScheme.Model;
-
-namespace PowerScheme
+﻿namespace PowerScheme
 {
     using Configuration;
+    using Model;
     using PowerSchemeServiceAPI;
     using Services;
     using System;

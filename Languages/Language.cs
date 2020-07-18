@@ -124,6 +124,6 @@ namespace Languages
             => "First start";
 
         public virtual string FirstStartDescription
-            => $"Create typical power schemes {StableName}, {MediaName}, {SimpleName}, ({ExtremeName} only Windows 10 and later)?";
+            => $"Create typical power schemes {StableName}, {MediaName}, {SimpleName}?";
     }
 }

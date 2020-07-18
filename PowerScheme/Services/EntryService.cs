@@ -19,7 +19,6 @@
     /// </summary>
     internal sealed class EntryService : IDisposable
     {
-        private const string RESTARTED_NAME = "ShowDialogFirstStart";
         private const int RESTARTED_VALUE = 0;
         private IPowerSchemeService _power;
 
@@ -61,7 +60,7 @@
 
             ActionFirstStart?.Invoke();
 
-            RegistryService.SetAppSettings(_appInfo.CompanyName, _appInfo.ProductName, RESTARTED_NAME, RESTARTED_VALUE);
+            RegistryService.SetAppSettings(_appInfo.CompanyName, _appInfo.ProductName, RESTARTED_VALUE);
 
             return this;
         }
