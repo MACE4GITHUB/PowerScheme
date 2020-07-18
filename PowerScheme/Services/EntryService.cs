@@ -1,6 +1,4 @@
-﻿using RunAs.Common;
-
-namespace PowerScheme.Services
+﻿namespace PowerScheme.Services
 {
     using FormAutoClose;
     using Languages;
@@ -8,6 +6,7 @@ namespace PowerScheme.Services
     using Ninject;
     using PowerSchemeServiceAPI;
     using RegistryManager;
+    using RunAs.Common;
     using RunAs.Common.Utils;
     using System;
     using System.Reflection;
@@ -15,63 +14,65 @@ namespace PowerScheme.Services
     using System.Threading;
     using System.Windows.Forms;
 
-    public class EntryService : IDisposable
+    /// <summary>
+    /// Represents the application startup order. 
+    /// </summary>
+    internal sealed class EntryService : IDisposable
     {
         private const string RESTARTED_NAME = "ShowDialogFirstStart";
         private const int RESTARTED_VALUE = 0;
-
-        private readonly string[] _args;
+        private IPowerSchemeService _power;
 
         private AppInfo _appInfo = new AppInfo();
 
-        public EntryService(string[] args)
+        /// <summary>
+        /// Determines the application startup order.
+        /// </summary>
+        public EntryService(IPowerSchemeService power)
         {
-            _args = args;
             ActionFirstStart = ShowFirstStartDialog;
+            _power = power;
         }
-
-        [Inject]
-        public IPowerSchemeService Power { get; set; }
 
         public Action ActionFirstStart { get; }
 
-        public void Start()
-        {
-            ValidateOs();
-            ValidateAdmin();
-            ValidateOnceApplication();
-            ValidateFirstStart();
-        }
+        public void Validate() 
+            => ValidateOs().ValidateAdmin().ValidateOnceApplication().ValidateFirstStart();
 
-        private bool IsValidateOs { get; set; } = true;
-
-        private bool IsValidateOnceApplication { get; set; } = true;
-
-        private bool IsValidateFirstStart { get; set; } = true;
-
-        private bool IsValidateAdmin { get; set; } = true;
-
+        /// <summary>
+        /// Gets Mutex to start one application instance.
+        /// </summary>
         public Mutex Mutex { get; private set; }
 
-        private void ValidateFirstStart()
+        public bool IsValidateOs { get; set; } = true;
+
+        public bool IsValidateAdmin { get; set; } = true;
+
+        public bool IsValidateOnceApplication { get; set; } = true;
+
+        public bool IsValidateFirstStart { get; set; } = true;
+        
+        private EntryService ValidateFirstStart()
         {
-            if (!IsValidateFirstStart) return;
+            if (!IsValidateFirstStart) return this;
 
             var isFirstStart = RegistryService.IsFirstStart(_appInfo.CompanyName, _appInfo.ProductName);
-            if (!isFirstStart) return;
+            if (!isFirstStart) return this;
 
             ActionFirstStart?.Invoke();
 
             RegistryService.SetAppSettings(_appInfo.CompanyName, _appInfo.ProductName, RESTARTED_NAME, RESTARTED_VALUE);
+
+            return this;
         }
 
-        private void ValidateAdmin()
+        private EntryService ValidateAdmin()
         {
-            if (!IsValidateAdmin) return;
+            if (!IsValidateAdmin) return this;
 
-            var executorMainService = new ExecutorRunAsService($"{Role.Admin} {AttributeFile.Normal}");
+            var executorMainService = new ExecutorRunAsService($"{AttributeFile.Normal}");
 
-            var isNeedAdminAccess = Power.IsNeedAdminAccessForChangePowerScheme;
+            var isNeedAdminAccess = _power.IsNeedAdminAccessForChangePowerScheme;
             if (isNeedAdminAccess)
             {
                 executorMainService.Execute();
@@ -81,31 +82,36 @@ namespace PowerScheme.Services
             {
                 executorMainService.RemoveIfExists();
             }
+
+            return this;
         }
 
-        private void ValidateOs()
+        private EntryService ValidateOs()
         {
-            if (!IsValidateOs) return;
-            if (UACHelper.IsValidOs) return;
+            if (!IsValidateOs) return this;
+            if (UACHelper.IsValidOs) return this;
 
             IFormAutoClose formAutoClose = new MessageBoxAutoClose(Language.Current.ApplicationLatter, Language.Current.Error, 15);
             formAutoClose.Show();
 
             Environment.Exit(-2);
+            return this;
         }
 
         private void ShowFirstStartDialog()
         {
             var result = MessageBox.Show(Language.Current.FirstStartDescription, Language.Current.FirstStartCaption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result != DialogResult.Yes) return;
-            Power.CreateTypicalSchemes();
+            _power.CreateTypicalSchemes();
         }
 
-        private void ValidateOnceApplication()
+        private EntryService ValidateOnceApplication()
         {
-            if (!IsValidateOnceApplication) return;
+            if (!IsValidateOnceApplication) return this;
 
             OnceApplication();
+
+            return this;
         }
 
         private void OnceApplication()
@@ -126,6 +132,7 @@ namespace PowerScheme.Services
             }
         }
 
+        #region IDisposable imlementation
         private bool _isDisposed;
 
         private void Dispose(bool disposing)
@@ -135,7 +142,7 @@ namespace PowerScheme.Services
             if (disposing)
             {
                 Mutex = null;
-                Power = null;
+                _power = null;
                 _appInfo = null;
             }
             _isDisposed = true;
@@ -144,7 +151,7 @@ namespace PowerScheme.Services
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
+        #endregion
     }
 }
