@@ -31,7 +31,7 @@
                 }
 
                 return SettingSchemes
-                    .Where(p => !p.Value.IsNative && p.Value.IsVisible && p.Key != SettingScheme.Extreme)
+                    .Where(p => !p.Value.IsNative && p.Value.IsVisible && !p.Value.IsMaxPerformance)
                     .Select(p => p.Value);
             }
         }
@@ -132,7 +132,7 @@
         {
             var activeScheme = ActivePowerScheme;
 
-            var listGuid = AllPowerSchemes.Select(p => p.Guid);
+            var listGuid = PowerSchemes.Select(p => p.Guid);
             var powerSchemeDCACValues = new PowerSchemeDCACValues(value, value);
 
             foreach (var guid in listGuid)
@@ -333,9 +333,6 @@
             return null;
         }
 
-        private IEnumerable<IPowerScheme> AllPowerSchemes
-            => DefaultPowerSchemes.Concat(UserPowerSchemes);
-
         private void CreateTypicalPowerScheme(Guid source, Guid destination, string name, string description = null)
         {
             var isExistsTypicalPowerScheme = ExistsTypicalPowerScheme(destination);
@@ -368,7 +365,7 @@
                     .Select(p => p.Value).FirstOrDefault();
 
             return powerSchemeParams 
-                   ?? new PowerScheme(Guid.Parse(guid), false, ImageItem.Unknown, true);
+                   ?? new PowerScheme(Guid.Parse(guid), false, ImageItem.Unknown);
         }
     }
 }

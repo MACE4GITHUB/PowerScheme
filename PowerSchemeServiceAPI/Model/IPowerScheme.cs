@@ -26,6 +26,11 @@ namespace PowerSchemeServiceAPI.Model
         bool IsVisible { get; }
 
         /// <summary>
+        /// Gets true if PowerScheme is Ultimate/Extreme, otherwise false
+        /// </summary>
+        bool IsMaxPerformance { get; }
+
+        /// <summary>
         /// Gets true if PowerScheme is active, otherwise false
         /// </summary>
         bool IsActive { get; }

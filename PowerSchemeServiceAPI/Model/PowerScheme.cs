@@ -16,11 +16,13 @@ namespace PowerSchemeServiceAPI.Model
         /// <param name="isNative"></param>
         /// <param name="picture"></param>
         /// <param name="isVisible"></param>
-        public PowerScheme(Guid guid, bool isNative, ImageItem picture, bool isVisible = true)
+        /// <param name="isMaxPerformance"></param>
+        public PowerScheme(Guid guid, bool isNative, ImageItem picture, bool isVisible = true, bool isMaxPerformance = false)
         {
             Guid = guid;
             IsNative = isNative;
             Picture = picture;
+            IsMaxPerformance = isMaxPerformance;
             IsVisible = isVisible;
         }
 
@@ -43,6 +45,11 @@ namespace PowerSchemeServiceAPI.Model
         /// Gets true if PowerScheme is visible, otherwise false
         /// </summary>
         public bool IsVisible { get; }
+
+        /// <summary>
+        /// Gets true if PowerScheme is Ultimate/Extreme, otherwise false
+        /// </summary>
+        public bool IsMaxPerformance { get; }
 
         /// <summary>
         /// Gets true if PowerScheme is active, otherwise false
