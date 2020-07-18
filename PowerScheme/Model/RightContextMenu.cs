@@ -21,13 +21,14 @@
 
         protected override void BuildContextMenu()
         {
-            AddMenuItemSettings();
+            AddMenuItemInfo();
             AddMenuItemSepatator();
             AddMenuItemStartWithWindows();
             AddMenuItemHibernate();
             AddMenuItemSleep();
             AddMenuItemLid();
             AddMenuItemSepatator();
+            AddMenuItemSettings();
             AddMenuItemExit();
         }
 
@@ -42,22 +43,26 @@
 
             if (!(Items[MenuItm.Settings.ToString()] is ToolStripMenuItem settingsToolStripMenuItem)) return;
 
-            settingsToolStripMenuItem.DropDownItems[MenuItm.RestoreDefaultPowerSchemes.ToString()].Click -= RestoreDefaultPowerSchemesOnClick;
-            settingsToolStripMenuItem.DropDownItems[MenuItm.ControlPanelSchemeWindows.ToString()].Click -= ItemCplSchemeOnClick;
-            settingsToolStripMenuItem.DropDownItems[MenuItm.CreateTypicalSchemes.ToString()].Click -= ItemCreateTypicalSchemesOnClick;
-            settingsToolStripMenuItem.DropDownItems[MenuItm.DeleteTypicalSchemes.ToString()].Click -= ItemDeleteTypicalSchemesOnClick;
+            var dropDownItems = settingsToolStripMenuItem.DropDownItems;
 
-            foreach (var itemMenu in settingsToolStripMenuItem.DropDownItems)
+            dropDownItems[MenuItm.RestoreDefaultPowerSchemes.ToString()].Click -= RestoreDefaultPowerSchemesOnClick;
+            dropDownItems[MenuItm.ControlPanelSchemeWindows.ToString()].Click -= ItemCplSchemeOnClick;
+            dropDownItems[MenuItm.CreateTypicalSchemes.ToString()].Click -= ItemCreateTypicalSchemesOnClick;
+            dropDownItems[MenuItm.DeleteTypicalSchemes.ToString()].Click -= ItemDeleteTypicalSchemesOnClick;
+            
+            for (var index = dropDownItems.Count - 1; index >= 0; index--)
             {
-                if (!(itemMenu is ToolStripMenuItem item)) continue;
+                var item = dropDownItems[index];
+                if (!(item is ToolStripMenuItem toolStripItem)) continue;
 
-                item.Text = null;
-                item.Tag = null;
-                item.Click -= ItemMenuActionPowerOnClick;
-                item.Dispose();
+                toolStripItem.Tag = null;
+                toolStripItem.Text = null;
+                toolStripItem.Image = null;
+                toolStripItem.Click -= ItemMenuActionPowerOnClick;
+                toolStripItem.Dispose();
             }
 
-            settingsToolStripMenuItem.DropDownItems.Clear();
+            dropDownItems.Clear();
             Items.Clear();
         }
 
@@ -178,6 +183,18 @@
             };
 
             item.Click += StartWithWindowsOnClick;
+            Items.Add(item);
+        }
+
+        private void AddMenuItemInfo()
+        {
+            var info = new AppInfo();
+            var item = new ToolStripMenuItem
+            {
+                Text = $@"{info.ProductName} {info.ProductVersion}",
+                Enabled = false
+            };
+
             Items.Add(item);
         }
 
