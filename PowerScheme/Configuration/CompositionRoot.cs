@@ -3,7 +3,10 @@
     using Ninject;
     using Ninject.Modules;
 
-    public class CompositionRoot
+    /// <summary>
+    /// Creates Composition Root for the application.
+    /// </summary>
+    internal static class CompositionRoot
     {
         private static IKernel _ninjectKernel;
 
@@ -12,6 +15,11 @@
             _ninjectKernel = new StandardKernel(module);
         }
 
+        /// <summary>
+        /// Gets the resolving class.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static T Resolve<T>()
         {
             return _ninjectKernel.Get<T>();
