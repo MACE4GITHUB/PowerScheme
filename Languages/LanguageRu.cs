@@ -100,10 +100,17 @@
             => "Приложение уже было запущено.";
 
         public override string Error
-            => "Ошибка.";
+            => "Ошибка";
+
+        public override string Information
+            => "Информация";
+
+        public override string CannotGetAdministratorRights
+            => "Приложению не удается получить права администратора. \n\nСм. свою политику доступа.";
 
         public override string ApplicationLatter
-            => "Приложение не может работать в текущей версии Windows. Приложение работает в Vista и более поздних версиях.";
+            => "Приложение не может работать в текущей версии Windows. " +
+               "\n\nТребуется ОС Windows Vista/7/10.";
 
         public override string FirstStartCaption
             => "Первый запуск";
@@ -114,6 +121,30 @@
                $"\n\n {MediaName} - схема на основе Сбалансированная. \n Частота переменная. \n Для просмотра видео, прослушивания аудио."+
                $"\n\n {SimpleName} - схема на основе Экономия энергии. \n Частота переменная, преимущественно низкая. \n Для просмотра интернет."+
                $"\n\n При нажатии \"Нет\" типовые схемы можно будет создать позже из меню \"Настройки\".";
+
+        public override string None
+            => "Ничего";
+
+        public override string Ok
+            => "ОК";
+
+        public override string Cancel
+            => "Отмена";
+
+        public override string Abort
+            => "Прервать";
+
+        public override string Retry
+            => "Повторить";
+
+        public override string Ignore
+            => "Игнорировать";
+
+        public override string Yes
+            => "Да";
+
+        public override string No
+            => "Нет";
 
     }
 }

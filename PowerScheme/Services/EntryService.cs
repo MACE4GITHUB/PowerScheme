@@ -1,9 +1,8 @@
 ﻿namespace PowerScheme.Services
 {
-    using FormAutoClose;
+    using MessageForm;
     using Languages;
     using Model;
-    using Ninject;
     using PowerSchemeServiceAPI;
     using RegistryManager;
     using RunAs.Common;
@@ -21,22 +20,26 @@
     {
         private const int RESTARTED_VALUE = 0;
         private IPowerSchemeService _power;
+        private readonly IMainMessageBox _messageBox;
+        private readonly string[] _args;
 
         private AppInfo _appInfo = new AppInfo();
 
         /// <summary>
         /// Determines the application startup order.
         /// </summary>
-        public EntryService(IPowerSchemeService power)
+        public EntryService(IPowerSchemeService power, IMainMessageBox messageBox)
         {
             ActionFirstStart = ShowFirstStartDialog;
             _power = power;
+            _args = Environment.GetCommandLineArgs();
+            _messageBox = messageBox;
         }
 
         public Action ActionFirstStart { get; }
 
-        public void Validate() 
-            => ValidateOs().ValidateAdmin().ValidateOnceApplication().ValidateFirstStart();
+        public void Validate()
+            => ValidateOs().ValidateOnceApplication().ValidateAdmin().ValidateFirstStart();
 
         /// <summary>
         /// Gets Mutex to start one application instance.
@@ -50,7 +53,7 @@
         public bool IsValidateOnceApplication { get; set; } = true;
 
         public bool IsValidateFirstStart { get; set; } = true;
-        
+
         private EntryService ValidateFirstStart()
         {
             if (!IsValidateFirstStart) return this;
@@ -67,13 +70,32 @@
 
         private EntryService ValidateAdmin()
         {
+            void ExitBecauseNotAdmin()
+            {
+                _messageBox.Show(Language.Current.CannotGetAdministratorRights,
+                    Language.Current.Error, MessageBoxButtons.OK, MessageBoxIcon.Error, 
+                    isApplicationExit:true, timeout: 15);
+            }
+
             if (!IsValidateAdmin) return this;
 
-            var executorMainService = new ExecutorRunAsService($"{AttributeFile.Normal}");
+            var executorMainService = new ExecutorRunAsService($"{Role.Admin} {AttributeFile.Normal}");
 
             var isNeedAdminAccess = _power.IsNeedAdminAccessForChangePowerScheme;
             if (isNeedAdminAccess)
             {
+                if (_args.Length == 1)
+                {
+                    var isRole = Enum.TryParse(_args[0], true, out Role role);
+                    if (isRole)
+                    {
+                        if (role == Role.Admin)
+                        {
+                            ExitBecauseNotAdmin();
+                        }
+                    }
+                }
+
                 executorMainService.Execute();
                 Environment.Exit(0);
             }
@@ -90,18 +112,31 @@
             if (!IsValidateOs) return this;
             if (UACHelper.IsValidOs) return this;
 
-            IFormAutoClose formAutoClose = new MessageBoxAutoClose(Language.Current.ApplicationLatter, Language.Current.Error, 15);
-            formAutoClose.Show();
+            _messageBox.Show(Language.Current.ApplicationLatter, 
+                Language.Current.Error, 
+                icon:MessageBoxIcon.Error, 
+                isApplicationExit: true, 
+                timeout: 15);
 
-            Environment.Exit(-2);
             return this;
         }
 
         private void ShowFirstStartDialog()
         {
-            var result = MessageBox.Show(Language.Current.FirstStartDescription, Language.Current.FirstStartCaption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = _messageBox.Show(Language.Current.FirstStartDescription, Language.Current.FirstStartCaption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result != DialogResult.Yes) return;
             _power.CreateTypicalSchemes();
+        }
+
+        private void OnceApplication()
+        {
+            var guid = Marshal.GetTypeLibGuidForAssembly(Assembly.GetExecutingAssembly()).ToString();
+            Mutex = new Mutex(true, guid, out var onceApp);
+
+            if (onceApp) return;
+
+            _messageBox.Show(Language.Current.AlreadyRunning,
+            Language.Current.Information, isApplicationExit: true, timeout:5);
         }
 
         private EntryService ValidateOnceApplication()
@@ -111,24 +146,6 @@
             OnceApplication();
 
             return this;
-        }
-
-        private void OnceApplication()
-        {
-            var guid = Marshal.GetTypeLibGuidForAssembly(Assembly.GetExecutingAssembly()).ToString();
-            Mutex = new Mutex(true, guid, out var onceApp);
-
-            if (onceApp)
-            {
-                // do nothing
-            }
-            else
-            {
-                IFormAutoClose formAutoClose = new MessageBoxAutoClose(Language.Current.AlreadyRunning, Language.Current.Error, 5);
-                formAutoClose.Show();
-
-                Environment.Exit(-1);
-            }
         }
 
         #region IDisposable imlementation
@@ -143,6 +160,7 @@
                 Mutex = null;
                 _power = null;
                 _appInfo = null;
+                _messageBox.Dispose();
             }
             _isDisposed = true;
         }

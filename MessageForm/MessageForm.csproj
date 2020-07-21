@@ -7,8 +7,8 @@
     <ProjectGuid>{9B901C5D-1720-42C0-ADBD-C58F19B47248}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FormAutoClose</RootNamespace>
-    <AssemblyName>FormAutoClose</AssemblyName>
+    <RootNamespace>MessageForm</RootNamespace>
+    <AssemblyName>MessageForm</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -52,14 +52,36 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IFormAutoClose.cs" />
+    <Compile Include="DialogResultLookup.cs" />
+    <Compile Include="IMainMessageBox.cs" />
+    <Compile Include="MainMessageBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainMessageBox.Designer.cs">
+      <DependentUpon>MainMessageBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="MessageBoxAutoClose.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WindowWrapper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MainMessageBox.resx">
+      <DependentUpon>MainMessageBox.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Languages\Languages.csproj">
+      <Project>{FC9D0998-254A-46A3-AC5B-317F80150175}</Project>
+      <Name>Languages</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -115,15 +115,46 @@ namespace Languages
             => "Another instance is already running.";
 
         public virtual string Error
-            => "Error.";
+            => "Error";
+
+        public virtual string Information
+            => "Information";
+
+        public virtual string CannotGetAdministratorRights
+            => "This application cannot get administrator rights. \n\nSee yours access policy.";
 
         public virtual string ApplicationLatter
-            => "This application does not run on the current Windows version. Works on Vista and latter.";
+            => "This application does not run on the current Windows version. \n\nWorks it on Vista and latter.";
 
         public virtual string FirstStartCaption
             => "First start";
 
         public virtual string FirstStartDescription
             => $"Create typical power schemes {StableName}, {MediaName}, {SimpleName}?";
+
+        public virtual string None
+            => "None";
+
+        public virtual string Ok
+            => "OK";
+
+        public virtual string Cancel
+            => "Cancel";
+
+        public virtual string Abort
+            => "Abort";
+
+        public virtual string Retry
+            => "Retry";
+
+        public virtual string Ignore
+            => "Ignore";
+
+        public virtual string Yes
+            => "Yes";
+
+        public virtual string No
+            => "No";
+
     }
 }

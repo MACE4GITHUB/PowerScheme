@@ -1,6 +1,7 @@
 ﻿namespace PowerScheme
 {
     using Configuration;
+    using MessageForm;
     using Model;
     using PowerSchemeServiceAPI;
     using Services;
@@ -18,17 +19,20 @@
             var applicationModule = new ApplicationModule();
             CompositionRoot.Wire(applicationModule);
 
-            using (var entry = new EntryService(CompositionRoot.Resolve<IPowerSchemeService>()))
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            using (var entry = new EntryService(
+                CompositionRoot.Resolve<IPowerSchemeService>(),
+                CompositionRoot.Resolve<IMainMessageBox>()))
             {
                 entry.Validate();
                 _mutexObj = entry.Mutex;
             }
 
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new ViewService(CompositionRoot.Resolve<IViewModel>()));
-            
-            _mutexObj.Dispose();
+
+            _mutexObj?.Dispose();
         }
     }
 }

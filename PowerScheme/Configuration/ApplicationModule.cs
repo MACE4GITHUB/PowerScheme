@@ -1,9 +1,9 @@
 ﻿namespace PowerScheme.Configuration
 {
+    using MessageForm;
     using Model;
     using Ninject.Modules;
     using PowerSchemeServiceAPI;
-    using Services;
 
     /// <summary>
     /// Binding Interfaces with Classes.
@@ -14,6 +14,7 @@
         {
             Bind<IPowerSchemeService>().To<PowerSchemeService>().InSingletonScope();
             Bind<IViewModel>().To<ViewModel>().InSingletonScope();
+            Bind<IMainMessageBox>().To<MainMessageBox>();
         }
     }
 }

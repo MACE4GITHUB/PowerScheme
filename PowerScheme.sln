@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerScheme", "PowerScheme\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistryManager", "RegistryManager\RegistryManager.csproj", "{0BA349FF-9FBB-45F8-87FC-9423CB283F33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormAutoClose", "FormAutoClose\FormAutoClose.csproj", "{9B901C5D-1720-42C0-ADBD-C58F19B47248}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageForm", "MessageForm\MessageForm.csproj", "{9B901C5D-1720-42C0-ADBD-C58F19B47248}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerManagerAPI", "PowerManagerAPI\PowerManagerAPI.csproj", "{11D90B11-3C6E-4C27-AC3E-F4A84B992628}"
 EndProject
