@@ -51,7 +51,4 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <ItemGroup>
-    <None Include="Package.nuspec" />
-  </ItemGroup>
 </Project>

@@ -754,9 +754,9 @@ namespace PowerManagerAPI
         PowerActionDisplayOff,
     }
 
-    public static class SettingIdLookup
+    public static class SettingLookup
     {
-        public static Dictionary<SettingSubgroup, Guid> SettingSubgroupGuids = new Dictionary<SettingSubgroup, Guid>
+        public static readonly Dictionary<SettingSubgroup, Guid> SettingSubgroupGuids = new Dictionary<SettingSubgroup, Guid>
         {
             { SettingSubgroup.NO_SUBGROUP,                  new Guid("fea3413e-7e05-4911-9a71-700331f1c294") },
             { SettingSubgroup.DISK_SUBGROUP,                new Guid("0012ee47-9041-4b5d-9b77-535fba8b1442") },
@@ -770,7 +770,7 @@ namespace PowerManagerAPI
             { SettingSubgroup.MULTIMEDIA_SUBGROUP,          new Guid("9596fb26-9850-41fd-ac3e-f7c3c00afd4b") }
         };
 
-        public static Dictionary<Setting, Guid> SettingGuids = new Dictionary<Setting, Guid>
+        public static readonly Dictionary<Setting, Guid> SettingGuids = new Dictionary<Setting, Guid>
         {
             { Setting.BATACTIONCRIT,    new Guid("637ea02f-bbcb-4015-8e2c-a1c7b9c0b546") },
             { Setting.BATACTIONLOW,     new Guid("d8742dcb-3e6a-4b3c-b3fe-374623cdcf06") },

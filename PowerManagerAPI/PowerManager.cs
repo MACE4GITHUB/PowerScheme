@@ -216,8 +216,8 @@ namespace PowerManagerAPI
             if (powerMode == (PowerMode.AC | PowerMode.DC))
                 throw new ArgumentException("Can't get both AC and DC values at the same time, because they may be different.");
 
-            Guid subgroupId = SettingIdLookup.SettingSubgroupGuids[subgroup];
-            Guid settingId = SettingIdLookup.SettingGuids[setting];
+            Guid subgroupId = SettingLookup.SettingSubgroupGuids[subgroup];
+            Guid settingId = SettingLookup.SettingGuids[setting];
 
             uint value = 0;
             uint res = 0;
@@ -247,8 +247,8 @@ namespace PowerManagerAPI
         /// <param name="value">The new value for the setting. Run <code>powercfg -q</code> from the command line to list possible values</param>
         public static void SetPlanSetting(Guid plan, SettingSubgroup subgroup, Setting setting, PowerMode powerMode, uint value)
         {
-            Guid subgroupId = SettingIdLookup.SettingSubgroupGuids[subgroup];
-            Guid settingId = SettingIdLookup.SettingGuids[setting];
+            Guid subgroupId = SettingLookup.SettingSubgroupGuids[subgroup];
+            Guid settingId = SettingLookup.SettingGuids[setting];
 
             if (powerMode.HasFlag(PowerMode.AC))
             {
