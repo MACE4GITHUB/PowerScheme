@@ -1,4 +1,6 @@
-﻿namespace PowerScheme.Model
+﻿using System.ComponentModel;
+
+namespace PowerScheme.Model
 {
     using Utility;
     using PowerSchemeServiceAPI;
@@ -8,7 +10,7 @@
     {
         protected IPowerSchemeService Power;
 
-        protected ContextMainMenu(IPowerSchemeService power)
+        protected ContextMainMenu(IContainer components, IPowerSchemeService power): base(components)
         {
             Power = power;
         }

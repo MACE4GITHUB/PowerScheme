@@ -1,4 +1,6 @@
-﻿namespace PowerScheme.Model
+﻿using System.ComponentModel;
+
+namespace PowerScheme.Model
 {
     using Common;
     using PowerSchemeServiceAPI;
@@ -16,7 +18,7 @@
 
     public sealed class RightContextMenu : ContextMainMenu
     {
-        public RightContextMenu(IPowerSchemeService power) : base(power)
+        public RightContextMenu(IContainer components, IPowerSchemeService power) : base(components, power)
         { }
 
         protected override void BuildContextMenu()

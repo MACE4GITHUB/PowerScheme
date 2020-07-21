@@ -1,4 +1,6 @@
-﻿namespace PowerScheme.Model
+﻿using System.ComponentModel;
+
+namespace PowerScheme.Model
 {
     using PowerSchemeServiceAPI;
     using PowerSchemeServiceAPI.Model;
@@ -9,7 +11,7 @@
 
     public sealed class LeftContextMenu : ContextMainMenu
     {
-        public LeftContextMenu(IPowerSchemeService power) : base(power)
+        public LeftContextMenu(IContainer components, IPowerSchemeService power) : base(components, power)
         { }
 
         public override void UpdateMenu()
