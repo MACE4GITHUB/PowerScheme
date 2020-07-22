@@ -6,6 +6,7 @@
 *.txt
 *.exe
 *.bat
+[Ii]nstall/
 
 # User-specific files
 *.rsuser
