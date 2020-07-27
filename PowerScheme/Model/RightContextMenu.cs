@@ -351,7 +351,7 @@ namespace PowerScheme.Model
 
         private void ExitOnClick(object sender, EventArgs e)
         {
-            Application.Exit();
+            Environment.Exit(0);
         }
 
         private void ItemMenuActionPowerOnClick(object sender, EventArgs e)
