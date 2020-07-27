@@ -325,9 +325,7 @@ namespace PowerScheme.Model
 
             Power.Watchers.RaiseActionWithoutWatchers(DeleteTypicalScheme);
         }
-
-
-
+        
         private static void StartWithWindowsOnClick(object sender, EventArgs e)
         {
             if (!GetCheckedOption(sender, out var isChecked)) return;
@@ -399,12 +397,20 @@ namespace PowerScheme.Model
         private static void CheckMenu(ToolStripItem item, bool @checked)
         {
             item.Tag = @checked;
-            item.Image = GetImageIfCheck(@checked);
+
+            var addShield = item.Name == MenuItm.Hibernate.ToString() || item.Name == MenuItm.Sleep.ToString();
+
+            item.Image = GetImageIfCheck(@checked, addShield);
         }
 
-        private static Bitmap GetImageIfCheck(bool @checked)
+        private static Bitmap GetImageIfCheck(bool @checked, bool addShield)
         {
-            return @checked ? GetImage(ImageItem.Check) : null;
+            var bitmap = GetImage(ImageItem.Check);
+            if (!addShield) 
+                return @checked ? bitmap : null;
+            
+            var shield = GetImage(ImageItem.Shield);
+            return @checked ?  bitmap.CopyToSquareCanvas(Color.Transparent, shield): shield;
         }
     }
 }

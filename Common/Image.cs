@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
 namespace Common
 {
     public static class Image
     {
-        public static Icon CreateIcon(this Bitmap sourceBitmap, IconSize iconSize)
+        public static Icon CreateIcon(this Bitmap sourceBitmap, IconSize iconSize, Bitmap addingBitmap = null)
         {
-            var squareCanvas = sourceBitmap.CopyToSquareCanvas(Color.Transparent);
+            var squareCanvas = sourceBitmap.CopyToSquareCanvas(Color.Transparent, addingBitmap);
             squareCanvas = (Bitmap)squareCanvas.GetThumbnailImage((int)iconSize, (int)iconSize, null, new IntPtr());
 
             var iconResult = Icon.FromHandle(squareCanvas.GetHicon());
@@ -16,7 +17,7 @@ namespace Common
             return iconResult;
         }
 
-        public static Bitmap CopyToSquareCanvas(this Bitmap sourceBitmap, Color canvasBackground)
+        public static Bitmap CopyToSquareCanvas(this Bitmap sourceBitmap, Color canvasBackground, Bitmap addingBitmap = null)
         {
             if (sourceBitmap == null) throw new ArgumentNullException(nameof(sourceBitmap));
 
@@ -31,6 +32,12 @@ namespace Common
                 var xOffset = (sourceBitmap.Width - maxSide) / 2;
 
                 graphicsResult.DrawImage(sourceBitmap, new Point(xOffset, xOffset));
+
+                if (addingBitmap == null) return bitmapResult;
+
+                graphicsResult.CompositingMode = CompositingMode.SourceOver;
+                var minSide = maxSide / 2;
+                graphicsResult.DrawImage(addingBitmap, new Rectangle(minSide, minSide, minSide, minSide));
             }
 
             return bitmapResult;

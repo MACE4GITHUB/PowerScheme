@@ -22,6 +22,7 @@
         Nothing,
         Sleep,
         Hibernate,
-        Shutdown
+        Shutdown,
+        Shield
     }
 }

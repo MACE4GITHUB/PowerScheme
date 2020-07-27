@@ -1,10 +1,8 @@
-﻿using Image = Common.Image;
-
-namespace PowerScheme.Utility
+﻿namespace PowerScheme.Utility
 {
     using Common;
     using System.Drawing;
-    using static Image;
+    using static Common.Image;
 
     internal static class TrayIcon
     {

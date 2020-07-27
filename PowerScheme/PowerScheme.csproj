@@ -135,6 +135,7 @@
     <None Include="Resources\RunAs.exe" />
     <None Include="Resources\Shutdown.png" />
     <None Include="Resources\Sleep.png" />
+    <Content Include="Resources\Shield.png" />
     <Content Include="Resources\Start.ico" />
     <None Include="Resources\Unknown.png" />
     <Content Include="Resources\Stop.png" />
