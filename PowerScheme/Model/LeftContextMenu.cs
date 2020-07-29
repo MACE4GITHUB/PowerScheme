@@ -72,19 +72,19 @@ namespace PowerScheme.Model
             }
 
         }
-
-        protected override void Dispose(bool disposing)
-        {
-            Power = null;
-            base.Dispose(disposing);
-        }
-
+        
         private void ItemMenuPowerOnClick(object sender, EventArgs e)
         {
             if (!(sender is ToolStripMenuItem menu)) return;
             if (!(menu.Tag is StatePowerScheme statePowerScheme)) return;
 
             Power.SetActivePowerScheme(statePowerScheme.PowerScheme);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            Power = null;
+            base.Dispose(disposing);
         }
     }
 }
