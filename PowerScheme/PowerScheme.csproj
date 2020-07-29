@@ -175,7 +175,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"%25ILMerge%25" /internalize /ndebug /copyattrs /targetplatform:4.0,"C:\Windows\Microsoft.NET\Framework64\v4.0.30319" /out:"$(TargetDir)Merge\PowerScheme.exe" $(TargetPath) "$(TargetDir)MessageForm.dll" "$(TargetDir)PowerManagerAPI.dll" "$(TargetDir)RegistryManager.dll" "$(TargetDir)RunAs.Common.dll" "$(TargetDir)Ninject.dll" "$(TargetDir)Common.dll" "$(TargetDir)Languages.dll" "$(TargetDir)PowerSchemeServiceAPI.dll"</PostBuildEvent>
+    <PostBuildEvent>"%ILMerge%" /internalize /ndebug /copyattrs /targetplatform:4.0,"C:\Windows\Microsoft.NET\Framework64\v4.0.30319" /out:"$(TargetDir)Merge\PowerScheme.exe" $(TargetPath) "$(TargetDir)MessageForm.dll" "$(TargetDir)PowerManagerAPI.dll" "$(TargetDir)RegistryManager.dll" "$(TargetDir)RunAs.Common.dll" "$(TargetDir)Ninject.dll" "$(TargetDir)Common.dll" "$(TargetDir)Languages.dll" "$(TargetDir)PowerSchemeServiceAPI.dll"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>taskkill /fi "pid gt 0" /im PowerScheme.exe
