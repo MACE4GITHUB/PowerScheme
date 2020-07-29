@@ -39,32 +39,61 @@ namespace PowerScheme.Model
             if (Items.Count <= 0) return;
 
             Items[MenuItm.StartupOnWindows.ToString()].Click -= StartWithWindowsOnClick;
-            Items[MenuItm.Hibernate.ToString()].Click -= HibernateOnClick;
             Items[MenuItm.Sleep.ToString()].Click -= SleepOnClick;
             Items[MenuItm.Exit.ToString()].Click -= ExitOnClick;
 
-            if (!(Items[MenuItm.Settings.ToString()] is ToolStripMenuItem settingsToolStripMenuItem)) return;
+            if (Power.ExistsHibernate) Items[MenuItm.Hibernate.ToString()].Click -= HibernateOnClick;
 
-            var dropDownItems = settingsToolStripMenuItem.DropDownItems;
-
-            dropDownItems[MenuItm.RestoreDefaultPowerSchemes.ToString()].Click -= RestoreDefaultPowerSchemesOnClick;
-            dropDownItems[MenuItm.ControlPanelSchemeWindows.ToString()].Click -= ItemCplSchemeOnClick;
-            dropDownItems[MenuItm.CreateTypicalSchemes.ToString()].Click -= ItemCreateTypicalSchemesOnClick;
-            dropDownItems[MenuItm.DeleteTypicalSchemes.ToString()].Click -= ItemDeleteTypicalSchemesOnClick;
-            
-            for (var index = dropDownItems.Count - 1; index >= 0; index--)
+            #region SettingsMenu
+            if (Items[MenuItm.Settings.ToString()] is ToolStripMenuItem settingsToolStripMenuItem)
             {
-                var item = dropDownItems[index];
-                if (!(item is ToolStripMenuItem toolStripItem)) continue;
+                var settingDropDownItems = settingsToolStripMenuItem.DropDownItems;
 
-                toolStripItem.Tag = null;
-                toolStripItem.Text = null;
-                toolStripItem.Image = null;
-                toolStripItem.Click -= ItemMenuActionPowerOnClick;
-                toolStripItem.Dispose();
+                settingDropDownItems[MenuItm.RestoreDefaultPowerSchemes.ToString()].Click -=
+                    RestoreDefaultPowerSchemesOnClick;
+                settingDropDownItems[MenuItm.ControlPanelSchemeWindows.ToString()].Click -= ItemCplSchemeOnClick;
+                settingDropDownItems[MenuItm.CreateTypicalSchemes.ToString()].Click -=
+                    ItemCreateTypicalSchemesOnClick;
+                settingDropDownItems[MenuItm.DeleteTypicalSchemes.ToString()].Click -=
+                    ItemDeleteTypicalSchemesOnClick;
+
+                for (var index = settingDropDownItems.Count - 1; index >= 0; index--)
+                {
+                    var item = settingDropDownItems[index];
+                    if (!(item is ToolStripMenuItem toolStripItem)) continue;
+
+                    toolStripItem.Tag = null;
+                    toolStripItem.Text = null;
+                    toolStripItem.Image = null;
+                    toolStripItem.Click -= ItemMenuActionPowerOnClick;
+                    toolStripItem.Dispose();
+                }
+
+                if (settingDropDownItems.Count > 0) settingDropDownItems.Clear();
             }
+            #endregion
 
-            dropDownItems.Clear();
+            #region LidMenu
+            if (Items[MenuItm.Lid.ToString()] is ToolStripMenuItem lidToolStripMenuItem)
+            {
+                var lidDropDownItems = lidToolStripMenuItem.DropDownItems;
+
+                for (var index = lidDropDownItems.Count - 1; index >= 0; index--)
+                {
+                    var item = lidDropDownItems[index];
+                    if (!(item is ToolStripMenuItem toolStripItem)) continue;
+
+                    toolStripItem.Tag = null;
+                    toolStripItem.Text = null;
+                    toolStripItem.Image = null;
+                    toolStripItem.Click -= LidOnClick;
+                    toolStripItem.Dispose();
+                }
+
+                if (lidDropDownItems.Count > 0) lidDropDownItems.Clear();
+            }
+            #endregion
+
             Items.Clear();
         }
 
@@ -325,7 +354,7 @@ namespace PowerScheme.Model
 
             Power.Watchers.RaiseActionWithoutWatchers(DeleteTypicalScheme);
         }
-        
+
         private static void StartWithWindowsOnClick(object sender, EventArgs e)
         {
             if (!GetCheckedOption(sender, out var isChecked)) return;
@@ -349,9 +378,9 @@ namespace PowerScheme.Model
             RegistryService.SetSleepOption(Resources.ResourceManager, value);
         }
 
-        private void ExitOnClick(object sender, EventArgs e)
+        private static void ExitOnClick(object sender, EventArgs e)
         {
-            Environment.Exit(0);
+            Application.Exit();
         }
 
         private void ItemMenuActionPowerOnClick(object sender, EventArgs e)
@@ -406,11 +435,17 @@ namespace PowerScheme.Model
         private static Bitmap GetImageIfCheck(bool @checked, bool addShield)
         {
             var bitmap = GetImage(ImageItem.Check);
-            if (!addShield) 
+            if (!addShield)
                 return @checked ? bitmap : null;
-            
+
             var shield = GetImage(ImageItem.Shield);
-            return @checked ?  bitmap.CopyToSquareCanvas(Color.Transparent, shield): shield;
+            return @checked ? bitmap.CopyToSquareCanvas(Color.Transparent, shield) : shield;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            Power = null;
+            base.Dispose(disposing);
         }
     }
 }
