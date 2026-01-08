@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RunAs.Common\RunAs.Common.csproj">
+      <Project>{747985b7-1908-4c46-8ce8-1b378779ab0d}</Project>
+      <Name>RunAs.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

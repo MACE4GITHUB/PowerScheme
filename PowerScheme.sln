@@ -3,27 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerScheme", "PowerScheme\PowerScheme.csproj", "{23610885-8476-4388-AFC8-BC564F6BE09F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerScheme", "src\PowerScheme\PowerScheme.csproj", "{23610885-8476-4388-AFC8-BC564F6BE09F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistryManager", "RegistryManager\RegistryManager.csproj", "{0BA349FF-9FBB-45F8-87FC-9423CB283F33}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistryManager", "src\RegistryManager\RegistryManager.csproj", "{0BA349FF-9FBB-45F8-87FC-9423CB283F33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageForm", "MessageForm\MessageForm.csproj", "{9B901C5D-1720-42C0-ADBD-C58F19B47248}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageForm", "src\MessageForm\MessageForm.csproj", "{9B901C5D-1720-42C0-ADBD-C58F19B47248}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerManagerAPI", "PowerManagerAPI\PowerManagerAPI.csproj", "{11D90B11-3C6E-4C27-AC3E-F4A84B992628}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerManagerAPI", "src\PowerManagerAPI\PowerManagerAPI.csproj", "{11D90B11-3C6E-4C27-AC3E-F4A84B992628}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegWriter", "RegWriter\RegWriter.csproj", "{9F448406-F168-4C75-A254-BC895EF0B25D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegWriter", "src\RegWriter\RegWriter.csproj", "{9F448406-F168-4C75-A254-BC895EF0B25D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunAs", "RunAs\RunAs.csproj", "{2F3C447D-7BA9-49D6-93FC-D29873F6AB5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunAs", "src\RunAs\RunAs.csproj", "{2F3C447D-7BA9-49D6-93FC-D29873F6AB5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunAs.Common", "RunAs.Common\RunAs.Common.csproj", "{747985B7-1908-4C46-8CE8-1B378779AB0D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunAs.Common", "src\RunAs.Common\RunAs.Common.csproj", "{747985B7-1908-4C46-8CE8-1B378779AB0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerSchemeServiceAPI", "PowerSchemeServiceAPI\PowerSchemeServiceAPI.csproj", "{8FF837D7-65A5-4404-B1D6-C98AD12FB627}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerSchemeServiceAPI", "src\PowerSchemeServiceAPI\PowerSchemeServiceAPI.csproj", "{8FF837D7-65A5-4404-B1D6-C98AD12FB627}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{220D6BE3-3CE1-4683-8980-7C25D5F77BB3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "src\Common\Common.csproj", "{220D6BE3-3CE1-4683-8980-7C25D5F77BB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Languages", "Languages\Languages.csproj", "{FC9D0998-254A-46A3-AC5B-317F80150175}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Languages", "src\Languages\Languages.csproj", "{FC9D0998-254A-46A3-AC5B-317F80150175}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupPowerScheme", "SetupPowerScheme\SetupPowerScheme.vdproj", "{2CC5F1B1-2F4D-4233-8A22-52018445FEC6}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupPowerScheme", "src\SetupPowerScheme\SetupPowerScheme.vdproj", "{2CC5F1B1-2F4D-4233-8A22-52018445FEC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

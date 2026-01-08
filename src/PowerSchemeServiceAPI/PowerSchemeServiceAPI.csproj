@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{220D6BE3-3CE1-4683-8980-7C25D5F77BB3}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Languages\Languages.csproj">
+      <Project>{FC9D0998-254A-46A3-AC5B-317F80150175}</Project>
+      <Name>Languages</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PowerManagerAPI\PowerManagerAPI.csproj">
+      <Project>{11D90B11-3C6E-4C27-AC3E-F4A84B992628}</Project>
+      <Name>PowerManagerAPI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RegistryManager\RegistryManager.csproj">
+      <Project>{0BA349FF-9FBB-45F8-87FC-9423CB283F33}</Project>
+      <Name>RegistryManager</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
