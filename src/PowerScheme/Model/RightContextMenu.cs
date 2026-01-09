@@ -337,7 +337,7 @@ public sealed class RightContextMenu : ContextMainMenu
 
     private static void ItemCplSchemeOnClick(object sender, EventArgs e)
     {
-        UACHelper.AttemptPrivilegeEscalation("powercfg.cpl");
+        UacHelper.AttemptPrivilegeEscalation("powercfg.cpl");
     }
 
     private void ItemCreateTypicalSchemesOnClick(object sender, EventArgs e)

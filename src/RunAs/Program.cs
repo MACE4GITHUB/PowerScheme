@@ -7,20 +7,31 @@ using Common.Services;
 
 internal static class Program
 {
-    private static void Main(string[] args)
+    private static void Main(string[]? args)
     {
-        if (args.Length < 3) ExitBecauseWrongParameters();
+        if (args == null || args.Length < 3)
+        {
+            ExitBecauseWrongParameters();
+        }
 
         var isRole = Enum.TryParse(args[1], true, out Role role);
-        if (!isRole) ExitBecauseWrongParameters("The role is not specified.");
+
+        if (!isRole)
+        {
+            ExitBecauseWrongParameters("The role is not specified.");
+        }
 
         var isAttributeFile = Enum.TryParse(args[2], true, out AttributeFile attributeFile);
-        if (!isAttributeFile) ExitBecauseWrongParameters("The attribute file is not specified.");
+        if (!isAttributeFile)
+        {
+            ExitBecauseWrongParameters("The attribute file is not specified.");
+        }
+
         var isHidden = attributeFile == AttributeFile.Hidden;
 
         var programName = args[0];
 
-        var executorService = new ExecutorService()
+        var executorService = new ExecutorService
         {
             Name = programName,
             Arguments = role.ToString(),
@@ -29,10 +40,11 @@ internal static class Program
             IsRemoveFile = false,
             IsHiddenFile = isHidden
         };
+
         executorService.Execute();
     }
 
-    private static void ExitBecauseWrongParameters(string message = null)
+    private static void ExitBecauseWrongParameters(string? message = null)
     {
         Console.WriteLine($"Wrong parameters. {message}");
         Console.ReadLine();

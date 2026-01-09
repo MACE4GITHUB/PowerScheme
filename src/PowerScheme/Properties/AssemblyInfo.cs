@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("BULAVA")]
 [assembly: AssemblyProduct("PowerScheme")]
-[assembly: AssemblyCopyright("Copyright ©  2020-2022 Dmitriy Bulava")]
+[assembly: AssemblyCopyright("Copyright ©  2020-2026 Dmitriy Bulava")]
 [assembly: AssemblyTrademark("BULAVA")]
 [assembly: AssemblyCulture("")]
 

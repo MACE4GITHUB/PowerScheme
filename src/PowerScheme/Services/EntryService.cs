@@ -109,7 +109,7 @@ internal sealed class EntryService : IDisposable
     private EntryService ValidateOs()
     {
         if (!IsValidateOs) return this;
-        if (UACHelper.IsValidOs) return this;
+        if (UacHelper.IsValidOs) return this;
 
         _messageBox.Show(Language.Current.ApplicationLatter,
             Language.Current.Error,

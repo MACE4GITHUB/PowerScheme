@@ -1,5 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
+	<PropertyGroup>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<UseWindowsForms>true</UseWindowsForms>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<OutputType>WinExe</OutputType>
+		<PublishSingleFile>true</PublishSingleFile>
+		<SelfContained>false</SelfContained>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<RootNamespace>PowerScheme</RootNamespace>
+		<AssemblyName>PowerScheme</AssemblyName>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<Deterministic>false</Deterministic>
+		<StartupObject>PowerScheme.Program</StartupObject>
+		<ApplicationIcon>Resources\Start.ico</ApplicationIcon>
+		<PreBuildEvent>
+			taskkill /fi "pid gt 0" /im PowerScheme.exe
+			taskkill /f /fi "pid gt 0" /im PowerScheme.exe
+			EXIT 0
+		</PreBuildEvent>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);CA1416</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Common\Common.csproj" />
+		<ProjectReference Include="..\Languages\Languages.csproj" />
+		<ProjectReference Include="..\MessageForm\MessageForm.csproj" />
+		<ProjectReference Include="..\PowerSchemeServiceAPI\PowerSchemeServiceAPI.csproj" />
+		<ProjectReference Include="..\RegistryManager\RegistryManager.csproj" />
+		<ProjectReference Include="..\RunAs.Common\RunAs.Common.csproj" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<None Include="Resources\Add.png" />
 		<Content Include="Resources\Balance.png" />
@@ -27,72 +65,5 @@
 		<None Include="Resources\Ultimate.png" />
 		<Content Include="Start.ico" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\Common\Common.csproj">
-			<Project>{220D6BE3-3CE1-4683-8980-7C25D5F77BB3}</Project>
-			<Name>Common</Name>
-		</ProjectReference>
-		<ProjectReference Include="..\MessageForm\MessageForm.csproj">
-			<Project>{9B901C5D-1720-42C0-ADBD-C58F19B47248}</Project>
-			<Name>MessageForm</Name>
-		</ProjectReference>
-		<ProjectReference Include="..\Languages\Languages.csproj">
-			<Project>{FC9D0998-254A-46A3-AC5B-317F80150175}</Project>
-			<Name>Languages</Name>
-		</ProjectReference>
-		<ProjectReference Include="..\PowerSchemeServiceAPI\PowerSchemeServiceAPI.csproj">
-			<Project>{8FF837D7-65A5-4404-B1D6-C98AD12FB627}</Project>
-			<Name>PowerSchemeServiceAPI</Name>
-		</ProjectReference>
-		<ProjectReference Include="..\RegistryManager\RegistryManager.csproj">
-			<Project>{0BA349FF-9FBB-45F8-87FC-9423CB283F33}</Project>
-			<Name>RegistryManager</Name>
-		</ProjectReference>
-		<ProjectReference Include="..\RunAs.Common\RunAs.Common.csproj">
-			<Project>{747985B7-1908-4C46-8CE8-1B378779AB0D}</Project>
-			<Name>RunAs.Common</Name>
-		</ProjectReference>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Update="Properties\Settings.Designer.cs">
-			<DesignTimeSharedInput>True</DesignTimeSharedInput>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>Settings.settings</DependentUpon>
-		</Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="Properties\Settings.settings">
-			<Generator>SettingsSingleFileGenerator</Generator>
-			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
-		</None>
-	</ItemGroup>
-
-	<PropertyGroup>
-		<TargetFramework>net10.0-windows</TargetFramework>
-		<UseWindowsForms>true</UseWindowsForms>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<OutputType>WinExe</OutputType>
-		<PublishSingleFile>true</PublishSingleFile>
-		<SelfContained>false</SelfContained>
-		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-		<RootNamespace>PowerScheme</RootNamespace>
-		<AssemblyName>PowerScheme</AssemblyName>
-		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-		<Deterministic>false</Deterministic>
-		<StartupObject>PowerScheme.Program</StartupObject>
-		<ApplicationIcon>Resources\Start.ico</ApplicationIcon>
-		<PreBuildEvent>
-			taskkill /fi "pid gt 0" /im PowerScheme.exe
-			taskkill /f /fi "pid gt 0" /im PowerScheme.exe
-			EXIT 0
-		</PreBuildEvent>
-	</PropertyGroup>
 
 </Project>

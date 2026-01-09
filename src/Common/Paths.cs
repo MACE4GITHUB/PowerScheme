@@ -8,7 +8,7 @@ public static class Paths
     public static string ApplicationPath
         => Path.GetDirectoryName(ApplicationFullName);
 
-    public static string ApplicationFullName 
+    public static string ApplicationFullName
         => Process.GetCurrentProcess().MainModule?.FileName;
 
     public static string ApplicationName
