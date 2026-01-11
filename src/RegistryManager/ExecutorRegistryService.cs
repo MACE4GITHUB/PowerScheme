@@ -8,7 +8,7 @@ namespace RegistryManager;
 public class ExecutorRegistryService : ExecutorService
 {
     private const string NAME = "RegWriter";
-    private bool isExecuted;
+    private bool _isExecuted;
 
     public ExecutorRegistryService(ResourceManager resourceManager, RegistryParam registryParam, RegistryAdminAction registryAdminAction, object fileName)
     {
@@ -40,12 +40,12 @@ public class ExecutorRegistryService : ExecutorService
 
     public override void Execute()
     {
-        if (isExecuted) 
+        if (_isExecuted) 
             throw new ArgumentNullException(nameof(RegistrySaver));
 
         RegistrySaver.SaveToStore();
         base.Execute();
         RegistrySaver.Dispose();
-        isExecuted = true;
+        _isExecuted = true;
     }
 }

@@ -1,16 +1,14 @@
-﻿using Common;
-
-namespace RunAs.Common.Services;
-
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Resources;
-using Utils;
+using RunAs.Common.Utils;
+
+namespace RunAs.Common.Services;
 
 public class ExecutorService
 {
-    private const string EXE_EXTENTION = ".exe";
+    private const string EXE_EXTENSION = ".exe";
 
     public ExecutorService()
     { }
@@ -22,14 +20,14 @@ public class ExecutorService
         ResourceManager = resourceManager;
     }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public string FullName
-        => Path.Combine(Paths.ApplicationPath, $"{Name}{EXE_EXTENTION}");
+        => Path.Combine(Path.GetDirectoryName(Environment.ProcessPath)!, $"{Name}{EXE_EXTENSION}");
 
-    public string Arguments { get; set; }
+    public string Arguments { get; set; } = string.Empty;
 
-    public ResourceManager ResourceManager { get; set; }
+    public ResourceManager? ResourceManager { get; set; }
 
     public ProcessWindowStyle ProcessWindowStyle { get; set; } = ProcessWindowStyle.Hidden;
 

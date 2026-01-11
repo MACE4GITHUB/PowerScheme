@@ -1,11 +1,10 @@
-﻿using Common;
+﻿using System;
+using System.Collections.Generic;
+using Common;
+using Microsoft.Win32;
+using RegistryManager.Model;
 
 namespace RegistryManager;
-
-using Microsoft.Win32;
-using Model;
-using System;
-using System.Collections.Generic;
 
 public static class Registry
 {
