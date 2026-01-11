@@ -1,16 +1,16 @@
-﻿namespace PowerSchemeServiceAPI;
-
-using Common;
-using EventsArgs;
-using Languages;
-using Model;
-using PowerManagerAPI;
-using RegistryManager;
-using Settings;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using static SettingSchemeLookup;
+using Common;
+using Languages;
+using PowerManagerAPI;
+using PowerSchemeServiceAPI.EventsArgs;
+using PowerSchemeServiceAPI.Model;
+using PowerSchemeServiceAPI.Settings;
+using RegistryManager;
+using static PowerSchemeServiceAPI.SettingSchemeLookup;
+
+namespace PowerSchemeServiceAPI;
 
 public class PowerSchemeService : IPowerSchemeService
 {
@@ -72,7 +72,10 @@ public class PowerSchemeService : IPowerSchemeService
 
     public void SetActivePowerScheme(IPowerScheme powerScheme, bool isForce = false)
     {
-        if (powerScheme.Guid == ActivePowerScheme.Guid && !isForce) return;
+        if (powerScheme.Guid == ActivePowerScheme.Guid && !isForce)
+        {
+            return;
+        }
 
         PowerManager.SetActivePlan(powerScheme.Guid);
         OnActivePowerSchemeChanged(new PowerSchemeEventArgs(powerScheme));
@@ -84,7 +87,7 @@ public class PowerSchemeService : IPowerSchemeService
     public void RestoreDefaultPowerSchemes()
         => Watchers.RaiseActionWithoutWatchers(PowerManager.RestoreDefaultPlans);
 
-    private bool CanCreateExtremePowerScheme
+    private static bool CanCreateExtremePowerScheme
         => RegistryService.ExistsDefaultPowerScheme(SettingSchemes[SettingScheme.Ultimate].Guid);
 
     public bool ExistsMobilePlatformRole
@@ -104,8 +107,10 @@ public class PowerSchemeService : IPowerSchemeService
                      .Where(p => !p.Value.IsNative && RegistryService.ExistsTypicalPowerScheme(p.Value.Guid))
                      .Select(p => p.Value.Guid))
         {
-            if (guid == activeGuid) 
+            if (guid == activeGuid)
+            {
                 SetActivePowerScheme(SettingSchemes[SettingScheme.Balance].Guid);
+            }
 
             PowerManager.DeletePlan(guid);
         }
@@ -117,7 +122,10 @@ public class PowerSchemeService : IPowerSchemeService
 
     private void DeleteTypicalScheme(Guid guid)
     {
-        if (!ExistsTypicalPowerScheme(guid)) return;
+        if (!ExistsTypicalPowerScheme(guid))
+        {
+            return;
+        }
 
         var activeGuid = ActivePowerScheme.Guid;
 
@@ -133,11 +141,11 @@ public class PowerSchemeService : IPowerSchemeService
         var activeScheme = ActivePowerScheme;
 
         var listGuid = PowerSchemes.Select(p => p.Guid);
-        var powerSchemeDCACValues = new PowerSchemeDCACValues(value, value);
+        var powerSchemeDcAcValues = new PowerSchemeDCACValues(value, value);
 
         foreach (var guid in listGuid)
         {
-            var settingLid = new PowerSchemeLid(guid, powerSchemeDCACValues);
+            var settingLid = new PowerSchemeLid(guid, powerSchemeDcAcValues);
             settingLid.ApplyValues();
         }
 
@@ -166,7 +174,7 @@ public class PowerSchemeService : IPowerSchemeService
         ApplyDefaultValues(SettingScheme.Stable);
     }
 
-    private void ApplyDefaultValues(SettingScheme settingScheme)
+    private static void ApplyDefaultValues(SettingScheme settingScheme)
     {
         var settings = new PowerSchemeSettings(settingScheme);
         settings.ApplyDefaultValues();
@@ -201,28 +209,30 @@ public class PowerSchemeService : IPowerSchemeService
     private void CreateExtremePowerScheme()
     {
         if (CanCreateExtremePowerScheme)
+        {
             CreateTypicalPowerScheme(SettingSchemes[SettingScheme.Ultimate].Guid, SettingSchemes[SettingScheme.Extreme].Guid,
                 Language.Current.ExtremeName, Language.Current.ExtremeDescription);
+        }
 
         ApplyDefaultValues(SettingScheme.Extreme);
     }
 
-    private bool ExistsStablePowerScheme
+    private static bool ExistsStablePowerScheme
         => ExistsTypicalPowerScheme(SettingSchemes[SettingScheme.Stable].Guid);
 
-    private bool ExistsMediaPowerScheme
+    private static bool ExistsMediaPowerScheme
         => ExistsTypicalPowerScheme(SettingSchemes[SettingScheme.Media].Guid);
 
-    private bool ExistsSimplePowerScheme
+    private static bool ExistsSimplePowerScheme
         => ExistsTypicalPowerScheme(SettingSchemes[SettingScheme.Simple].Guid);
 
-    private bool ExistsExtremePowerScheme
+    private static bool ExistsExtremePowerScheme
         => ExistsTypicalPowerScheme(SettingSchemes[SettingScheme.Extreme].Guid);
 
     private void DeleteExtremePowerScheme()
         => DeleteTypicalScheme(SettingSchemes[SettingScheme.Extreme].Guid);
 
-    private StatePowerScheme ToggledStatePowerScheme(StatePowerScheme statePowerScheme, bool b)
+    private static StatePowerScheme ToggledStatePowerScheme(StatePowerScheme statePowerScheme, bool b)
     {
         return b ? new StatePowerScheme(statePowerScheme.PowerScheme, ActionWithPowerScheme.Delete)
             : new StatePowerScheme(statePowerScheme.PowerScheme, ActionWithPowerScheme.Create);
@@ -256,8 +266,10 @@ public class PowerSchemeService : IPowerSchemeService
         return null;
     }
 
-    private void ApplyAction(ActionWithPowerScheme actionWithPowerScheme,
-        Action create, Action delete)
+    private static void ApplyAction(
+        ActionWithPowerScheme actionWithPowerScheme,
+        Action create, 
+        Action delete)
     {
         switch (actionWithPowerScheme)
         {
@@ -268,7 +280,7 @@ public class PowerSchemeService : IPowerSchemeService
                 delete();
                 break;
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new AccessViolationException(nameof(ActionWithPowerScheme));
         }
     }
 
@@ -333,15 +345,23 @@ public class PowerSchemeService : IPowerSchemeService
         return null;
     }
 
-    private void CreateTypicalPowerScheme(Guid source, Guid destination, string name, string description = null)
+    private static void CreateTypicalPowerScheme(Guid source, Guid destination, string name, string description = null)
     {
         var isExistsTypicalPowerScheme = ExistsTypicalPowerScheme(destination);
-        if (isExistsTypicalPowerScheme) return;
+        if (isExistsTypicalPowerScheme)
+        {
+            return;
+        }
+
         PowerManager.DuplicatePlan(source, destination);
 
         PowerManager.SetPlanName(destination, name);
 
-        if (description == null) return;
+        if (description == null)
+        {
+            return;
+        }
+
         PowerManager.SetPlanDescription(destination, description);
     }
 
@@ -364,7 +384,7 @@ public class PowerSchemeService : IPowerSchemeService
                 .Where(p => p.Value.Guid.ToString() == guid)
                 .Select(p => p.Value).FirstOrDefault();
 
-        return powerSchemeParams 
+        return powerSchemeParams
                ?? new PowerScheme(Guid.Parse(guid), false, ImageItem.Unknown);
     }
 }

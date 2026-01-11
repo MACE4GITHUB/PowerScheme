@@ -1,23 +1,20 @@
-﻿namespace MessageForm;
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using static DialogResultLookup;
+using static MessageForm.DialogResultLookup;
+
+namespace MessageForm;
 
 public partial class MainMessageBox : Form, IMainMessageBox
 {
-    private List<object> _eventsCloseMessage;
     private int _timeout;
     private readonly IWin32Window _owner;
-    private readonly IntPtr _handle;
-    private Timer _timer;
+    private Timer? _timer;
     private int _valueTimerTick;
-    private Control _controlForValueTimerTick;
+    private Control? _controlForValueTimerTick;
     private string _initialControlValue = "";
     private DialogResult _defaultResultAfterTimeout;
     private DialogResult _returnResultAfterTimeout;
@@ -27,29 +24,13 @@ public partial class MainMessageBox : Form, IMainMessageBox
     {
         InitializeComponent();
         _labelTimerTick.Text = "";
-        _handle = Process.GetCurrentProcess().MainWindowHandle;
-        _owner = new WindowWrapper(_handle);
+        var handle = Process.GetCurrentProcess().MainWindowHandle;
+        _owner = new WindowWrapper(handle);
     }
-
-    event EventHandler IMainMessageBox.Closed
-    {
-        add
-        {
-            Closed += value;
-            if (_eventsCloseMessage == null) _eventsCloseMessage = new List<object>();
-            _eventsCloseMessage.Add(value);
-        }
-        remove
-        {
-            if (_eventsCloseMessage == null || _eventsCloseMessage.Count == 0) return;
-
-            Closed -= value;
-            _eventsCloseMessage.Remove(value);
-        }
-    }
-
-    public DialogResult Show(string message,
-        string title = null,
+    
+    public DialogResult Show(
+        string message,
+        string? title = null,
         MessageBoxButtons? buttons = MessageBoxButtons.OK,
         MessageBoxIcon icon = MessageBoxIcon.Information,
         bool isApplicationExit = false,
@@ -67,10 +48,13 @@ public partial class MainMessageBox : Form, IMainMessageBox
 
         if (isApplicationExit)
         {
-            Closed += (sender, args) => Environment.Exit(0);
+            FormClosed += (sender, args) => Environment.Exit(0);
         }
 
-        if (_hasTimer) LoadTimer();
+        if (_hasTimer)
+        {
+            LoadTimer();
+        }
 
         var resultDialog = ShowDialog(_owner);
         var result = resultDialog == DialogResult.Cancel
@@ -82,10 +66,21 @@ public partial class MainMessageBox : Form, IMainMessageBox
 
     private void SetTimeout(int timeout)
     {
-        if (timeout < 0) timeout = 0;
-        if (timeout > 1440) timeout = 1440;
+        if (timeout < 0)
+        {
+            timeout = 0;
+        }
+
+        if (timeout > 1440)
+        {
+            timeout = 1440;
+        }
+
         _timeout = timeout;
-        if (_timeout > 0) _hasTimer = true;
+        if (_timeout > 0)
+        {
+            _hasTimer = true;
+        }
     }
 
     private void LoadTimer()
@@ -131,7 +126,10 @@ public partial class MainMessageBox : Form, IMainMessageBox
         _controlForValueTimerTick = _labelTimerTick;
         _defaultResultAfterTimeout = defaultResultAfterTimeout;
 
-        if (!messageBoxButtons.HasValue) return;
+        if (!messageBoxButtons.HasValue)
+        {
+            return;
+        }
 
         switch (messageBoxButtons)
         {
@@ -218,16 +216,20 @@ public partial class MainMessageBox : Form, IMainMessageBox
         }
         var height = 125;
 
-        SizeF size = TextRenderer.MeasureText("W", new Font("Microsoft Sans Serif", 8.25F));
+        SizeF size = TextRenderer.MeasureText("W", 
+            new Font(new FontFamily("Microsoft Sans Serif"),
+            8.25f,
+            0,
+            (GraphicsUnit)3));
         var sHeight = (int)(size.Height * 1.1);
         var sWidth = (int)(_lblMessage.Width / size.Width * 3);
 
         var groups = (from Match m in Regex.Matches(message, ".{1," + sWidth + "}") select m.Value).ToArray();
-        var groupsInline = (from Match m in Regex.Matches(message, "\n\n{1,1}") select m.Value).ToArray();
+        var groupsInline = (from Match m in MyRegex().Matches(message) select m.Value).ToArray();
         var lines = groups.Length;
-        var fHeight = (int)(sHeight * groupsInline.Length * 1);
+        var fHeight = sHeight * groupsInline.Length * 1;
 
-        height += sHeight * lines + fHeight - (int)(groupsInline.Length * 1.5);
+        height += (sHeight * lines) + fHeight - (int)(groupsInline.Length * 1.5);
 
         Size = new Size(Width, height);
     }
@@ -258,7 +260,10 @@ public partial class MainMessageBox : Form, IMainMessageBox
         button.Click += ButtonClick;
         _flpButtons.Controls.Add(button);
 
-        if (!isDefault && _hasTimer) return;
+        if (!isDefault && _hasTimer)
+        {
+            return;
+        }
 
         _controlForValueTimerTick = button;
         _initialControlValue = DialogResultScheme[buttonDialogResult];
@@ -266,8 +271,15 @@ public partial class MainMessageBox : Form, IMainMessageBox
 
     private void ButtonClick(object sender, EventArgs e)
     {
-        if (!(sender is Button btn)) return;
-        if (!(btn.Tag is DialogResult dialogResult)) return;
+        if (sender is not Button btn)
+        {
+            return;
+        }
+
+        if (btn.Tag is not DialogResult dialogResult)
+        {
+            return;
+        }
 
         DialogResult = dialogResult;
 
@@ -278,19 +290,18 @@ public partial class MainMessageBox : Form, IMainMessageBox
     {
         foreach (Control flpButtonsControl in _flpButtons.Controls)
         {
-            if (!(flpButtonsControl is Button button)) return;
+            if (flpButtonsControl is not Button button)
+            {
+                return;
+            }
+
             button.Click -= ButtonClick;
         }
 
-        if (_eventsCloseMessage == null || _eventsCloseMessage.Count <= 0) return;
-        foreach (EventHandler handler in _eventsCloseMessage)
-        {
-            Closed -= handler;
-        }
-        _eventsCloseMessage.Clear();
-        _eventsCloseMessage = null;
-
-        _timer.Tick -= TimerOnTick;
-        _timer.Dispose();
+        _timer?.Tick -= TimerOnTick;
+        _timer?.Dispose();
     }
+
+    [GeneratedRegex("\n\n{1,1}")]
+    private static partial Regex MyRegex();
 }

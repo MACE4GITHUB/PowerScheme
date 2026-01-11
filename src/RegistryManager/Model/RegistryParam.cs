@@ -17,38 +17,38 @@ public struct RegistryParam
     private const string DELIMITER = "|&|";
     private const string DELIMITER_STRINGS = "|s|";
 
-    private RegistryValueKind _registryValueKind;
-
     public RegistryHive RegistryHive { get; set; }
 
     public string Path { get; set; }
 
     public string Section { get; set; }
 
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     public RegistryValueKind RegistryValueKind
     {
-        get => _registryValueKind == RegistryValueKind.Unknown ? CalculateValueKind() : _registryValueKind;
-        set => _registryValueKind = value;
+        readonly get => field == RegistryValueKind.Unknown
+            ? CalculateValueKind()
+            : field;
+        set;
     }
 
-    public object Value { get; set; }
+    public object? Value { get; set; }
 
 
     /// <summary>
     /// Returns 'Path + "\\" + Section'
     /// </summary>
-    public string RegistrySubKey => Path + "\\" + Section;
+    public readonly string RegistrySubKey => Path + "\\" + Section;
 
-    public string Hive => CalculateRegistryHive();
+    public readonly string Hive => CalculateRegistryHive();
 
     /// <summary>
     /// Returns Hive + "\\" + RegistrySubKey
     /// </summary>
-    public string RegistryKey => Hive + "\\" + RegistrySubKey;
+    public readonly string RegistryKey => Hive + "\\" + RegistrySubKey;
 
-    public override string ToString()
+    public override readonly string ToString()
     {
         var value = CalculateStringValue(Value, RegistryValueKind);
         return $"{RegistryHive}{DELIMITER}{Path}{DELIMITER}{Section}{DELIMITER}{Name}{DELIMITER}{RegistryValueKind}{DELIMITER}{value}";
@@ -63,12 +63,12 @@ public struct RegistryParam
             return new RegistryParam();
         }
 
-        var registryValueKind = (RegistryValueKind) Enum.Parse(typeof(RegistryValueKind), param[4]);
+        var registryValueKind = Enum.Parse<RegistryValueKind>(param[4], true);
         var value = CalculateTypedValue(param[5], registryValueKind);
 
         var registryParam = new RegistryParam
         {
-            RegistryHive = (RegistryHive)Enum.Parse(typeof(RegistryHive), param[0]),
+            RegistryHive = Enum.Parse<RegistryHive>(param[0], true),
             Path = param[1],
             Section = param[2],
             Name = param[3],
@@ -79,95 +79,53 @@ public struct RegistryParam
         return registryParam;
     }
 
-    private RegistryValueKind CalculateValueKind()
-    {
-        switch (Value)
+    private readonly RegistryValueKind CalculateValueKind() =>
+        Value switch
         {
-            case null:
-                return RegistryValueKind.None;
-            case int _:
-                return RegistryValueKind.DWord;
-            case uint _:
-                return RegistryValueKind.QWord;
-            case Array _:
-                switch (Value)
-                {
-                    case byte[] _:
-                        return RegistryValueKind.Binary;
-                    case string[] _:
-                        return RegistryValueKind.MultiString;
-                    default:
-                        throw new ArgumentException(Value.GetType().Name);
-                }
-            default:
-                return RegistryValueKind.String;
-        }
-    }
+            null => RegistryValueKind.None,
+            int _ => RegistryValueKind.DWord,
+            uint _ => RegistryValueKind.QWord,
+            Array _ => Value switch
+            {
+                byte[] _ => RegistryValueKind.Binary,
+                string[] _ => RegistryValueKind.MultiString,
+                _ => throw new ArgumentException(Value.GetType().Name)
+            },
+            _ => RegistryValueKind.String
+        };
 
-    private static object CalculateTypedValue(string value, RegistryValueKind registryValueKind)
-    {
-        switch (registryValueKind)
+    private static object CalculateTypedValue(string value, RegistryValueKind registryValueKind) =>
+        registryValueKind switch
         {
-            case RegistryValueKind.String:
-            case RegistryValueKind.ExpandString:
-                return value;
-            case RegistryValueKind.DWord:
-                return int.Parse(value);
-            case RegistryValueKind.QWord:
-                return uint.Parse(value);
-            case RegistryValueKind.Binary:
-                return value.DecodeToBytes();
-            case RegistryValueKind.MultiString:
-                return value.SplitByString(DELIMITER_STRINGS);
-            default:
-                throw new ArgumentOutOfRangeException(nameof(registryValueKind), registryValueKind, null);
-        }
-    }
+            RegistryValueKind.String or RegistryValueKind.ExpandString => value,
+            RegistryValueKind.DWord => int.Parse(value),
+            RegistryValueKind.QWord => uint.Parse(value),
+            RegistryValueKind.Binary => value.DecodeToBytes(),
+            RegistryValueKind.MultiString => value.SplitByString(DELIMITER_STRINGS),
+            _ => throw new ArgumentOutOfRangeException(nameof(registryValueKind), registryValueKind, null)
+        };
 
-    private static string CalculateStringValue(object value, RegistryValueKind registryValueKind)
-    {
-        switch (registryValueKind)
+    private static string CalculateStringValue(object value, RegistryValueKind registryValueKind) =>
+        registryValueKind switch
         {
-            case RegistryValueKind.String:
-            case RegistryValueKind.ExpandString:
-            case RegistryValueKind.DWord:
-            case RegistryValueKind.QWord:
-                return value.ToString();
-            case RegistryValueKind.Binary:
-                return ((byte[])value).EncodeToString();
-            case RegistryValueKind.MultiString:
-                return string.Join(DELIMITER_STRINGS, (string[])value);
-            default:
-                throw new ArgumentOutOfRangeException(nameof(registryValueKind), registryValueKind, null);
-        }
-    }
+            RegistryValueKind.String or
+                RegistryValueKind.ExpandString or
+                RegistryValueKind.DWord or
+                RegistryValueKind.QWord => $"{value}",
+            RegistryValueKind.Binary => ((byte[])value).EncodeToString(),
+            RegistryValueKind.MultiString => string.Join(DELIMITER_STRINGS, (string[])value),
+            _ => throw new ArgumentOutOfRangeException(nameof(registryValueKind), registryValueKind, null)
+        };
 
-    private string CalculateRegistryHive()
-    {
-        switch (RegistryHive)
+    private readonly string CalculateRegistryHive() =>
+        RegistryHive switch
         {
-            case RegistryHive.ClassesRoot:
-                return HKEY_CLASSES_ROOT;
-
-            case RegistryHive.CurrentConfig:
-                return HKEY_CURRENT_CONFIG;
-
-            case RegistryHive.CurrentUser:
-                return HKEY_CURRENT_USER;
-
-            case RegistryHive.LocalMachine:
-                return HKEY_LOCAL_MACHINE;
-
-            case RegistryHive.PerformanceData:
-                return HKEY_PERFORMANCE_DATA;
-
-            case RegistryHive.Users:
-                return HKEY_USERS;
-
-            default:
-                throw new InvalidEnumArgumentException(nameof(RegistryHive),
-                    (int)RegistryHive, typeof(RegistryHive));
-        }
-    }
-
+            RegistryHive.ClassesRoot => HKEY_CLASSES_ROOT,
+            RegistryHive.CurrentConfig => HKEY_CURRENT_CONFIG,
+            RegistryHive.CurrentUser => HKEY_CURRENT_USER,
+            RegistryHive.LocalMachine => HKEY_LOCAL_MACHINE,
+            RegistryHive.PerformanceData => HKEY_PERFORMANCE_DATA,
+            RegistryHive.Users => HKEY_USERS,
+            _ => throw new InvalidEnumArgumentException(nameof(RegistryHive), (int)RegistryHive, typeof(RegistryHive))
+        };
 }

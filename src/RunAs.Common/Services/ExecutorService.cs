@@ -80,6 +80,6 @@ public class ExecutorService
     }
 
     private byte[] Executor
-        => (byte[])ResourceManager.GetObject(Name)
-           ?? throw new ArgumentNullException(nameof(Name));
+        => (byte[])(ResourceManager?.GetObject(Name)
+           ?? throw new ArgumentNullException(nameof(Name)));
 }

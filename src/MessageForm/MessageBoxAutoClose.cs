@@ -1,10 +1,9 @@
-﻿namespace MessageForm;
-
-using System;
-using System.Diagnostics;
+﻿using System;
 using System.Windows.Forms;
-using static NativeMethods;
 using static System.Threading.Timeout;
+using static MessageForm.NativeMethods;
+
+namespace MessageForm;
 
 /// <summary>
 /// Represents Auto-close form
@@ -19,6 +18,8 @@ public sealed class MessageBoxAutoClose : IMainMessageBox
     private MessageBoxIcon _messageBoxIcon;
     private MessageBoxButtons? _messageBoxButtons;
 
+    public event EventHandler Closed;
+
     public MessageBoxAutoClose()
     {
         Closed += OnClosed;
@@ -29,11 +30,11 @@ public sealed class MessageBoxAutoClose : IMainMessageBox
         string title = null,
         MessageBoxButtons? buttons = MessageBoxButtons.OK,
         MessageBoxIcon icon = MessageBoxIcon.Asterisk,
-        bool isApplicationExit = false, 
+        bool isApplicationExit = false,
         int timeout = 0,
         DialogResult defaultResultAfterTimeout = DialogResult.None)
     {
-        var currentProcessId = Process.GetCurrentProcess().Id;
+        var currentProcessId = Environment.ProcessId;
         _text = message;
         _title = $"{title} [Id {currentProcessId}]";
         _timeout = timeout == 0 ? 1000 : timeout;
@@ -44,7 +45,10 @@ public sealed class MessageBoxAutoClose : IMainMessageBox
 
         var result = MessageBox.Show(_text, _title, _messageBoxButtons ?? MessageBoxButtons.OK, _messageBoxIcon);
 
-        if (isApplicationExit) Closed?.Invoke(this, EventArgs.Empty);
+        if (isApplicationExit)
+        {
+            Closed?.Invoke(this, EventArgs.Empty);
+        }
 
         return result;
     }
@@ -52,15 +56,13 @@ public sealed class MessageBoxAutoClose : IMainMessageBox
     private void OnTimerElapsed(object state)
     {
         var mbWnd = FindWindow(null, _title);
-        if (mbWnd == IntPtr.Zero) return;
+        if (mbWnd == IntPtr.Zero)
+        {
+            return;
+        }
 
         SendMessage(mbWnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
     }
-
-    #region Dispose
-    private bool disposed;
-
-    public event EventHandler Closed;
 
     private static void OnClosed(object sender, EventArgs args)
     {
@@ -69,10 +71,7 @@ public sealed class MessageBoxAutoClose : IMainMessageBox
 
     public void Dispose()
     {
-        if (disposed) return;
         Closed -= OnClosed;
         _timeoutTimer?.Dispose();
-        disposed = true;
     }
-    #endregion
 }

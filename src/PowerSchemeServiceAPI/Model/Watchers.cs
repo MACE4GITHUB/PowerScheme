@@ -13,14 +13,28 @@ public class Watchers
 
     public void Start()
     {
-        if (!ActivePowerScheme.IsMonitoring) ActivePowerScheme.Start();
-        if (!PowerSchemes.IsMonitoring) PowerSchemes.Start();
+        if (!ActivePowerScheme.IsMonitoring)
+        {
+            ActivePowerScheme.Start();
+        }
+
+        if (!PowerSchemes.IsMonitoring)
+        {
+            PowerSchemes.Start();
+        }
     }
 
     public void Stop()
     {
-        if (ActivePowerScheme.IsMonitoring) ActivePowerScheme.Stop();
-        if (PowerSchemes.IsMonitoring) PowerSchemes.Stop();
+        if (ActivePowerScheme.IsMonitoring)
+        {
+            ActivePowerScheme.Stop();
+        }
+
+        if (PowerSchemes.IsMonitoring)
+        {
+            PowerSchemes.Stop();
+        }
     }
 
     public void RaiseActionWithoutWatchers(Action action)
@@ -31,8 +45,15 @@ public class Watchers
         Stop();
         action();
 
-        if (tempW1) ActivePowerScheme.Start();
-        if (tempW2) PowerSchemes.Start();
+        if (tempW1)
+        {
+            ActivePowerScheme.Start();
+        }
+
+        if (tempW2)
+        {
+            PowerSchemes.Start();
+        }
     }
 
 }

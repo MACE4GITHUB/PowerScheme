@@ -18,12 +18,10 @@ public interface IMainMessageBox: IDisposable
     /// <param name="defaultResultAfterTimeout"></param>
     /// <returns></returns>
     DialogResult Show(string message, 
-        string title = null,
+        string? title = null,
         MessageBoxButtons? buttons = MessageBoxButtons.OK,
         MessageBoxIcon icon = MessageBoxIcon.Information,
         bool isApplicationExit = false,
         int timeout = 0,
         DialogResult defaultResultAfterTimeout = DialogResult.None);
-
-    event EventHandler Closed;
 }

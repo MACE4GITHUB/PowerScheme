@@ -1,9 +1,9 @@
-﻿namespace RegistryManager;
-
-using System;
+﻿using System;
 using System.IO;
-using EventsArgs;
-using Model;
+using RegistryManager.EventsArgs;
+using RegistryManager.Model;
+
+namespace RegistryManager;
 
 public interface IRegistryWatcher
 {
@@ -23,7 +23,7 @@ public interface IRegistryWatcher
     RegChangeNotifyFilter RegChangeNotifyFilter { get; set; }
 
     /// <summary>
-    /// <b>true</b> if this <see cref="RegistryWatcher"/> object is currently monitoring;
+    /// <b>true</b> if this <see cref="IRegistryWatcher"/> object is currently monitoring;
     /// otherwise, <b>false</b>.
     /// </summary>
     bool IsMonitoring { get; }

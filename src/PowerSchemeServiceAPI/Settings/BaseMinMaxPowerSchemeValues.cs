@@ -3,43 +3,45 @@ using PowerManagerAPI;
 
 namespace PowerSchemeServiceAPI.Settings;
 
-public abstract class BaseMinMaxPowerSchemeValues : IApplicable
+public abstract class BaseMinMaxPowerSchemeValues(
+    Guid powerSchemeGuid) : 
+    IApplicable
 {
-    protected BaseMinMaxPowerSchemeValues(Guid powerSchemeGuid) => 
-        PowerSchemeGuid = powerSchemeGuid;
-
     protected virtual PowerSchemeValues MinState { get; set; }
 
     protected virtual PowerSchemeValues MaxState { get; set; }
 
     protected virtual SettingSubgroup SettingSubgroup { get; }
 
-    public Guid PowerSchemeGuid { get; }
+    public Guid PowerSchemeGuid { get; } = powerSchemeGuid;
 
     public void ApplyValues()
     {
-        ApplyDCMinMaxValues();
-        ApplyACMinMaxValues();
+        ApplyDcMinMaxValues();
+        ApplyAcMinMaxValues();
     }
 
-    private void ApplyDCMinMaxValues()
+    private void ApplyDcMinMaxValues()
     {
-        ApplyDCValues(MinState);
-        ApplyDCValues(MaxState);
+        ApplyDcValues(MinState);
+        ApplyDcValues(MaxState);
     }
 
-    private void ApplyACMinMaxValues()
+    private void ApplyAcMinMaxValues()
     {
-        ApplyACValues(MinState);
-        ApplyACValues(MaxState);
+        ApplyAcValues(MinState);
+        ApplyAcValues(MaxState);
     }
 
-    private void ApplyDCValues(PowerSchemeValues powerSchemeValues)
+    private void ApplyDcValues(PowerSchemeValues powerSchemeValues)
     {
         if (PowerSchemeGuid == Guid.Empty)
-            throw new ArgumentNullException(nameof(PowerSchemeGuid));
+        {
+            throw new AccessViolationException(nameof(PowerSchemeGuid));
+        }
 
         if (powerSchemeValues.DCSettings >= 0)
+        {
             PowerManager.SetPlanSetting(
                 PowerSchemeGuid,
                 SettingSubgroup,
@@ -47,14 +49,18 @@ public abstract class BaseMinMaxPowerSchemeValues : IApplicable
                 PowerMode.DC,
                 (uint)powerSchemeValues.DCSettings
             );
+        }
     }
 
-    private void ApplyACValues(PowerSchemeValues powerSchemeValues)
+    private void ApplyAcValues(PowerSchemeValues powerSchemeValues)
     {
         if (PowerSchemeGuid == Guid.Empty)
-            throw new ArgumentNullException(nameof(PowerSchemeGuid));
+        {
+            throw new AccessViolationException(nameof(PowerSchemeGuid));
+        }
 
         if (powerSchemeValues.ACSettings >= 0)
+        {
             PowerManager.SetPlanSetting(
                 PowerSchemeGuid,
                 SettingSubgroup,
@@ -62,5 +68,6 @@ public abstract class BaseMinMaxPowerSchemeValues : IApplicable
                 PowerMode.AC,
                 (uint)powerSchemeValues.ACSettings
             );
+        }
     }
 }

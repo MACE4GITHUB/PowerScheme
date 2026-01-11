@@ -13,6 +13,7 @@ public class ExecutorRegistryService : ExecutorService
     public ExecutorRegistryService(ResourceManager resourceManager, RegistryParam registryParam, RegistryAdminAction registryAdminAction, object fileName)
     {
         RegistryAdminAction = registryAdminAction;
+        
         if (fileName is Guid guidFileName)
         {
             RegistryFileName = guidFileName.ToString();
@@ -40,8 +41,10 @@ public class ExecutorRegistryService : ExecutorService
 
     public override void Execute()
     {
-        if (_isExecuted) 
+        if (_isExecuted)
+        {
             throw new ArgumentNullException(nameof(RegistrySaver));
+        }
 
         RegistrySaver.SaveToStore();
         base.Execute();

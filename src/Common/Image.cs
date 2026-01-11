@@ -7,38 +7,44 @@ namespace Common;
 
 public static class Image
 {
-    public static Icon CreateIcon(this Bitmap sourceBitmap, IconSize iconSize, Bitmap addingBitmap = null)
+    extension(Bitmap sourceBitmap)
     {
-        var squareCanvas = sourceBitmap.CopyToSquareCanvas(Color.Transparent, addingBitmap);
-        squareCanvas = (Bitmap)squareCanvas.GetThumbnailImage((int)iconSize, (int)iconSize, null, new IntPtr());
+        public Icon CreateIcon(IconSize iconSize, Bitmap? addingBitmap = null)
+        {
+            var squareCanvas = sourceBitmap.CopyToSquareCanvas(Color.Transparent, addingBitmap);
+            squareCanvas = (Bitmap)squareCanvas.GetThumbnailImage((int)iconSize, (int)iconSize, null, new IntPtr());
 
-        var iconResult = Icon.FromHandle(squareCanvas.GetHicon());
+            var iconResult = Icon.FromHandle(squareCanvas.GetHicon());
 
-        return iconResult;
-    }
+            return iconResult;
+        }
 
-    public static Bitmap CopyToSquareCanvas(this Bitmap sourceBitmap, Color canvasBackground, Bitmap addingBitmap = null)
-    {
-        if (sourceBitmap == null) throw new ArgumentNullException(nameof(sourceBitmap));
+        public Bitmap CopyToSquareCanvas(Color canvasBackground, Bitmap? addingBitmap = null)
+        {
+            ArgumentNullException.ThrowIfNull(sourceBitmap);
 
-        var maxSide = sourceBitmap.Width > sourceBitmap.Height ? sourceBitmap.Width : sourceBitmap.Height;
+            var maxSide = sourceBitmap.Width > sourceBitmap.Height ? sourceBitmap.Width : sourceBitmap.Height;
 
-        var bitmapResult = new Bitmap(maxSide, maxSide, PixelFormat.Format32bppArgb);
+            var bitmapResult = new Bitmap(maxSide, maxSide, PixelFormat.Format32bppArgb);
 
-        using var graphicsResult = Graphics.FromImage(bitmapResult);
-        graphicsResult.Clear(canvasBackground);
+            using var graphicsResult = Graphics.FromImage(bitmapResult);
+            graphicsResult.Clear(canvasBackground);
 
-        var xOffset = (sourceBitmap.Width - maxSide) / 2;
+            var xOffset = (sourceBitmap.Width - maxSide) / 2;
 
-        graphicsResult.DrawImage(sourceBitmap, new Point(xOffset, xOffset));
+            graphicsResult.DrawImage(sourceBitmap, new Point(xOffset, xOffset));
 
-        if (addingBitmap == null) return bitmapResult;
+            if (addingBitmap == null)
+            {
+                return bitmapResult;
+            }
 
-        graphicsResult.CompositingMode = CompositingMode.SourceOver;
-        var minSide = maxSide / 2;
-        graphicsResult.DrawImage(addingBitmap, new Rectangle(minSide, minSide, minSide, minSide));
+            graphicsResult.CompositingMode = CompositingMode.SourceOver;
+            var minSide = maxSide / 2;
+            graphicsResult.DrawImage(addingBitmap, new Rectangle(minSide, minSide, minSide, minSide));
 
-        return bitmapResult;
+            return bitmapResult;
+        }
     }
 
     public enum IconSize

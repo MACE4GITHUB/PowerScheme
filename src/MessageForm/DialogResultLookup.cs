@@ -4,7 +4,7 @@ using Languages;
 
 namespace MessageForm;
 
-internal class DialogResultLookup
+internal sealed class DialogResultLookup
 {
     internal static readonly Dictionary<DialogResult, string> DialogResultScheme
         = new()

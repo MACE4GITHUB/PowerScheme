@@ -6,20 +6,11 @@ using static PowerSchemeServiceAPI.SettingSchemeLookup;
 
 namespace PowerSchemeServiceAPI.Settings;
 
-internal class PowerSchemeSettings
+internal class PowerSchemeSettings(SettingScheme settingScheme)
 {
-    private readonly SettingScheme _settingScheme;
-
-    public PowerSchemeSettings(SettingScheme settingScheme)
-    {
-        PowerSchemeGuid = SettingSchemes
+    public Guid PowerSchemeGuid { get; } = SettingSchemes
             .Where(p => p.Key == settingScheme)
             .Select(p => p.Value.Guid).FirstOrDefault();
-
-        _settingScheme = settingScheme;
-    }
-
-    public Guid PowerSchemeGuid { get; }
 
     public PowerSchemeProcessorThrottle ProcessorThrottle(Values values) =>
         new(PowerSchemeGuid, values.MinState, values.MaxState);
@@ -38,15 +29,15 @@ internal class PowerSchemeSettings
 
     public void ApplyDefaultValues()
     {
-        var powerSchemeDefaultSettings = new PowerSchemeDefaultSettings(_settingScheme);
+        var powerSchemeDefaultSettings = new PowerSchemeDefaultSettings(settingScheme);
         var ds = powerSchemeDefaultSettings.Settings;
 
         var typeSetting = typeof(PowerSchemeSetting);
         foreach (var name in Enum.GetNames(typeSetting))
         {
-            var set = (PowerSchemeSetting)Enum.Parse(typeSetting, name);
+            var set = Enum.Parse<PowerSchemeSetting>(name);
             var mi = typeof(PowerSchemeSettings).GetMethod(name, BindingFlags.Instance | BindingFlags.Public);
-            var res = mi?.Invoke(this, new object[] { ds[set] });
+            var res = mi?.Invoke(this, [ds[set]]);
             var applicable = res as IApplicable;
             try
             {
@@ -65,25 +56,14 @@ internal class PowerSchemeDefaultSettings
 {
     public PowerSchemeDefaultSettings(SettingScheme settingScheme)
     {
-        Dictionary<PowerSchemeSetting, int[]> defaultSetting;
-
-        switch (settingScheme)
+        var defaultSetting = settingScheme switch
         {
-            case SettingScheme.Stable:
-                defaultSetting = SettingsStable;
-                break;
-            case SettingScheme.Media:
-                defaultSetting = SettingsMedia;
-                break;
-            case SettingScheme.Simple:
-                defaultSetting = SettingsSimple;
-                break;
-            case SettingScheme.Extreme:
-                defaultSetting = SettingsExtreme;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(settingScheme), settingScheme, null);
-        }
+            SettingScheme.Stable => SettingsStable,
+            SettingScheme.Media => SettingsMedia,
+            SettingScheme.Simple => SettingsSimple,
+            SettingScheme.Extreme => SettingsExtreme,
+            _ => throw new ArgumentOutOfRangeException(nameof(settingScheme), settingScheme, null)
+        };
 
         Settings = new Dictionary<PowerSchemeSetting, Values>
         {
@@ -100,58 +80,57 @@ internal class PowerSchemeDefaultSettings
 
     public Dictionary<PowerSchemeSetting, Values> Settings { get; }
 
-    private Dictionary<PowerSchemeSetting, int[]> SettingsStable
+    private static Dictionary<PowerSchemeSetting, int[]> SettingsStable
         => new()
         {
-            {PowerSchemeSetting.ProcessorThrottle, new []{5,85,60,85}},
-            {PowerSchemeSetting.TurnOffDisplay, new []{300,7200}},
-            {PowerSchemeSetting.Sleep, new []{900,10800}},
-            {PowerSchemeSetting.WiFi, new []{2,2}},
-            {PowerSchemeSetting.MultimediaPlay, new []{1,1}},
-            {PowerSchemeSetting.MultimediaShare, new []{2,2}},
-            {PowerSchemeSetting.MultimediaQuality, new []{1,1}}
+            {PowerSchemeSetting.ProcessorThrottle, [5,85,60,85] },
+            {PowerSchemeSetting.TurnOffDisplay, [300,7200] },
+            {PowerSchemeSetting.Sleep, [900,10800] },
+            {PowerSchemeSetting.WiFi, [2,2] },
+            {PowerSchemeSetting.MultimediaPlay, [1,1] },
+            {PowerSchemeSetting.MultimediaShare, [2,2] },
+            {PowerSchemeSetting.MultimediaQuality, [1,1] }
         };
 
-    private Dictionary<PowerSchemeSetting, int[]> SettingsMedia
+    private static Dictionary<PowerSchemeSetting, int[]> SettingsMedia
         => new()
         {
-            {PowerSchemeSetting.ProcessorThrottle, new []{5,5,60,85}},
-            {PowerSchemeSetting.TurnOffDisplay, new []{300,7200}},
-            {PowerSchemeSetting.Sleep, new []{1800,10800}},
-            {PowerSchemeSetting.WiFi, new []{2,3}},
-            {PowerSchemeSetting.MultimediaPlay, new []{2,1}},
-            {PowerSchemeSetting.MultimediaShare, new []{0,1}},
-            {PowerSchemeSetting.MultimediaQuality, new []{1,1}}
+            {PowerSchemeSetting.ProcessorThrottle, [5,5,60,85] },
+            {PowerSchemeSetting.TurnOffDisplay, [300,7200] },
+            {PowerSchemeSetting.Sleep, [1800,10800] },
+            {PowerSchemeSetting.WiFi, [2,3] },
+            {PowerSchemeSetting.MultimediaPlay, [2,1] },
+            {PowerSchemeSetting.MultimediaShare, [0,1] },
+            {PowerSchemeSetting.MultimediaQuality, [1,1] }
         };
 
-    private Dictionary<PowerSchemeSetting, int[]> SettingsSimple
+    private static Dictionary<PowerSchemeSetting, int[]> SettingsSimple
         => new()
         {
-            {PowerSchemeSetting.ProcessorThrottle, new []{5,5,50,60}},
-            {PowerSchemeSetting.TurnOffDisplay, new []{300,7200}},
-            {PowerSchemeSetting.Sleep, new []{1800,10800}},
-            {PowerSchemeSetting.WiFi, new []{3,3}},
-            {PowerSchemeSetting.MultimediaPlay, new []{2,2}},
-            {PowerSchemeSetting.MultimediaShare, new []{0,2}},
-            {PowerSchemeSetting.MultimediaQuality, new []{0,0}}
+            {PowerSchemeSetting.ProcessorThrottle, [5,5,50,60] },
+            {PowerSchemeSetting.TurnOffDisplay, [300,7200] },
+            {PowerSchemeSetting.Sleep, [1800,10800] },
+            {PowerSchemeSetting.WiFi, [3,3] },
+            {PowerSchemeSetting.MultimediaPlay, [2,2] },
+            {PowerSchemeSetting.MultimediaShare, [0,2] },
+            {PowerSchemeSetting.MultimediaQuality, [0,0] }
         };
 
-    private Dictionary<PowerSchemeSetting, int[]> SettingsExtreme
+    private static Dictionary<PowerSchemeSetting, int[]> SettingsExtreme
         => new()
         {
-            {PowerSchemeSetting.ProcessorThrottle, new []{5,100,60,100}},
-            {PowerSchemeSetting.TurnOffDisplay, new []{300,7200}},
-            {PowerSchemeSetting.Sleep, new []{900,10800}},
-            {PowerSchemeSetting.WiFi, new []{0,0}},
-            {PowerSchemeSetting.MultimediaPlay, new []{0,0}},
-            {PowerSchemeSetting.MultimediaShare, new []{2,2}},
-            {PowerSchemeSetting.MultimediaQuality, new []{1,1}}
+            {PowerSchemeSetting.ProcessorThrottle, [5,100,60,100] },
+            {PowerSchemeSetting.TurnOffDisplay, [300,7200] },
+            {PowerSchemeSetting.Sleep, [900,10800] },
+            {PowerSchemeSetting.WiFi, [0,0] },
+            {PowerSchemeSetting.MultimediaPlay, [0,0] },
+            {PowerSchemeSetting.MultimediaShare, [2,2] },
+            {PowerSchemeSetting.MultimediaQuality, [1,1] }
         };
 }
 
 public class Values
 {
-
     public Values(PowerSchemeDCACValues state)
     {
         State = state;

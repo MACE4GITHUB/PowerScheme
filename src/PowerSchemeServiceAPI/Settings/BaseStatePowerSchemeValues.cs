@@ -3,43 +3,46 @@ using PowerManagerAPI;
 
 namespace PowerSchemeServiceAPI.Settings;
 
-public abstract class BaseStatePowerSchemeValues: IApplicable
+public abstract class BaseStatePowerSchemeValues(
+    Guid powerSchemeGuid) :
+    IApplicable
 {
-    protected BaseStatePowerSchemeValues(Guid powerSchemeGuid)
-    {
-        PowerSchemeGuid = powerSchemeGuid;
-    }
-
     protected virtual PowerSchemeValues State { get; }
 
     protected virtual SettingSubgroup SettingSubgroup { get; }
 
-    public Guid PowerSchemeGuid { get; }
-        
+    public Guid PowerSchemeGuid { get; } = powerSchemeGuid;
+
     public void ApplyValues()
     {
-        ApplyDCStateValues();
-        ApplyACStateValues();
+        ApplyDcStateValues();
+        ApplyAcStateValues();
     }
 
-    private void ApplyDCStateValues()
+    private void ApplyDcStateValues()
     {
-        ApplyDCValues(State);
+        ApplyDcValues(State);
     }
 
-    private void ApplyACStateValues()
+    private void ApplyAcStateValues()
     {
-        ApplyACValues(State);
+        ApplyAcValues(State);
     }
 
-    private void ApplyDCValues(PowerSchemeValues powerSchemeValues)
+    private void ApplyDcValues(PowerSchemeValues powerSchemeValues)
     {
-        if (powerSchemeValues.DCSettings == -1) return;
+        if (powerSchemeValues.DCSettings == -1)
+        {
+            return;
+        }
 
         if (PowerSchemeGuid == Guid.Empty)
-            throw new ArgumentNullException(nameof(PowerSchemeGuid));
+        {
+            throw new AccessViolationException(nameof(PowerSchemeGuid));
+        }
 
         if (powerSchemeValues.DCSettings >= 0)
+        {
             PowerManager.SetPlanSetting(
                 PowerSchemeGuid,
                 SettingSubgroup,
@@ -47,16 +50,23 @@ public abstract class BaseStatePowerSchemeValues: IApplicable
                 PowerMode.DC,
                 (uint)powerSchemeValues.DCSettings
             );
+        }
     }
 
-    private void ApplyACValues(PowerSchemeValues powerSchemeValues)
+    private void ApplyAcValues(PowerSchemeValues powerSchemeValues)
     {
-        if (powerSchemeValues.ACSettings == -1) return;
+        if (powerSchemeValues.ACSettings == -1)
+        {
+            return;
+        }
 
         if (PowerSchemeGuid == Guid.Empty)
-            throw new ArgumentNullException(nameof(PowerSchemeGuid));
+        {
+            throw new AccessViolationException(nameof(PowerSchemeGuid));
+        }
 
         if (powerSchemeValues.ACSettings >= 0)
+        {
             PowerManager.SetPlanSetting(
                 PowerSchemeGuid,
                 SettingSubgroup,
@@ -64,5 +74,6 @@ public abstract class BaseStatePowerSchemeValues: IApplicable
                 PowerMode.AC,
                 (uint)powerSchemeValues.ACSettings
             );
+        }
     }
 }

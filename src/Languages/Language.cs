@@ -9,6 +9,7 @@ public class Language
     public static Language GetLanguage()
     {
         var currentCulture = CultureInfo.CurrentCulture.Name;
+        
         if (currentCulture == "ru-RU")
         {
             return new LanguageRu();

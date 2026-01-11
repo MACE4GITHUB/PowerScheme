@@ -28,12 +28,16 @@ internal static class StringExtensions
                 index = indexOf + separator.Length;
             }
             else
+            {
                 index = stringToSplit.Length;
+            }
         }
 
         var final = new string[offset + 1];
         if (offset == 0) //changed from 1, to fix when no split found
+        {
             final[0] = stringToSplit;
+        }
         else
         {
             offset--;

@@ -1,14 +1,9 @@
-﻿namespace MessageForm;
-
-using System;
+﻿using System;
 using System.Windows.Forms;
 
-internal class WindowWrapper : IWin32Window
-{
-    public WindowWrapper(IntPtr handle)
-    {
-        Handle = handle;
-    }
+namespace MessageForm;
 
-    public IntPtr Handle { get; }
+internal class WindowWrapper(IntPtr handle) : IWin32Window
+{
+    public IntPtr Handle { get; } = handle;
 }

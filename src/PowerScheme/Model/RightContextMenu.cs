@@ -1,66 +1,74 @@
-﻿using System.ComponentModel;
-
-namespace PowerScheme.Model;
-
-using Common;
-using PowerSchemeServiceAPI;
-using PowerSchemeServiceAPI.Model;
-using Properties;
-using RegistryManager;
-using RunAs.Common.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using static MenuLookup;
-using static Utility.TrayIcon;
+using Common;
+using PowerScheme.Properties;
+using PowerSchemeServiceAPI;
+using PowerSchemeServiceAPI.Model;
+using RegistryManager;
+using RunAs.Common.Utils;
+using static PowerScheme.MenuLookup;
+using static PowerScheme.Utility.TrayIcon;
 
-public sealed class RightContextMenu : ContextMainMenu
+namespace PowerScheme.Model;
+
+public sealed class RightContextMenu(
+    IContainer components,
+    IPowerSchemeService power) :
+    ContextMainMenu(components, power)
 {
-    public RightContextMenu(IContainer components, IPowerSchemeService power) : base(components, power)
-    { }
-
     protected override void BuildContextMenu()
     {
         AddMenuItemInfo();
-        AddMenuItemSepatator();
+        AddMenuItemSeparator();
         AddMenuItemStartWithWindows();
         AddMenuItemHibernate();
         AddMenuItemSleep();
         AddMenuItemLid();
-        AddMenuItemSepatator();
+        AddMenuItemSeparator();
         AddMenuItemSettings();
         AddMenuItemExit();
     }
 
     public override void ClearMenu()
     {
-        if (Items.Count <= 0) return;
+        if (Items.Count <= 0)
+        {
+            return;
+        }
 
-        Items[MenuItm.StartupOnWindows.ToString()].Click -= StartWithWindowsOnClick;
-        Items[MenuItm.Sleep.ToString()].Click -= SleepOnClick;
-        Items[MenuItm.Exit.ToString()].Click -= ExitOnClick;
+        Items[nameof(MenuItm.StartupOnWindows)].Click -= StartWithWindowsOnClick;
+        Items[nameof(MenuItm.Sleep)].Click -= SleepOnClick;
+        Items[nameof(MenuItm.Exit)].Click -= ExitOnClick;
 
-        if (Power.ExistsHibernate) Items[MenuItm.Hibernate.ToString()].Click -= HibernateOnClick;
+        if (Power.ExistsHibernate)
+        {
+            Items[nameof(MenuItm.Hibernate)].Click -= HibernateOnClick;
+        }
 
         #region SettingsMenu
-        if (Items[MenuItm.Settings.ToString()] is ToolStripMenuItem settingsToolStripMenuItem)
+        if (Items[nameof(MenuItm.Settings)] is ToolStripMenuItem settingsToolStripMenuItem)
         {
             var settingDropDownItems = settingsToolStripMenuItem.DropDownItems;
 
-            settingDropDownItems[MenuItm.RestoreDefaultPowerSchemes.ToString()].Click -=
+            settingDropDownItems[nameof(MenuItm.RestoreDefaultPowerSchemes)].Click -=
                 RestoreDefaultPowerSchemesOnClick;
-            settingDropDownItems[MenuItm.ControlPanelSchemeWindows.ToString()].Click -= ItemCplSchemeOnClick;
-            settingDropDownItems[MenuItm.CreateTypicalSchemes.ToString()].Click -=
+            settingDropDownItems[nameof(MenuItm.ControlPanelSchemeWindows)].Click -= ItemCplSchemeOnClick;
+            settingDropDownItems[nameof(MenuItm.CreateTypicalSchemes)].Click -=
                 ItemCreateTypicalSchemesOnClick;
-            settingDropDownItems[MenuItm.DeleteTypicalSchemes.ToString()].Click -=
+            settingDropDownItems[nameof(MenuItm.DeleteTypicalSchemes)].Click -=
                 ItemDeleteTypicalSchemesOnClick;
 
             for (var index = settingDropDownItems.Count - 1; index >= 0; index--)
             {
                 var item = settingDropDownItems[index];
-                if (!(item is ToolStripMenuItem toolStripItem)) continue;
+                if (item is not ToolStripMenuItem toolStripItem)
+                {
+                    continue;
+                }
 
                 toolStripItem.Tag = null;
                 toolStripItem.Text = null;
@@ -69,19 +77,25 @@ public sealed class RightContextMenu : ContextMainMenu
                 toolStripItem.Dispose();
             }
 
-            if (settingDropDownItems.Count > 0) settingDropDownItems.Clear();
+            if (settingDropDownItems.Count > 0)
+            {
+                settingDropDownItems.Clear();
+            }
         }
         #endregion
 
         #region LidMenu
-        if (Items[MenuItm.Lid.ToString()] is ToolStripMenuItem lidToolStripMenuItem)
+        if (Items[nameof(MenuItm.Lid)] is ToolStripMenuItem lidToolStripMenuItem)
         {
             var lidDropDownItems = lidToolStripMenuItem.DropDownItems;
 
             for (var index = lidDropDownItems.Count - 1; index >= 0; index--)
             {
                 var item = lidDropDownItems[index];
-                if (!(item is ToolStripMenuItem toolStripItem)) continue;
+                if (item is not ToolStripMenuItem toolStripItem)
+                {
+                    continue;
+                }
 
                 toolStripItem.Tag = null;
                 toolStripItem.Text = null;
@@ -90,7 +104,10 @@ public sealed class RightContextMenu : ContextMainMenu
                 toolStripItem.Dispose();
             }
 
-            if (lidDropDownItems.Count > 0) lidDropDownItems.Clear();
+            if (lidDropDownItems.Count > 0)
+            {
+                lidDropDownItems.Clear();
+            }
         }
         #endregion
 
@@ -100,22 +117,24 @@ public sealed class RightContextMenu : ContextMainMenu
     public override void UpdateMenu()
     {
         CheckMenu(
-            Items[MenuItm.StartupOnWindows.ToString()],
+            Items[nameof(MenuItm.StartupOnWindows)],
             RegistryService.IsRunOnStartup);
 
         if (Power.ExistsHibernate)
+        {
             CheckMenu(
-                Items[MenuItm.Hibernate.ToString()],
+                Items[nameof(MenuItm.Hibernate)],
                 RegistryService.IsShowHibernateOption);
+        }
 
         CheckMenu(
-            Items[MenuItm.Sleep.ToString()],
+            Items[nameof(MenuItm.Sleep)],
             RegistryService.IsShowSleepOption);
 
-        if (Items[MenuItm.Settings.ToString()] is ToolStripMenuItem settingsToolStripMenuItem)
+        if (Items[nameof(MenuItm.Settings)] is ToolStripMenuItem settingsToolStripMenuItem)
         {
-            settingsToolStripMenuItem.DropDownItems[MenuItm.DeleteTypicalSchemes.ToString()].Visible = Power.TypicalPowerSchemes.Any();
-            settingsToolStripMenuItem.DropDownItems[MenuItm.CreateTypicalSchemes.ToString()].Visible = !Power.ExistsAllTypicalScheme;
+            settingsToolStripMenuItem.DropDownItems[nameof(MenuItm.DeleteTypicalSchemes)].Visible = Power.TypicalPowerSchemes.Any();
+            settingsToolStripMenuItem.DropDownItems[nameof(MenuItm.CreateTypicalSchemes)].Visible = !Power.ExistsAllTypicalScheme;
             UpdateItemsTypicalScheme();
         }
 
@@ -126,14 +145,14 @@ public sealed class RightContextMenu : ContextMainMenu
     {
         var itemDropDownSetting = new ToolStripMenuItem
         {
-            Name = MenuItm.Settings.ToString(),
+            Name = nameof(MenuItm.Settings),
             Text = MenuItems[MenuItm.Settings].Name
         };
 
         #region CplSchemeWindows
         var itemCplScheme = new ToolStripMenuItem
         {
-            Name = MenuItm.ControlPanelSchemeWindows.ToString(),
+            Name = nameof(MenuItm.ControlPanelSchemeWindows),
             Text = MenuItems[MenuItm.ControlPanelSchemeWindows].Name,
             ImageScaling = ToolStripItemImageScaling.SizeToFit,
             Image = GetImage(MenuItems[MenuItm.ControlPanelSchemeWindows].Picture)
@@ -146,7 +165,7 @@ public sealed class RightContextMenu : ContextMainMenu
         #region RestoreDefaultWindows
         var itemRestore = new ToolStripMenuItem
         {
-            Name = MenuItm.RestoreDefaultPowerSchemes.ToString(),
+            Name = nameof(MenuItm.RestoreDefaultPowerSchemes),
             Text = MenuItems[MenuItm.RestoreDefaultPowerSchemes].Name,
             ToolTipText = MenuItems[MenuItm.RestoreDefaultPowerSchemes].Description,
             ImageScaling = ToolStripItemImageScaling.SizeToFit,
@@ -162,7 +181,7 @@ public sealed class RightContextMenu : ContextMainMenu
         #region AddTypicalSchemes
         var itemTypicalSchemes = new ToolStripMenuItem
         {
-            Name = MenuItm.CreateTypicalSchemes.ToString(),
+            Name = nameof(MenuItm.CreateTypicalSchemes),
             Text = MenuItems[MenuItm.CreateTypicalSchemes].Name,
             ImageScaling = ToolStripItemImageScaling.SizeToFit,
             Image = GetImage(MenuItems[MenuItm.CreateTypicalSchemes].Picture)
@@ -176,7 +195,7 @@ public sealed class RightContextMenu : ContextMainMenu
 
         var itemDeleteTypicalSchemes = new ToolStripMenuItem
         {
-            Name = MenuItm.DeleteTypicalSchemes.ToString(),
+            Name = nameof(MenuItm.DeleteTypicalSchemes),
             Text = MenuItems[MenuItm.DeleteTypicalSchemes].Name,
             ImageScaling = ToolStripItemImageScaling.SizeToFit,
             Image = GetImage(MenuItems[MenuItm.DeleteTypicalSchemes].Picture)
@@ -209,7 +228,7 @@ public sealed class RightContextMenu : ContextMainMenu
     {
         var item = new ToolStripMenuItem
         {
-            Name = MenuItm.StartupOnWindows.ToString(),
+            Name = nameof(MenuItm.StartupOnWindows),
             Text = MenuItems[MenuItm.StartupOnWindows].Name
         };
 
@@ -219,10 +238,9 @@ public sealed class RightContextMenu : ContextMainMenu
 
     private void AddMenuItemInfo()
     {
-        var info = new AppInfo();
         var item = new ToolStripMenuItem
         {
-            Text = $@"{info.ProductName} {info.ProductVersion}"
+            Text = $@"{AppInfo.ProductName} {AppInfo.ProductVersion}"
         };
 
         Items.Add(item);
@@ -230,11 +248,14 @@ public sealed class RightContextMenu : ContextMainMenu
 
     private void AddMenuItemHibernate()
     {
-        if (!Power.ExistsHibernate) return;
+        if (!Power.ExistsHibernate)
+        {
+            return;
+        }
 
         var item = new ToolStripMenuItem
         {
-            Name = MenuItm.Hibernate.ToString(),
+            Name = nameof(MenuItm.Hibernate),
             Text = MenuItems[MenuItm.Hibernate].Name,
             ToolTipText = MenuItems[MenuItm.Hibernate].Description
         };
@@ -247,7 +268,7 @@ public sealed class RightContextMenu : ContextMainMenu
     {
         var item = new ToolStripMenuItem
         {
-            Name = MenuItm.Sleep.ToString(),
+            Name = nameof(MenuItm.Sleep),
             Text = MenuItems[MenuItm.Sleep].Name,
             ToolTipText = MenuItems[MenuItm.Sleep].Description
         };
@@ -260,7 +281,7 @@ public sealed class RightContextMenu : ContextMainMenu
     {
         var item = new ToolStripMenuItem
         {
-            Name = MenuItm.Exit.ToString(),
+            Name = nameof(MenuItm.Exit),
             Text = MenuItems[MenuItm.Exit].Name
         };
 
@@ -268,23 +289,30 @@ public sealed class RightContextMenu : ContextMainMenu
         Items.Add(item);
     }
 
-    private void AddMenuItemSepatator()
+    private void AddMenuItemSeparator()
         => Items.Add(new ToolStripSeparator());
 
 
-    private bool HasLidValue(KeyValuePair<MenuItm, ViewMenu> mi, int i)
+    private static bool HasLidValue(KeyValuePair<MenuItm, ViewMenu> mi, int i)
     {
-        if (!(mi.Value.Tag is Lid value)) return false;
+        if (mi.Value.Tag is not Lid value)
+        {
+            return false;
+        }
+
         return (int)value == i;
     }
 
     private void AddMenuItemLid()
     {
-        if (!Power.ExistsMobilePlatformRole) return;
+        if (!Power.ExistsMobilePlatformRole)
+        {
+            return;
+        }
 
         var item = new ToolStripMenuItem
         {
-            Name = MenuItm.Lid.ToString(),
+            Name = nameof(MenuItm.Lid),
             Text = MenuItems[MenuItm.Lid].Name
         };
         var itemsDropDown = item.DropDownItems;
@@ -309,20 +337,37 @@ public sealed class RightContextMenu : ContextMainMenu
 
     private void LidOnClick(object sender, EventArgs e)
     {
-        if (!(sender is ToolStripMenuItem item)) return;
-        if (!(item.Tag is Lid value)) return;
+        if (sender is not ToolStripMenuItem item)
+        {
+            return;
+        }
+
+        if (item.Tag is not Lid value)
+        {
+            return;
+        }
 
         Power.SetLid((int)value);
     }
 
     private void UpdateItemsTypicalScheme()
     {
-        if (!(Items[MenuItm.Settings.ToString()] is ToolStripMenuItem settingsToolStripMenuItem)) return;
+        if (Items[nameof(MenuItm.Settings)] is not ToolStripMenuItem settingsToolStripMenuItem)
+        {
+            return;
+        }
 
         foreach (var itemMenu in settingsToolStripMenuItem.DropDownItems)
         {
-            if (!(itemMenu is ToolStripMenuItem item)) continue;
-            if (!(item.Tag is StatePowerScheme tag)) continue;
+            if (itemMenu is not ToolStripMenuItem item)
+            {
+                continue;
+            }
+
+            if (item.Tag is not StatePowerScheme tag)
+            {
+                continue;
+            }
 
             item.Text = Power.TextActionToggle(tag);
             item.Tag = Power.StatePowerSchemeToggle(tag);
@@ -357,14 +402,20 @@ public sealed class RightContextMenu : ContextMainMenu
 
     private static void StartWithWindowsOnClick(object sender, EventArgs e)
     {
-        if (!GetCheckedOption(sender, out var isChecked)) return;
+        if (!GetCheckedOption(sender, out var isChecked))
+        {
+            return;
+        }
 
         RegistryService.SetStartup(isChecked);
     }
 
     private void HibernateOnClick(object sender, EventArgs e)
     {
-        if (!GetCheckedOption(sender, out var isChecked)) return;
+        if (!GetCheckedOption(sender, out var isChecked))
+        {
+            return;
+        }
 
         var value = isChecked ? 1 : 0;
         RegistryService.SetHibernateOption(Resources.ResourceManager, value);
@@ -372,7 +423,10 @@ public sealed class RightContextMenu : ContextMainMenu
 
     private void SleepOnClick(object sender, EventArgs e)
     {
-        if (!GetCheckedOption(sender, out var isChecked)) return;
+        if (!GetCheckedOption(sender, out var isChecked))
+        {
+            return;
+        }
 
         var value = isChecked ? 1 : 0;
         RegistryService.SetSleepOption(Resources.ResourceManager, value);
@@ -385,8 +439,16 @@ public sealed class RightContextMenu : ContextMainMenu
 
     private void ItemMenuActionPowerOnClick(object sender, EventArgs e)
     {
-        if (!(sender is ToolStripMenuItem menu)) return;
-        if (!(menu.Tag is StatePowerScheme tag)) return;
+        if (sender is not ToolStripMenuItem menu)
+        {
+            return;
+        }
+
+        if (menu.Tag is not StatePowerScheme tag)
+        {
+            return;
+        }
+
         Power.ActionPowerScheme(tag);
     }
 
@@ -394,9 +456,16 @@ public sealed class RightContextMenu : ContextMainMenu
     {
         isChecked = false;
         var menu = (ToolStripMenuItem)sender;
-        if (menu == null) return false;
+        if (menu == null)
+        {
+            return false;
+        }
 
-        if (!(menu.Tag is bool b)) return false;
+        if (menu.Tag is not bool b)
+        {
+            return false;
+        }
+
         isChecked = !b;
         menu.Tag = isChecked;
         menu.Image = isChecked ? GetImage(ImageItem.Check) : null;
@@ -405,8 +474,15 @@ public sealed class RightContextMenu : ContextMainMenu
 
     private void CheckLid()
     {
-        if (!(Items[MenuItm.Lid.ToString()] is ToolStripMenuItem lidItems)) return;
-        if (!Power.ExistsMobilePlatformRole) return;
+        if (Items[nameof(MenuItm.Lid)] is not ToolStripMenuItem lidItems)
+        {
+            return;
+        }
+
+        if (!Power.ExistsMobilePlatformRole)
+        {
+            return;
+        }
 
         var any = Power.ActivePowerScheme.Guid;
         var valueLidOn = RegistryService.GetLidOption(any);
@@ -417,17 +493,20 @@ public sealed class RightContextMenu : ContextMainMenu
             var @checked = valueLidOn == valueTag;
             // Uncomment if you want to change the Image style
             //lidStripMenuItem.Image = GetImage(@checked ? ImageItem.RadioOn : ImageItem.RadioOff);
-            if (@checked) pictureName = MenuItems.Where(mi =>
-                HasLidValue(mi, valueTag)).Select(mi => mi.Value.Picture).FirstOrDefault();
+            if (@checked)
+            {
+                pictureName = MenuItems.Where(mi =>
+                    HasLidValue(mi, valueTag)).Select(mi => mi.Value.Picture).FirstOrDefault();
+            }
         }
-        Items[MenuItm.Lid.ToString()].Image = GetImage(pictureName);
+        Items[nameof(MenuItm.Lid)].Image = GetImage(pictureName);
     }
 
     private static void CheckMenu(ToolStripItem item, bool @checked)
     {
         item.Tag = @checked;
 
-        var addShield = item.Name == MenuItm.Hibernate.ToString() || item.Name == MenuItm.Sleep.ToString();
+        var addShield = item.Name == nameof(MenuItm.Hibernate) || item.Name == nameof(MenuItm.Sleep);
 
         item.Image = GetImageIfCheck(@checked, addShield);
     }
@@ -436,7 +515,9 @@ public sealed class RightContextMenu : ContextMainMenu
     {
         var bitmap = GetImage(ImageItem.Check);
         if (!addShield)
+        {
             return @checked ? bitmap : null;
+        }
 
         var shield = GetImage(ImageItem.Shield);
         return @checked ? bitmap.CopyToSquareCanvas(Color.Transparent, shield) : shield;

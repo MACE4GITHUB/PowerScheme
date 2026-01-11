@@ -1,15 +1,16 @@
 ﻿using System;
 using System.IO;
-using Common;
 using RegistryManager.Extensions;
 using RegistryManager.Model;
 
 namespace RegistryManager;
 
-public class RegistrySaver : IDisposable
+public sealed class RegistrySaver(
+    string operation,
+    string fileName) :
+    IDisposable
 {
     private const string REG_EXTENSION = "";
-    private bool _disposedValue;
 
     public RegistrySaver(RegistryAdminAction registryAdminAction, string fileName) :
         this(registryAdminAction.ToString(), fileName)
@@ -19,18 +20,12 @@ public class RegistrySaver : IDisposable
         this(registryAdminAction.ToString(), guid.ToString())
     { }
 
-    public RegistrySaver(string operation, string fileName)
-    {
-        Operation = operation;
-        FileName = fileName;
-    }
-
-    public string FileName { get; }
+    public string FileName { get; } = fileName;
 
     public string FileFullName
         => Path.Combine(Paths.ApplicationPath, FileName + REG_EXTENSION);
 
-    public string Operation { get; }
+    public string Operation { get; } = operation;
 
     public RegistryParam RegistryParam { get; set; }
 
@@ -43,17 +38,24 @@ public class RegistrySaver : IDisposable
             var decodeText =
                 System.Text.Encoding.UTF8.DecodeBase64(settings);
 
+            if (decodeText == null)
+            {
+                return;
+            }
+
             var registryParam = RegistryParam.FromString(decodeText);
 
-            var operation = (RegistryAdminAction)Enum.Parse(typeof(RegistryAdminAction), Operation.ToLowerInvariant());
+            var operation = Enum.Parse<RegistryAdminAction>(Operation, true);
             switch (operation)
             {
-                case RegistryAdminAction.set:
+                case RegistryAdminAction.Set:
                     Registry.SaveSetting(registryParam);
                     break;
-                case RegistryAdminAction.delete:
+                case RegistryAdminAction.Delete:
                     Registry.DeleteSetting(registryParam);
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(operation));
             }
         }
         catch (Exception)
@@ -62,7 +64,9 @@ public class RegistrySaver : IDisposable
         }
     }
 
-    public string Arguments => $"\"{Operation}\" \"{FileName}\"";
+    public string Arguments => $"""
+                                "{Operation}" "{FileName}"
+                                """;
 
     public void SaveToStore()
     {
@@ -72,25 +76,11 @@ public class RegistrySaver : IDisposable
         File.SetAttributes(FileFullName, FileAttributes.Hidden);
     }
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposedValue) return;
-        if (disposing)
-        {
-            if (File.Exists(FileFullName)) File.Delete(FileFullName);
-        }
-
-        _disposedValue = true;
-    }
-
-    void IDisposable.Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
     public void Dispose()
     {
-        ((IDisposable)this).Dispose();
+        if (File.Exists(FileFullName))
+        {
+            File.Delete(FileFullName);
+        }
     }
 }

@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<Nullable>enable</Nullable>
 		<TargetFramework>net10.0-windows</TargetFramework>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<NoWarn>$(NoWarn);CA1416</NoWarn>
+		<NoWarn>$(NoWarn);CA1416;CA2101;SYSLIB1054</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\PowerManagerAPI\PowerManagerAPI.csproj" />
 		<ProjectReference Include="..\RunAs.Common\RunAs.Common.csproj" />
 	</ItemGroup>

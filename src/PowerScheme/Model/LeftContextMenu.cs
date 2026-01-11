@@ -1,19 +1,18 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows.Forms;
+using PowerSchemeServiceAPI;
+using PowerSchemeServiceAPI.Model;
+using static PowerScheme.Utility.TrayIcon;
 
 namespace PowerScheme.Model;
 
-using PowerSchemeServiceAPI;
-using PowerSchemeServiceAPI.Model;
-using System;
-using System.Linq;
-using System.Windows.Forms;
-using static Utility.TrayIcon;
-
-public sealed class LeftContextMenu : ContextMainMenu
+public sealed class LeftContextMenu(
+    IContainer components,
+    IPowerSchemeService power) :
+    ContextMainMenu(components, power)
 {
-    public LeftContextMenu(IContainer components, IPowerSchemeService power) : base(components, power)
-    { }
-
     public override void UpdateMenu()
     {
         BuildMenu();
@@ -21,7 +20,10 @@ public sealed class LeftContextMenu : ContextMainMenu
 
     public override void ClearMenu()
     {
-        if (Items.Count <= 0) return;
+        if (Items.Count <= 0)
+        {
+            return;
+        }
 
         for (var index = Items.Count - 1; index >= 0; index--)
         {
@@ -53,7 +55,10 @@ public sealed class LeftContextMenu : ContextMainMenu
             Items.Add(item);
         }
 
-        if (!Power.UserPowerSchemes.Any()) return;
+        if (!Power.UserPowerSchemes.Any())
+        {
+            return;
+        }
 
         Items.Add(new ToolStripSeparator());
 
@@ -72,11 +77,18 @@ public sealed class LeftContextMenu : ContextMainMenu
         }
 
     }
-        
+
     private void ItemMenuPowerOnClick(object sender, EventArgs e)
     {
-        if (!(sender is ToolStripMenuItem menu)) return;
-        if (!(menu.Tag is StatePowerScheme statePowerScheme)) return;
+        if (sender is not ToolStripMenuItem menu)
+        {
+            return;
+        }
+
+        if (menu.Tag is not StatePowerScheme statePowerScheme)
+        {
+            return;
+        }
 
         Power.SetActivePowerScheme(statePowerScheme.PowerScheme);
     }

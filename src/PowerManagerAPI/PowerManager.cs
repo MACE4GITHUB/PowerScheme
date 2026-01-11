@@ -28,9 +28,11 @@ public static class PowerManager
         var res = PowerGetActiveScheme(IntPtr.Zero, out var activePolicyGuidPtr);
 
         if (res != (uint)ErrorCode.SUCCESS)
+        {
             throw new Win32Exception((int)res);
+        }
 
-        var guid = (Guid)Marshal.PtrToStructure(activePolicyGuidPtr, typeof(Guid));
+        var guid = Marshal.PtrToStructure<Guid>(activePolicyGuidPtr);
 
         LocalFree(activePolicyGuidPtr);
 
@@ -46,7 +48,9 @@ public static class PowerManager
         var res = PowerSetActiveScheme(IntPtr.Zero, ref planId);
 
         if (res != (uint)ErrorCode.SUCCESS)
+        {
             throw new Win32Exception((int)res);
+        }
     }
 
     /// <summary>
@@ -54,7 +58,7 @@ public static class PowerManager
     /// </summary>
     /// <param name="planId">The Guid of the power plan</param>
     /// <returns>Plan name</returns>
-    public static string GetPlanName(Guid planId)
+    public static string? GetPlanName(Guid planId)
     {
         uint bufferSize = 255;
         var buffer = Marshal.AllocHGlobal((int)bufferSize);
@@ -73,7 +77,9 @@ public static class PowerManager
             }
 
             if (res != (uint)ErrorCode.SUCCESS)
+            {
                 return null;
+            }
 
             return Marshal.PtrToStringUni(buffer);
         }
@@ -96,7 +102,9 @@ public static class PowerManager
         var res = PowerWriteFriendlyName(IntPtr.Zero, ref planId, IntPtr.Zero, IntPtr.Zero, name, bufferSize);
 
         if (res != (uint)ErrorCode.SUCCESS)
+        {
             throw new Win32Exception((int)res);
+        }
     }
 
     /// <summary>
@@ -104,7 +112,7 @@ public static class PowerManager
     /// </summary>
     /// <param name="planId">Guid for the plan</param>
     /// <returns>Description</returns>
-    public static string GetPlanDescription(Guid planId)
+    public static string? GetPlanDescription(Guid planId)
     {
         uint bufferSize = 255;
         var buffer = Marshal.AllocHGlobal((int)bufferSize);
@@ -123,7 +131,9 @@ public static class PowerManager
             }
 
             if (res != (uint)ErrorCode.SUCCESS)
+            {
                 return null;
+            }
 
             return Marshal.PtrToStringUni(buffer);
         }
@@ -146,7 +156,9 @@ public static class PowerManager
         var res = PowerWriteDescription(IntPtr.Zero, ref planId, IntPtr.Zero, IntPtr.Zero, description, bufferSize);
 
         if (res != (uint)ErrorCode.SUCCESS)
+        {
             throw new Win32Exception((int)res);
+        }
     }
 
     /// <summary>
@@ -158,7 +170,9 @@ public static class PowerManager
     public static Guid DuplicatePlan(Guid sourcePlanId, Guid targetPlanId = new())
     {
         if (targetPlanId == Guid.Empty)
+        {
             targetPlanId = Guid.NewGuid();
+        }
 
         var targetPlanPtr = Marshal.AllocHGlobal(Marshal.SizeOf(targetPlanId));
         uint res;
@@ -174,7 +188,9 @@ public static class PowerManager
         }
 
         if (res != (uint)ErrorCode.SUCCESS)
+        {
             throw new Win32Exception((int)res);
+        }
 
         return targetPlanId;
     }
@@ -188,7 +204,9 @@ public static class PowerManager
         var res = PowerDeleteScheme(IntPtr.Zero, ref planId);
 
         if (res != (uint)ErrorCode.SUCCESS)
+        {
             throw new Win32Exception((int)res);
+        }
     }
 
     /// <summary>
@@ -198,7 +216,9 @@ public static class PowerManager
     public static void DeletePlanIfExists(Guid planId)
     {
         if (!PlanExists(planId))
+        {
             return;
+        }
 
         DeletePlan(planId);
     }
@@ -214,7 +234,9 @@ public static class PowerManager
     public static uint GetPlanSetting(Guid plan, SettingSubgroup subgroup, Setting setting, PowerMode powerMode)
     {
         if (powerMode == (PowerMode.AC | PowerMode.DC))
+        {
             throw new ArgumentException("Can't get both AC and DC values at the same time, because they may be different.");
+        }
 
         var subgroupId = SettingLookup.SettingSubgroupGuids[subgroup];
         var settingId = SettingLookup.SettingGuids[setting];
@@ -232,7 +254,9 @@ public static class PowerManager
         }
 
         if (res != (uint)ErrorCode.SUCCESS)
+        {
             throw new Win32Exception((int)res);
+        }
 
         return value;
     }
@@ -254,13 +278,17 @@ public static class PowerManager
         {
             var res = PowerWriteACValueIndex(IntPtr.Zero, ref plan, ref subgroupId, ref settingId, value);
             if (res != (uint)ErrorCode.SUCCESS)
+            {
                 throw new Win32Exception((int)res);
+            }
         }
         if (powerMode.HasFlag(PowerMode.DC))
         {
             var res = PowerWriteDCValueIndex(IntPtr.Zero, ref plan, ref subgroupId, ref settingId, value);
             if (res != (uint)ErrorCode.SUCCESS)
+            {
                 throw new Win32Exception((int)res);
+            }
         }
     }
 
@@ -286,11 +314,17 @@ public static class PowerManager
             {
                 ret = PowerEnumerate(IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, AccessFlags.ACCESS_SCHEME, index, buffer, ref bufferSize);
 
-                if (ret == (uint)ErrorCode.NO_MORE_ITEMS) break;
-                if (ret != (uint)ErrorCode.SUCCESS)
-                    throw new Win32Exception((int)ret);
+                if (ret == (uint)ErrorCode.NO_MORE_ITEMS)
+                {
+                    break;
+                }
 
-                var guid = (Guid)Marshal.PtrToStructure(buffer, typeof(Guid));
+                if (ret != (uint)ErrorCode.SUCCESS)
+                {
+                    throw new Win32Exception((int)ret);
+                }
+
+                var guid = Marshal.PtrToStructure<Guid>(buffer);
                 powerPlans.Add(guid);
             }
             finally
@@ -318,7 +352,9 @@ public static class PowerManager
     {
         var res = PowerRestoreDefaultPowerSchemes();
         if (res != (uint)ErrorCode.SUCCESS)
+        {
             throw new Win32Exception((int)res);
+        }
     }
 
     public static bool SetLid(POWER_ACTION powerAction)

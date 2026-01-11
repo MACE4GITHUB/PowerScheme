@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Resources;
-using Common;
 using Microsoft.Win32;
 using PowerManagerAPI;
 using RegistryManager.Model;
@@ -17,12 +16,20 @@ public static class RegistryService
         get
         {
             var result = GetSettings<string>(RegRunOnStartup);
-            if (result.IsError) return false;
+            if (result.IsError)
+            {
+                return false;
+            }
 
             var isPathCorrect =
-                result.Data.Equals(Paths.ApplicationFullName, StringComparison.InvariantCultureIgnoreCase);
+                result.Data?
+                    .Equals(Paths.ApplicationFullName, StringComparison.InvariantCultureIgnoreCase) 
+                ?? false;
 
-            if (!isPathCorrect) SetStartup(true);
+            if (!isPathCorrect)
+            {
+                SetStartup(true);
+            }
 
             return true;
         }
@@ -33,7 +40,10 @@ public static class RegistryService
         get
         {
             var result = GetSettings<int>(RegShowHibernateOption);
-            if (result.IsError) return false;
+            if (result.IsError)
+            {
+                return false;
+            }
 
             return result.Data == 1;
         }
@@ -44,7 +54,10 @@ public static class RegistryService
         get
         {
             var result = GetSettings<int>(RegShowSleepOption);
-            if (result.IsError) return true;
+            if (result.IsError)
+            {
+                return true;
+            }
 
             return result.Data == 1;
         }
@@ -55,7 +68,10 @@ public static class RegistryService
         get
         {
             var result = GetSettings<int>(RegShowLockOption);
-            if (result.IsError) return true;
+            if (result.IsError)
+            {
+                return true;
+            }
 
             return result.Data == 1;
         }
@@ -66,8 +82,14 @@ public static class RegistryService
     {
         var registryParam = RegStartup;
 
-        if (isStart) SaveSetting(registryParam);
-        else DeleteSetting(registryParam);
+        if (isStart)
+        {
+            SaveSetting(registryParam);
+        }
+        else
+        {
+            DeleteSetting(registryParam);
+        }
     }
         
     public static int GetLidOption(Guid guid)
@@ -79,7 +101,10 @@ public static class RegistryService
     public static bool IsFirstStart(string company, string product)
     {
         var result = GetSettings<int>(RegAppSettings(company, product));
-        if (result.IsError) return true;
+        if (result.IsError)
+        {
+            return true;
+        }
 
         return result.Data != 0;
     }
@@ -102,8 +127,8 @@ public static class RegistryService
     private static IEnumerable<string> CurrentPowerSchemes => 
         GetSubKeys(RegPowerSchemes());
 
-    public static IEnumerable<string> UserPowerSchemes => 
-        CurrentPowerSchemes.Except(DefaultPowerSchemes).ToArray();
+    public static IEnumerable<string> UserPowerSchemes =>
+        [.. CurrentPowerSchemes.Except(DefaultPowerSchemes)];
 
     public static RegistryWatcher<string> ActivePowerSchemeRegistryWatcher()
         => new(RegActivePowerScheme)
@@ -142,7 +167,7 @@ public static class RegistryService
             new ExecutorRegistryService(
                 resourceManager,
                 registryParam,
-                RegistryAdminAction.set,
+                RegistryAdminAction.Set,
                 Guid.NewGuid());
 
         executorRegistryService.Execute();

@@ -1,12 +1,13 @@
-using Microsoft.Win32;
-using RegistryManager.EventsArgs;
-using RegistryManager.Model;
 using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Microsoft.Win32;
+using RegistryManager.EventsArgs;
+using RegistryManager.Model;
 using static RegistryManager.NativeMethods;
+using static RegistryManager.Registry;
 
 namespace RegistryManager;
 
@@ -19,7 +20,7 @@ namespace RegistryManager;
 /// <para>The Windows API provides a function
 /// <a href="http://msdn.microsoft.com/library/en-us/sysinfo/base/regnotifychangekeyvalue.asp">
 /// RegNotifyChangeKeyValue</a>, which is not covered by the
-/// <see cref="Microsoft.Win32.RegistryKey"/> class. <see cref="RegistryWatcher"/> imports
+/// <see cref="Microsoft.Win32.RegistryKey"/> class. <see cref="IRegistryWatcher"/> imports
 /// that function and encapsulates it in a convenient manner.
 /// </para>
 /// </remarks>
@@ -46,25 +47,24 @@ namespace RegistryManager;
 /// }
 /// </code>
 /// </example>
-public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
+public sealed class RegistryWatcher<T> : IRegistryWatcher, IDisposable
 {
     private const int KEY_QUERY_VALUE = 0x0001;
     private const int KEY_NOTIFY = 0x0010;
     private const int STANDARD_RIGHTS_READ = 0x00020000;
 
-    private static readonly IntPtr HKEY_CLASSES_ROOT = new(unchecked((int)0x80000000));
-    private static readonly IntPtr HKEY_CURRENT_USER = new(unchecked((int)0x80000001));
-    private static readonly IntPtr HKEY_LOCAL_MACHINE = new(unchecked((int)0x80000002));
-    private static readonly IntPtr HKEY_USERS = new(unchecked((int)0x80000003));
-    private static readonly IntPtr HKEY_PERFORMANCE_DATA = new(unchecked((int)0x80000004));
-    private static readonly IntPtr HKEY_CURRENT_CONFIG = new(unchecked((int)0x80000005));
+    private readonly IntPtr HKEY_CLASSES_ROOT = new(unchecked((int)0x80000000));
+    private readonly IntPtr HKEY_CURRENT_USER = new(unchecked((int)0x80000001));
+    private readonly IntPtr HKEY_LOCAL_MACHINE = new(unchecked((int)0x80000002));
+    private readonly IntPtr HKEY_USERS = new(unchecked((int)0x80000003));
+    private readonly IntPtr HKEY_PERFORMANCE_DATA = new(unchecked((int)0x80000004));
+    private readonly IntPtr HKEY_CURRENT_CONFIG = new(unchecked((int)0x80000005));
 
     #region Private member variables
 
     private IntPtr _registryHive;
-    private readonly object _threadLock = new();
-    private Thread _thread;
-    private bool _disposed;
+    private readonly Lock _threadLock = new();
+    private Thread? _thread;
     private readonly ManualResetEvent _eventTerminate = new(false);
     private readonly RegistryParam _registryParam;
     private readonly RegistryParam _registryParamTemp;
@@ -83,7 +83,7 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
     /// <summary>
     /// Occurs when the specified registry key has changed.
     /// </summary>
-    public event EventHandler<RegistryChangedEventArgs> Changed;
+    public event EventHandler<RegistryChangedEventArgs>? Changed;
 
     /// <summary>
     /// Raises the <see cref="Changed"/> event.
@@ -97,14 +97,21 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
     /// the base class's <see cref="OnChanged"/> method.
     /// </note>
     /// </remarks>
-    protected virtual void OnChanged()
+    public void OnChanged()
     {
         if (RegChangeNotifyFilter == RegChangeNotifyFilter.Value)
         {
-            _registryParamCurrent.Value = Registry.GetSettings<T>(_registryParamTemp);
+            _registryParamCurrent.Value = GetSettings<T>(_registryParamTemp);
             if (_registryParamCurrent.Value == _registryParamTemp.Value &&
-                _registryParam.Value != _registryParamTemp.Value) return;
-            if (_registryParamCurrent.Value == _registryParamPrevious.Value) return;
+                _registryParam.Value != _registryParamTemp.Value)
+            {
+                return;
+            }
+
+            if (_registryParamCurrent.Value == _registryParamPrevious.Value)
+            {
+                return;
+            }
 
             Changed?.Invoke(this, new RegistryChangedEventArgs(RegChangeNotifyFilter, _registryParamPrevious, _registryParamCurrent));
 
@@ -113,20 +120,26 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
 
         if (RegChangeNotifyFilter == RegChangeNotifyFilter.Key)
         {
-            var subKeysCurrent = Registry.GetSubKeys(_registryParamCurrent).ToArray();
+            var subKeysCurrent = GetSubKeys(_registryParamCurrent).ToArray();
 
-            if (subKeysCurrent.Length == _subKeysPrevious.Length) return;
+            if (subKeysCurrent.Length == _subKeysPrevious.Length)
+            {
+                return;
+            }
 
             string[] subKeysExcept;
             bool isChange;
 
             subKeysExcept =
                 subKeysCurrent.Length > _subKeysPrevious.Length ?
-                    subKeysCurrent.Except(_subKeysPrevious).ToArray() :
-                    _subKeysPrevious.Except(subKeysCurrent).ToArray();
+                    [.. subKeysCurrent.Except(_subKeysPrevious)] :
+                    [.. _subKeysPrevious.Except(subKeysCurrent)];
 
             isChange = subKeysExcept.Length > 0;
-            if (!isChange) return;
+            if (!isChange)
+            {
+                return;
+            }
 
             // Needs some time to create subKeys / params
             Thread.Sleep(1000);
@@ -138,7 +151,7 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
     /// <summary>
     /// Occurs when the access to the registry fails.
     /// </summary>
-    public event ErrorEventHandler Error;
+    public event ErrorEventHandler? Error;
 
     /// <summary>
     /// Raises the <see cref="Error"/> event.
@@ -153,7 +166,7 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
     /// the base class's <see cref="OnError"/> method.
     /// </note>
     /// </remarks>
-    protected virtual void OnError(Exception e)
+    public void OnError(Exception e)
     {
         Error?.Invoke(this, new ErrorEventArgs(e));
     }
@@ -161,7 +174,7 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
     #endregion
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RegistryWatcher"/> class.
+    /// Initializes a new instance of the <see cref="IRegistryWatcher"/> class.
     /// </summary>
     /// <param name="registryParam"></param>
     public RegistryWatcher(RegistryParam registryParam)
@@ -172,11 +185,11 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
         _registryParamTemp.Value = null;
 
         _registryParamPrevious = _registryParamTemp;
-        _registryParamPrevious.Value = Registry.GetSettings<T>(_registryParamTemp);
+        _registryParamPrevious.Value = GetSettings<T>(_registryParamTemp);
 
         _registryParamCurrent = registryParam;
 
-        _subKeysPrevious = Registry.GetSubKeys(registryParam).ToArray();
+        _subKeysPrevious = [.. GetSubKeys(registryParam)];
 
         InitRegistryKey();
     }
@@ -187,8 +200,6 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
     public void Dispose()
     {
         Stop();
-        _disposed = true;
-        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -202,7 +213,9 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
             lock (_threadLock)
             {
                 if (IsMonitoring)
+                {
                     throw new InvalidOperationException("Monitoring thread is already running");
+                }
 
                 _regFilter = value;
             }
@@ -210,7 +223,7 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
     }
 
     /// <summary>
-    /// <b>true</b> if this <see cref="RegistryWatcher"/> object is currently monitoring;
+    /// <b>true</b> if this <see cref="IRegistryWatcher"/> object is currently monitoring;
     /// otherwise, <b>false</b>.
     /// </summary>
     public bool IsMonitoring => _thread != null;
@@ -220,12 +233,13 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
     /// </summary>
     public void Start()
     {
-        if (_disposed)
-            throw new ObjectDisposedException(null, "This instance is already disposed");
-
         lock (_threadLock)
         {
-            if (IsMonitoring) return;
+            if (IsMonitoring)
+            {
+                return;
+            }
+
             _eventTerminate.Reset();
             _thread = new Thread(MonitorThread)
             {
@@ -240,13 +254,13 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
     /// </summary>
     public void Stop()
     {
-        if (_disposed)
-            throw new ObjectDisposedException(null, "This instance is already disposed");
-
         lock (_threadLock)
         {
             var thread = _thread;
-            if (thread == null) return;
+            if (thread == null)
+            {
+                return;
+            }
 
             _eventTerminate.Set();
             thread.Join();
@@ -256,35 +270,17 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
     #region Initialization
     private void InitRegistryKey()
     {
-        switch (_registryParam.RegistryHive)
+        _registryHive = _registryParam.RegistryHive switch
         {
-            case RegistryHive.ClassesRoot:
-                _registryHive = HKEY_CLASSES_ROOT;
-                break;
-
-            case RegistryHive.CurrentConfig:
-                _registryHive = HKEY_CURRENT_CONFIG;
-                break;
-
-            case RegistryHive.CurrentUser:
-                _registryHive = HKEY_CURRENT_USER;
-                break;
-
-            case RegistryHive.LocalMachine:
-                _registryHive = HKEY_LOCAL_MACHINE;
-                break;
-
-            case RegistryHive.PerformanceData:
-                _registryHive = HKEY_PERFORMANCE_DATA;
-                break;
-
-            case RegistryHive.Users:
-                _registryHive = HKEY_USERS;
-                break;
-
-            default:
-                throw new InvalidEnumArgumentException(nameof(_registryParam.RegistryHive), (int)_registryParam.RegistryHive, typeof(RegistryHive));
-        }
+            RegistryHive.ClassesRoot => HKEY_CLASSES_ROOT,
+            RegistryHive.CurrentConfig => HKEY_CURRENT_CONFIG,
+            RegistryHive.CurrentUser => HKEY_CURRENT_USER,
+            RegistryHive.LocalMachine => HKEY_LOCAL_MACHINE,
+            RegistryHive.PerformanceData => HKEY_PERFORMANCE_DATA,
+            RegistryHive.Users => HKEY_USERS,
+            _ => throw new InvalidEnumArgumentException(nameof(_registryParam.RegistryHive),
+                (int)_registryParam.RegistryHive, typeof(RegistryHive))
+        };
     }
     #endregion
 
@@ -308,32 +304,35 @@ public class RegistryWatcher<T> : IRegistryWatcher, IDisposable
         var result = RegOpenKeyEx(_registryHive, _registryParam.RegistrySubKey, 0, STANDARD_RIGHTS_READ | KEY_QUERY_VALUE | KEY_NOTIFY,
             out var registryKey);
         if (result != 0)
+        {
             throw new Win32Exception(result);
+        }
 
         try
         {
-            using(var eventNotify = new AutoResetEvent(false))
-            using (var hEvent = eventNotify.SafeWaitHandle)
-            {
-                WaitHandle[] waitHandles = {eventNotify, _eventTerminate};
-                while (!_eventTerminate.WaitOne(0, true))
-                {
-                    result = RegNotifyChangeKeyValue(registryKey, false, _regFilter, eventNotify, true);
-                    if (result != 0)
-                        throw new Win32Exception(result);
+            using var eventNotify = new AutoResetEvent(false);
+            using var hEvent = eventNotify.SafeWaitHandle;
+            WaitHandle[] waitHandles = [eventNotify, _eventTerminate];
 
-                    if (WaitHandle.WaitAny(waitHandles) == 0)
-                    {
-                        OnChanged();
-                    }
+            while (!_eventTerminate.WaitOne(0, true))
+            {
+                result = RegNotifyChangeKeyValue(registryKey, false, _regFilter, eventNotify, true);
+                if (result != 0)
+                {
+                    throw new Win32Exception(result);
+                }
+
+                if (WaitHandle.WaitAny(waitHandles) == 0)
+                {
+                    OnChanged();
                 }
             }
         }
         finally
         {
-            if (registryKey != IntPtr.Zero)
+            if (registryKey != IntPtr.Zero && RegCloseKey(registryKey) != 0)
             {
-                RegCloseKey(registryKey);
+                // Do nothing
             }
         }
     }

@@ -145,5 +145,4 @@ public sealed class LanguageRu : Language
 
     public override string No
         => "Нет";
-
 }

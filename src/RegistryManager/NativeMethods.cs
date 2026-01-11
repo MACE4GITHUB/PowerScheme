@@ -40,7 +40,7 @@ internal static class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool CloseHandle(IntPtr hObject);
 
-    /// <summary>Provides a <see cref="SafeHandle"/> to an event that is automatically disposed using CloseHandle.</summary>
+    /// <summary>Provides a <see cref="System.Runtime.InteropServices.SafeHandle"/> to an event that is automatically disposed using CloseHandle.</summary>
     public class SafeEventHandle : SafeSyncHandle
     {
         /// <summary>Initializes a new instance of the <see cref="SafeEventHandle"/> class and assigns an existing handle.</summary>
@@ -50,7 +50,8 @@ internal static class NativeMethods
         /// </param>
         public SafeEventHandle(IntPtr preexistingHandle, bool ownsHandle = true) : base(preexistingHandle, ownsHandle) { }
 
-        private SafeEventHandle() : base() { }
+        protected SafeEventHandle()
+        { }
 
         /// <summary>Sets this event object to the nonsignaled state.</summary>
         /// <returns>
@@ -85,12 +86,13 @@ internal static class NativeMethods
         public static explicit operator IntPtr(SafeEventHandle h) => h.handle;
     }
 
-    /// <summary>Provides a <see cref="SafeHandle"/> to a synchronization object that is automatically disposed using CloseHandle.</summary>
+    /// <summary>Provides a <see cref="System.Runtime.InteropServices.SafeHandle"/> to a synchronization object that is automatically disposed using CloseHandle.</summary>
     /// <remarks></remarks>
     public abstract class SafeSyncHandle : SafeKernelHandle, ISyncHandle
     {
         /// <summary>Initializes a new instance of the <see cref="SafeSyncHandle"/> class.</summary>
-        protected SafeSyncHandle() : base() { }
+        protected SafeSyncHandle()
+        { }
 
         /// <summary>Initializes a new instance of the <see cref="SafeSyncHandle"/> class and assigns an existing handle.</summary>
         /// <param name="preexistingHandle">An <see cref="IntPtr"/> object that represents the pre-existing handle to use.</param>
@@ -105,13 +107,14 @@ internal static class NativeMethods
         public static implicit operator SafeWaitHandle(SafeSyncHandle h) => new(h.handle, false);
     }
 
-    /// <summary>Provides a <see cref="SafeHandle"/> to a handle that releases a created HANDLE instance at disposal using CloseHandle.</summary>
-    public abstract class SafeKernelHandle : SafeHANDLE, IKernelHandle
+    /// <summary>Provides a <see cref="System.Runtime.InteropServices.SafeHandle"/> to a handle that releases a created HANDLE instance at disposal using CloseHandle.</summary>
+    public abstract class SafeKernelHandle : SafeHandle, IKernelHandle
     {
         /// <summary>Initializes a new instance of the <see cref="SafeSyncHandle"/> class.</summary>
-        protected SafeKernelHandle() : base() { }
+        protected SafeKernelHandle()
+        { }
 
-        /// <summary>Initializes a new instance of the <see cref="SafeHANDLE"/> class and assigns an existing handle.</summary>
+        /// <summary>Initializes a new instance of the <see cref="SafeHandle"/> class and assigns an existing handle.</summary>
         /// <param name="preexistingHandle">An <see cref="IntPtr"/> object that represents the pre-existing handle to use.</param>
         /// <param name="ownsHandle">
         /// <see langword="true"/> to reliably release the handle during the finalization phase; otherwise, <see langword="false"/> (not recommended).
@@ -123,7 +126,7 @@ internal static class NativeMethods
     }
 
     /// <summary>Signals that a structure or class holds a handle to a synchronization object.</summary>
-    public interface ISyncHandle : IKernelHandle { }
+    public interface ISyncHandle : IKernelHandle;
 
     public interface IHandle
     {
@@ -133,26 +136,26 @@ internal static class NativeMethods
     }
 
     /// <summary>Signals that a structure or class holds a handle to a synchronization object.</summary>
-    public interface IKernelHandle : IHandle { }
+    public interface IKernelHandle : IHandle;
 
     /// <summary>Base class for all native handles.</summary>
     /// <seealso cref="Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid"/>
     /// <seealso cref="System.IEquatable{T}"/>
     /// <seealso cref="IHandle"/>
     [DebuggerDisplay("{handle}")]
-    public abstract class SafeHANDLE : SafeHandleZeroOrMinusOneIsInvalid, IEquatable<SafeHANDLE>, IHandle
+    public abstract class SafeHandle : SafeHandleZeroOrMinusOneIsInvalid, IEquatable<SafeHandle>, IHandle
     {
-        /// <summary>Initializes a new instance of the <see cref="SafeHANDLE"/> class.</summary>
-        public SafeHANDLE() : base(true)
+        /// <summary>Initializes a new instance of the <see cref="SafeHandle"/> class.</summary>
+        protected SafeHandle() : base(true)
         {
         }
 
-        /// <summary>Initializes a new instance of the <see cref="SafeHANDLE"/> class and assigns an existing handle.</summary>
+        /// <summary>Initializes a new instance of the <see cref="SafeHandle"/> class and assigns an existing handle.</summary>
         /// <param name="preexistingHandle">An <see cref="IntPtr"/> object that represents the pre-existing handle to use.</param>
         /// <param name="ownsHandle">
         /// <see langword="true"/> to reliably release the handle during the finalization phase; otherwise, <see langword="false"/> (not recommended).
         /// </param>
-        protected SafeHANDLE(IntPtr preexistingHandle, bool ownsHandle = true) : base(ownsHandle) => SetHandle(preexistingHandle);
+        protected SafeHandle(IntPtr preexistingHandle, bool ownsHandle = true) : base(ownsHandle) => SetHandle(preexistingHandle);
 
         /// <summary>Gets a value indicating whether this instance is null.</summary>
         /// <value><c>true</c> if this instance is null; otherwise, <c>false</c>.</value>
@@ -162,43 +165,43 @@ internal static class NativeMethods
         /// <param name="h1">The first handle.</param>
         /// <param name="h2">The second handle.</param>
         /// <returns>The result of the operator.</returns>
-        public static bool operator !=(SafeHANDLE h1, SafeHANDLE h2) => !(h1 == h2);
+        public static bool operator !=(SafeHandle? h1, SafeHandle? h2) => !(h1 == h2);
 
         /// <summary>Implements the operator ==.</summary>
         /// <param name="h1">The first handle.</param>
         /// <param name="h2">The second handle.</param>
         /// <returns>The result of the operator.</returns>
-        public static bool operator ==(SafeHANDLE h1, SafeHANDLE h2) => h1?.Equals(h2) ?? h2 is null;
+        public static bool operator ==(SafeHandle? h1, SafeHandle? h2) => h1?.Equals(h2) ?? h2 is null;
 
-        /// <summary>Determines whether the specified <see cref="SafeHANDLE"/>, is equal to this instance.</summary>
-        /// <param name="other">The <see cref="SafeHANDLE"/> to compare with this instance.</param>
-        /// <returns><c>true</c> if the specified <see cref="SafeHANDLE"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public bool Equals(SafeHANDLE other)
+        /// <summary>Determines whether the specified <see cref="SafeHandle"/>, is equal to this instance.</summary>
+        /// <param name="other">The <see cref="SafeHandle"/> to compare with this instance.</param>
+        /// <returns><c>true</c> if the specified <see cref="SafeHandle"/> is equal to this instance; otherwise, <c>false</c>.</returns>
+        public bool Equals(SafeHandle? other)
         {
             if (other is null)
+            {
                 return false;
+            }
+
             if (ReferenceEquals(this, other))
+            {
                 return true;
+            }
+
             return handle == other.handle && IsClosed == other.IsClosed;
         }
 
         /// <summary>Determines whether the specified <see cref="System.Object"/>, is equal to this instance.</summary>
         /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
         /// <returns><c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object obj)
-        {
-            switch (obj)
+        public override bool Equals(object? obj) =>
+            obj switch
             {
-                case IHandle ih:
-                    return handle.Equals(ih.DangerousGetHandle());
-                case SafeHandle sh:
-                    return handle.Equals(sh.DangerousGetHandle());
-                case IntPtr p:
-                    return handle.Equals(p);
-                default:
-                    return base.Equals(obj);
-            }
-        }
+                IHandle ih => handle.Equals(ih.DangerousGetHandle()),
+                System.Runtime.InteropServices.SafeHandle sh => handle.Equals(sh.DangerousGetHandle()),
+                IntPtr p => handle.Equals(p),
+                _ => base.Equals(obj)
+            };
 
         /// <summary>Returns a hash code for this instance.</summary>
         /// <returns>A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.</returns>
@@ -215,8 +218,16 @@ internal static class NativeMethods
         [MethodImpl(MethodImplOptions.NoOptimization | MethodImplOptions.NoInlining)]
         protected override bool ReleaseHandle()
         {
-            if (IsInvalid) return true;
-            if (!InternalReleaseHandle()) return false;
+            if (IsInvalid)
+            {
+                return true;
+            }
+
+            if (!InternalReleaseHandle())
+            {
+                return false;
+            }
+
             handle = IntPtr.Zero;
             return true;
         }

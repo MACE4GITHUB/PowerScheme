@@ -1,35 +1,52 @@
-﻿namespace RegistryManager.EventsArgs;
+﻿using System;
+using RegistryManager.Model;
 
-using Model;
-using System;
+namespace RegistryManager.EventsArgs;
 
-public sealed class RegistryChangedEventArgs : EventArgs
+public sealed class RegistryChangedEventArgs(
+    RegChangeNotifyFilter regChangeNotifyFilter,
+    RegistryParam previous,
+    RegistryParam current,
+    string[]? subKeys)
+    : EventArgs
 {
-    public RegistryChangedEventArgs(RegChangeNotifyFilter regChangeNotifyFilter, RegistryParam registryParam) :
-        this(regChangeNotifyFilter, registryParam, registryParam, null)
+    public RegistryChangedEventArgs(
+        RegChangeNotifyFilter regChangeNotifyFilter, 
+        RegistryParam registryParam) :
+        this(
+            regChangeNotifyFilter, 
+            registryParam,
+            registryParam, 
+            null)
     { }
 
-    public RegistryChangedEventArgs(RegChangeNotifyFilter regChangeNotifyFilter, RegistryParam registryParam, string[] subKeys) :
-        this(regChangeNotifyFilter, registryParam, registryParam, subKeys)
+    public RegistryChangedEventArgs(
+        RegChangeNotifyFilter regChangeNotifyFilter, 
+        RegistryParam registryParam, 
+        string[] subKeys) :
+        this(
+            regChangeNotifyFilter, 
+            registryParam, 
+            registryParam, 
+            subKeys)
     { }
         
-    public RegistryChangedEventArgs(RegChangeNotifyFilter regChangeNotifyFilter, RegistryParam previous, RegistryParam current) :
-        this(regChangeNotifyFilter, previous, current, null)
+    public RegistryChangedEventArgs(
+        RegChangeNotifyFilter regChangeNotifyFilter, 
+        RegistryParam previous, 
+        RegistryParam current) :
+        this(
+            regChangeNotifyFilter, 
+            previous, 
+            current, 
+            null)
     { }
 
-    public RegistryChangedEventArgs(RegChangeNotifyFilter regChangeNotifyFilter,  RegistryParam previous, RegistryParam current, string[] subKeys)
-    {
-        RegChangeNotifyFilter = regChangeNotifyFilter;
-        Previous = previous;
-        Current = current;
-        NewSubKeys = subKeys;
-    }
+    public RegChangeNotifyFilter RegChangeNotifyFilter { get; } = regChangeNotifyFilter;
 
-    public RegChangeNotifyFilter RegChangeNotifyFilter { get; }
+    public RegistryParam Previous { get; } = previous;
 
-    public RegistryParam Previous { get; }
+    public RegistryParam Current { get; } = current;
 
-    public RegistryParam Current { get; }
-        
-    public string[] NewSubKeys { get; }
+    public string[]? NewSubKeys { get; } = subKeys;
 }

@@ -1,16 +1,16 @@
-﻿namespace PowerScheme.Services;
-
-using System;
+﻿using System;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 using Languages;
 using MessageForm;
-using Model;
+using PowerScheme.Model;
 using PowerSchemeServiceAPI;
 using RegistryManager;
 using RunAs.Common;
 using RunAs.Common.Utils;
+
+namespace PowerScheme.Services;
 
 /// <summary>
 /// Represents the application startup order.
@@ -21,8 +21,6 @@ internal sealed class EntryService : IDisposable
     private IPowerSchemeService _power;
     private readonly IMainMessageBox _messageBox;
     private readonly string[] _args;
-
-    private AppInfo _appInfo = new();
 
     /// <summary>
     /// Determines the application startup order.
@@ -55,28 +53,30 @@ internal sealed class EntryService : IDisposable
 
     private EntryService ValidateFirstStart()
     {
-        if (!IsValidateFirstStart) return this;
+        if (!IsValidateFirstStart)
+        {
+            return this;
+        }
 
-        var isFirstStart = RegistryService.IsFirstStart(_appInfo.CompanyName, _appInfo.ProductName);
-        if (!isFirstStart) return this;
+        var isFirstStart = RegistryService.IsFirstStart(AppInfo.CompanyName, AppInfo.ProductName);
+        if (!isFirstStart)
+        {
+            return this;
+        }
 
         ActionFirstStart?.Invoke();
 
-        RegistryService.SetAppSettings(_appInfo.CompanyName, _appInfo.ProductName, RESTARTED_VALUE);
+        RegistryService.SetAppSettings(AppInfo.CompanyName, AppInfo.ProductName, RESTARTED_VALUE);
 
         return this;
     }
 
     private EntryService ValidateAdmin()
     {
-        void ExitBecauseNotAdmin()
+        if (!IsValidateAdmin)
         {
-            _messageBox.Show(Language.Current.CannotGetAdministratorRights,
-                Language.Current.Error, MessageBoxButtons.OK, MessageBoxIcon.Error,
-                isApplicationExit:true, timeout: 15);
+            return this;
         }
-
-        if (!IsValidateAdmin) return this;
 
         var executorMainService = new ExecutorRunAsService($"{Role.Admin} {AttributeFile.Normal}");
 
@@ -104,16 +104,30 @@ internal sealed class EntryService : IDisposable
         }
 
         return this;
+
+        void ExitBecauseNotAdmin()
+        {
+            _messageBox.Show(Language.Current.CannotGetAdministratorRights,
+                Language.Current.Error, MessageBoxButtons.OK, MessageBoxIcon.Error,
+                isApplicationExit: true, timeout: 15);
+        }
     }
 
     private EntryService ValidateOs()
     {
-        if (!IsValidateOs) return this;
-        if (UacHelper.IsValidOs) return this;
+        if (!IsValidateOs)
+        {
+            return this;
+        }
+
+        if (UacHelper.IsValidOs)
+        {
+            return this;
+        }
 
         _messageBox.Show(Language.Current.ApplicationLatter,
             Language.Current.Error,
-            icon:MessageBoxIcon.Error,
+            icon: MessageBoxIcon.Error,
             isApplicationExit: true,
             timeout: 15);
 
@@ -123,50 +137,44 @@ internal sealed class EntryService : IDisposable
     private void ShowFirstStartDialog()
     {
         var result = _messageBox.Show(Language.Current.FirstStartDescription, Language.Current.FirstStartCaption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-        if (result != DialogResult.Yes) return;
+        if (result != DialogResult.Yes)
+        {
+            return;
+        }
+
         _power.CreateTypicalSchemes();
     }
 
     private void OnceApplication()
     {
-        var guid = Assembly.GetExecutingAssembly().GetType().GUID.ToString();
+        var guid = AppInfo.ProductGuid;
         Mutex = new Mutex(true, guid, out var onceApp);
 
-        if (onceApp) return;
+        if (onceApp)
+        {
+            return;
+        }
 
         _messageBox.Show(Language.Current.AlreadyRunning,
-            Language.Current.Information, isApplicationExit: true, timeout:5);
+            Language.Current.Information, isApplicationExit: true, timeout: 5);
     }
 
     private EntryService ValidateOnceApplication()
     {
-        if (!IsValidateOnceApplication) return this;
+        if (!IsValidateOnceApplication)
+        {
+            return this;
+        }
 
         OnceApplication();
 
         return this;
     }
 
-    #region IDisposable imlementation
-    private bool _isDisposed;
-
-    private void Dispose(bool disposing)
-    {
-        if (_isDisposed) return;
-
-        if (disposing)
-        {
-            Mutex = null;
-            _power = null;
-            _appInfo = null;
-            _messageBox.Dispose();
-        }
-        _isDisposed = true;
-    }
-
     public void Dispose()
     {
-        Dispose(true);
+        Mutex = null;
+        _power = null;
+        _messageBox.Dispose();
     }
-    #endregion
 }

@@ -3,7 +3,7 @@ namespace RegistryManager.Model;
 using System;
 
 /// <summary>
-/// Filter for notifications reported by <see cref="RegistryWatcher"/>.
+/// Filter for notifications reported by <see cref="IRegistryWatcher"/>.
 /// </summary>
 [Flags]
 public enum RegChangeNotifyFilter
@@ -18,5 +18,5 @@ public enum RegChangeNotifyFilter
     Value = 4,
     /// <summary>Notify the caller of changes to the security descriptor
     /// of the key.</summary>
-    Security = 8,
+    Security = 8
 }
