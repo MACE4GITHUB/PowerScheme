@@ -42,12 +42,13 @@ internal static class StringExtensions
         {
             offset--;
 
-            final[0] = stringToSplit[..offsets[0]];
+            final[0] = stringToSplit.Substring(0, offsets[0]);
             for (var i = 0; i < offset; i++)
             {
                 final[i + 1] = stringToSplit.Substring(offsets[i] + separator.Length, offsets[i + 1] - offsets[i] - separator.Length);
             }
-            final[offset + 1] = stringToSplit[(offsets[offset] + separator.Length)..];
+
+            final[offset + 1] = stringToSplit.Substring(offsets[offset] + separator.Length);
         }
 
         return final;

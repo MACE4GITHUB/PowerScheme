@@ -1,7 +1,7 @@
-﻿namespace MessageForm;
-
-using System;
+﻿using System;
 using System.Windows.Forms;
+
+namespace MessageForm;
 
 public interface IMainMessageBox: IDisposable
 {
@@ -16,8 +16,8 @@ public interface IMainMessageBox: IDisposable
     /// <param name="isApplicationExit"></param>
     /// <param name="timeout"></param>
     /// <param name="defaultResultAfterTimeout"></param>
-    /// <returns></returns>
-    DialogResult Show(string message, 
+    DialogResult Show(
+        string message,
         string? title = null,
         MessageBoxButtons? buttons = MessageBoxButtons.OK,
         MessageBoxIcon icon = MessageBoxIcon.Information,

@@ -45,7 +45,7 @@ public sealed class RegistrySaver(
 
             var registryParam = RegistryParam.FromString(decodeText);
 
-            var operation = Enum.Parse<RegistryAdminAction>(Operation, true);
+            var operation = (RegistryAdminAction)Enum.Parse(typeof(RegistryAdminAction), Operation, true);
             switch (operation)
             {
                 case RegistryAdminAction.Set:

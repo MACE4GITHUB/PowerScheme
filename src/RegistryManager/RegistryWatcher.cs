@@ -29,14 +29,14 @@ namespace RegistryManager;
 /// <code>
 /// public class MonitorSample
 /// {
-///     static void Main() 
+///     static void Main()
 ///     {
 ///         RegistryMonitor monitor = new RegistryMonitor(RegistryHive.CurrentUser, "Environment");
 ///         monitor.Changed += new EventHandler(OnChanged);
 ///         monitor.Start();
 ///
 ///         while(true);
-/// 
+///
 ///			monitor.Stop();
 ///     }
 ///
@@ -63,7 +63,7 @@ public sealed class RegistryWatcher<T> : IRegistryWatcher, IDisposable
     #region Private member variables
 
     private IntPtr _registryHive;
-    private readonly Lock _threadLock = new();
+    private readonly object _threadLock = new();
     private Thread? _thread;
     private readonly ManualResetEvent _eventTerminate = new(false);
     private readonly RegistryParam _registryParam;

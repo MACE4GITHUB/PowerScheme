@@ -1,9 +1,8 @@
 ﻿using System;
 using RunAs.Common;
+using RunAs.Common.Services;
 
 namespace RunAs;
-
-using Common.Services;
 
 internal static class Program
 {
@@ -70,7 +69,6 @@ internal static class Program
     private static void ExitBecauseIncorrectParameters(string? message = null)
     {
         Console.WriteLine($"Incorrect parameters. {message}");
-        Console.ReadLine();
         Environment.Exit(-1);
     }
 }
