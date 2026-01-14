@@ -4,27 +4,30 @@ using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using static MessageForm.DialogResultLookup;
+using static MessageForm.DialogResultScheme;
 
 namespace MessageForm;
 
 public partial class MainMessageBox : Form, IMainMessageBox
 {
     private int _timeout;
-    private readonly IWin32Window _owner;
-    private Timer? _timer;
     private int _valueTimerTick;
-    private Control? _controlForValueTimerTick;
     private string _initialControlValue = "";
+    private bool _hasTimer;
+    private Timer? _timer;
+    private Control? _controlForValueTimerTick;
     private DialogResult _defaultResultAfterTimeout;
     private DialogResult _returnResultAfterTimeout;
-    private bool _hasTimer;
+
+    private readonly IWin32Window _owner;
 
     public MainMessageBox()
     {
         InitializeComponent();
+
         _labelTimerTick.Text = "";
         var handle = Process.GetCurrentProcess().MainWindowHandle;
+
         _owner = new WindowWrapper(handle);
     }
 
@@ -120,7 +123,8 @@ public partial class MainMessageBox : Form, IMainMessageBox
         DialogResult = _returnResultAfterTimeout;
     }
 
-    private void SetButtons(MessageBoxButtons? messageBoxButtons,
+    private void SetButtons(
+        MessageBoxButtons? messageBoxButtons,
         DialogResult defaultResultAfterTimeout)
     {
         _controlForValueTimerTick = _labelTimerTick;
@@ -217,22 +221,25 @@ public partial class MainMessageBox : Form, IMainMessageBox
 
         var height = 125;
 
+        var scale = DeviceDpi / 96f;
+
         SizeF size = TextRenderer.MeasureText("W",
             new Font(new FontFamily("Microsoft Sans Serif"),
             8.25f,
             0,
             (GraphicsUnit)3));
-        var sHeight = (int)(size.Height * 1.1);
+        var sHeight = (int)(size.Height * scale);
         var sWidth = (int)(_lblMessage.Width / size.Width * 3);
 
         var groups = (from Match m in Regex.Matches(message, ".{1," + sWidth + "}") select m.Value).ToArray();
         var groupsInline = (from Match m in MyRegex().Matches(message) select m.Value).ToArray();
-        var lines = groups.Length;
-        var fHeight = sHeight * groupsInline.Length * 1;
+        var lines = groups.Length + 1;
+        var fHeight = sHeight * groupsInline.Length;
 
-        height += (sHeight * lines) + fHeight - (int)(groupsInline.Length * 1.5);
+        height += (int)(((sHeight * lines) + fHeight) * scale);
+        var width = (int)(350 * scale);
 
-        Size = new Size(Width, height);
+        Size = new Size(width, height);
     }
 
     private void AddButton(DialogResult buttonDialogResult, bool isDefault = false)
@@ -242,8 +249,8 @@ public partial class MainMessageBox : Form, IMainMessageBox
             : _defaultResultAfterTimeout == buttonDialogResult;
 
         var text = isDefault && _hasTimer
-            ? $@"{DialogResultScheme[buttonDialogResult]} ({_timeout})"
-            : DialogResultScheme[buttonDialogResult];
+            ? $@"{DialogResultButtonName[buttonDialogResult]} ({_timeout})"
+            : DialogResultButtonName[buttonDialogResult];
 
         var button = new Button
         {
@@ -267,7 +274,7 @@ public partial class MainMessageBox : Form, IMainMessageBox
         }
 
         _controlForValueTimerTick = button;
-        _initialControlValue = DialogResultScheme[buttonDialogResult];
+        _initialControlValue = DialogResultButtonName[buttonDialogResult];
     }
 
     private void ButtonClick(object sender, EventArgs e)

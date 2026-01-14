@@ -4,9 +4,9 @@ using Languages;
 
 namespace MessageForm;
 
-internal sealed class DialogResultLookup
+internal sealed class DialogResultScheme
 {
-    internal static readonly Dictionary<DialogResult, string> DialogResultScheme
+    internal static readonly Dictionary<DialogResult, string> DialogResultButtonName
         = new()
         {
             {DialogResult.None, Language.Current.None},
