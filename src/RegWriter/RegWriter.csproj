@@ -3,10 +3,9 @@
 	<PropertyGroup>
 		<Nullable>enable</Nullable>
 		<OutputType>exe</OutputType>
-		<TargetFramework>net10.0-windows</TargetFramework>
+		<TargetFramework>net48</TargetFramework>
+		<LangVersion>14.0</LangVersion>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-		<PublishSingleFile>true</PublishSingleFile>
-		<SelfContained>false</SelfContained>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
 

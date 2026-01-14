@@ -39,7 +39,10 @@ public static class Registry
 
     public static void SaveSetting(RegistryParam registryParam)
     {
-        ArgumentNullException.ThrowIfNull(registryParam.Value);
+        if (registryParam.Value == null)
+        {
+            throw new ArgumentNullException(nameof(registryParam.Value));
+        }
 
         using var regKey = GetRegistryKey(registryParam, true, true);
 

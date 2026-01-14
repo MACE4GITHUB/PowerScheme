@@ -63,12 +63,12 @@ public struct RegistryParam
             return new RegistryParam();
         }
 
-        var registryValueKind = Enum.Parse<RegistryValueKind>(param[4], true);
+        var registryValueKind = (RegistryValueKind)Enum.Parse(typeof(RegistryValueKind), param[4], true);
         var value = CalculateTypedValue(param[5], registryValueKind);
 
         var registryParam = new RegistryParam
         {
-            RegistryHive = Enum.Parse<RegistryHive>(param[0], true),
+            RegistryHive = (RegistryHive)Enum.Parse(typeof(RegistryHive), param[0], true),
             Path = param[1],
             Section = param[2],
             Name = param[3],

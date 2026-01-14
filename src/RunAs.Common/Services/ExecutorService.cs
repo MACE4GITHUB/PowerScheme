@@ -23,7 +23,7 @@ public class ExecutorService
     public string Name { get; set; } = string.Empty;
 
     public string FullName
-        => Path.Combine(Path.GetDirectoryName(Environment.ProcessPath)!, $"{Name}{EXE_EXTENSION}");
+        => Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule?.FileName)!, $"{Name}{EXE_EXTENSION}");
 
     public string Arguments { get; set; } = string.Empty;
 
@@ -81,5 +81,5 @@ public class ExecutorService
 
     private byte[] Executor
         => (byte[])(ResourceManager?.GetObject(Name)
-           ?? throw new ArgumentNullException(nameof(Name)));
+                    ?? throw new ArgumentNullException(nameof(Name)));
 }

@@ -27,7 +27,7 @@ public partial class MainMessageBox : Form, IMainMessageBox
         var handle = Process.GetCurrentProcess().MainWindowHandle;
         _owner = new WindowWrapper(handle);
     }
-    
+
     public DialogResult Show(
         string message,
         string? title = null,
@@ -209,14 +209,15 @@ public partial class MainMessageBox : Form, IMainMessageBox
     private void SetSizeMessageBox()
     {
         var message = _lblMessage.Text;
-        if (message.Length < 60)
-        {
-            Size = new Size(350, 170);
-            return;
-        }
+        //if (message.Length < 60)
+        //{
+        //    Size = new Size(350, 170);
+        //    return;
+        //}
+
         var height = 125;
 
-        SizeF size = TextRenderer.MeasureText("W", 
+        SizeF size = TextRenderer.MeasureText("W",
             new Font(new FontFamily("Microsoft Sans Serif"),
             8.25f,
             0,

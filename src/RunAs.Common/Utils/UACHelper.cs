@@ -2,8 +2,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Security.Principal;
-using static System.Security.Principal.WindowsIdentity;
 
 namespace RunAs.Common.Utils;
 
@@ -12,31 +10,6 @@ namespace RunAs.Common.Utils;
 /// </summary>
 public static class UacHelper
 {
-    /// <summary>
-    /// Determines if current user has admin privileges.
-    /// </summary>
-    /// <returns>true if it does, false if not.</returns>
-    public static bool HasAdminPrivileges
-    {
-        get
-        {
-            bool isAdmin;
-
-            try
-            {
-                var user = GetCurrent();
-                var principal = new WindowsPrincipal(user);
-                isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
-            }
-            catch (Exception)
-            {
-                isAdmin = false;
-            }
-
-            return isAdmin;
-        }
-    }
-
     /// <summary>
     /// Attempts to run the given process as an admin process.
     /// </summary>

@@ -19,7 +19,7 @@ internal sealed class DiConfigurator
         services.AddSingleton<IPowerSchemeService, PowerSchemeService>();
         services.AddSingleton<IViewModel, ViewModel>();
         services.AddTransient<IMainMessageBox, MainMessageBox>();
-        
+
         return services;
     }
 }
