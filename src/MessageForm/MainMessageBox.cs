@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -26,9 +25,8 @@ public partial class MainMessageBox : Form, IMainMessageBox
         InitializeComponent();
 
         _labelTimerTick.Text = "";
-        var handle = Process.GetCurrentProcess().MainWindowHandle;
 
-        _owner = new WindowWrapper(handle);
+        _owner = new WindowWrapper(Handle);
     }
 
     public DialogResult Show(
@@ -51,7 +49,7 @@ public partial class MainMessageBox : Form, IMainMessageBox
 
         if (isApplicationExit)
         {
-            FormClosed += (sender, args) => Environment.Exit(0);
+            FormClosed += (_, _) => Application.Exit();
         }
 
         if (_hasTimer)
@@ -94,20 +92,20 @@ public partial class MainMessageBox : Form, IMainMessageBox
         _timer.Tick += TimerOnTick;
     }
 
-    private void TimerOnTick(object sender, EventArgs e)
+    private void TimerOnTick(object? sender, EventArgs e)
     {
         _valueTimerTick--;
 
         if (_valueTimerTick > 0)
         {
-            _controlForValueTimerTick.Text =
+            _controlForValueTimerTick?.Text =
                 string.IsNullOrWhiteSpace(_initialControlValue)
                     ? $@"{_valueTimerTick}"
                     : $@"{_initialControlValue} ({_valueTimerTick})";
         }
         else
         {
-            _timer.Stop();
+            _timer?.Stop();
             Dispose();
         }
     }
@@ -206,6 +204,11 @@ public partial class MainMessageBox : Form, IMainMessageBox
                 throw new ArgumentOutOfRangeException(nameof(icon), icon, null);
         }
 
+        if (_pictureBox.Image == null)
+        {
+            return;
+        }
+
         _pictureBox.Width = _pictureBox.Image.Width;
         _pictureBox.Height = _pictureBox.Image.Height;
     }
@@ -213,11 +216,6 @@ public partial class MainMessageBox : Form, IMainMessageBox
     private void SetSizeMessageBox()
     {
         var message = _lblMessage.Text;
-        //if (message.Length < 60)
-        //{
-        //    Size = new Size(350, 170);
-        //    return;
-        //}
 
         var height = 125;
 
@@ -258,7 +256,7 @@ public partial class MainMessageBox : Form, IMainMessageBox
             Tag = buttonDialogResult,
             Font = isDefault
                 ? new Font("Microsoft Sans Serif", 8.25F,
-                    FontStyle.Bold, GraphicsUnit.Point, (byte)204)
+                    FontStyle.Bold, GraphicsUnit.Point, 204)
                 : new Font("Microsoft Sans Serif", 8.25F),
             BackColor = Color.FromArgb(225, 225, 225),
             Padding = new Padding(2),
@@ -277,7 +275,7 @@ public partial class MainMessageBox : Form, IMainMessageBox
         _initialControlValue = DialogResultButtonName[buttonDialogResult];
     }
 
-    private void ButtonClick(object sender, EventArgs e)
+    private void ButtonClick(object? sender, EventArgs e)
     {
         if (sender is not Button btn)
         {

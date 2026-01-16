@@ -12,7 +12,7 @@ public static class Image
         public Icon CreateIcon(IconSize iconSize, Bitmap? addingBitmap = null)
         {
             var squareCanvas = sourceBitmap.CopyToSquareCanvas(Color.Transparent, addingBitmap);
-            squareCanvas = (Bitmap)squareCanvas.GetThumbnailImage((int)iconSize, (int)iconSize, null, new IntPtr());
+            squareCanvas = (Bitmap)squareCanvas.GetThumbnailImage((int)iconSize, (int)iconSize, null, 0);
 
             var iconResult = Icon.FromHandle(squareCanvas.GetHicon());
 

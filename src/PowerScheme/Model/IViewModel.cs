@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Windows.Forms;
-using PowerScheme.Services;
 using PowerSchemeServiceAPI;
 
 namespace PowerScheme.Model;
 
-public interface IViewModel: IDisposable
+public interface IViewModel : IDisposable
 {
     NotifyIcon NotifyIcon { get; }
     ContextMainMenu ContextLeftMenu { get; }

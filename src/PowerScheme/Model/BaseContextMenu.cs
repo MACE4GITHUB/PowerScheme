@@ -1,19 +1,16 @@
 ﻿using System.ComponentModel;
+using System.Windows.Forms;
+using PowerScheme.Utility;
+using PowerSchemeServiceAPI;
 
 namespace PowerScheme.Model;
 
-using Utility;
-using PowerSchemeServiceAPI;
-using System.Windows.Forms;
-
-public abstract class ContextMainMenu : ContextMenuStrip
+public abstract class ContextMainMenu(
+    IContainer components,
+    IPowerSchemeService power) :
+    ContextMenuStrip(components)
 {
-    protected IPowerSchemeService Power;
-
-    protected ContextMainMenu(IContainer components, IPowerSchemeService power): base(components)
-    {
-        Power = power;
-    }
+    protected IPowerSchemeService Power = power;
 
     public void BuildMenu()
     {
@@ -25,5 +22,4 @@ public abstract class ContextMainMenu : ContextMenuStrip
     public abstract void ClearMenu();
 
     protected abstract void BuildContextMenu();
-
 }

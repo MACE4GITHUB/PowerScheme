@@ -1,26 +1,25 @@
 ﻿using System.ComponentModel;
+using System.Windows.Forms;
+using PowerSchemeServiceAPI;
 
 namespace PowerScheme.Model;
 
-using PowerSchemeServiceAPI;
-using System.Windows.Forms;
-
 public sealed class ViewModel : IViewModel
 {
-    private readonly IContainer components;
+    private readonly Container _components;
 
     public ViewModel(IPowerSchemeService power)
     {
-        components = new Container();
+        _components = new Container();
         Power = power;
-        ContextLeftMenu = new LeftContextMenu(components, power);
-        ContextRightMenu = new RightContextMenu(components, power);
-        NotifyIcon = new NotifyIcon(components);
+        ContextLeftMenu = new LeftContextMenu(_components, power);
+        ContextRightMenu = new RightContextMenu(_components, power);
+        NotifyIcon = new NotifyIcon(_components);
     }
 
     public NotifyIcon NotifyIcon { get; }
 
-    public ContextMainMenu ContextLeftMenu { get; } 
+    public ContextMainMenu ContextLeftMenu { get; }
 
     public ContextMainMenu ContextRightMenu { get; }
 
@@ -29,7 +28,7 @@ public sealed class ViewModel : IViewModel
         ContextLeftMenu.ClearMenu();
         ContextRightMenu.ClearMenu();
     }
-        
+
     public void BuildAllMenu()
     {
         ContextLeftMenu.BuildMenu();
@@ -40,6 +39,6 @@ public sealed class ViewModel : IViewModel
 
     public void Dispose()
     {
-        components?.Dispose();
+        _components?.Dispose();
     }
 }

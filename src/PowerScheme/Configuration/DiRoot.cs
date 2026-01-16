@@ -13,12 +13,12 @@ public static class DiRoot
     /// <summary>
     /// Configures services and builds service provider.
     /// </summary>
-    public static void ConfigureServices(IServiceCollection services) => 
+    public static void ConfigureServices(IServiceCollection services) =>
         ServiceProvider = services?.BuildServiceProvider();
 
     /// <summary>
     /// Gets the service of T.
     /// </summary>
-    public static T GetService<T>() where T : class => 
+    public static T GetService<T>() where T : class =>
         (T)ServiceProvider.GetService(typeof(T));
 }

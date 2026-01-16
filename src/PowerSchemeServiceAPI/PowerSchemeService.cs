@@ -268,7 +268,7 @@ public class PowerSchemeService : IPowerSchemeService
 
     private static void ApplyAction(
         ActionWithPowerScheme actionWithPowerScheme,
-        Action create, 
+        Action create,
         Action delete)
     {
         switch (actionWithPowerScheme)

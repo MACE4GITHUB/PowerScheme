@@ -1,11 +1,10 @@
 ﻿using System.Reflection;
+using System.Windows.Forms;
+using PowerScheme.Model;
+using RegistryManager.EventsArgs;
+using static PowerScheme.Utility.TrayIcon;
 
 namespace PowerScheme.Services;
-
-using Model;
-using RegistryManager.EventsArgs;
-using System.Windows.Forms;
-using static Utility.TrayIcon;
 
 public sealed class ViewService : ApplicationContext, IViewService
 {
