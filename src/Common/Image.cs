@@ -2,49 +2,78 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace Common;
 
 public static class Image
 {
-    extension(Bitmap sourceBitmap)
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool DestroyIcon(IntPtr hIcon);
+
+    public static Icon CreateIcon(
+        this Bitmap sourceBitmap,
+        IconSize iconSize,
+        Bitmap? addingBitmap = null)
     {
-        public Icon CreateIcon(IconSize iconSize, Bitmap? addingBitmap = null)
+        ArgumentNullException.ThrowIfNull(sourceBitmap);
+
+        // Create a squared and resized thumbnail as managed Bitmaps and dispose them deterministically.
+        using var squareCanvas = sourceBitmap.CopyToSquareCanvas(Color.Transparent, addingBitmap);
+        var size = (int)iconSize;
+        using var thumbnail = new Bitmap(size, size, PixelFormat.Format32bppArgb);
+
+        using (var g = Graphics.FromImage(thumbnail))
         {
-            var squareCanvas = sourceBitmap.CopyToSquareCanvas(Color.Transparent, addingBitmap);
-            squareCanvas = (Bitmap)squareCanvas.GetThumbnailImage((int)iconSize, (int)iconSize, null, 0);
-
-            var iconResult = Icon.FromHandle(squareCanvas.GetHicon());
-
-            return iconResult;
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            g.CompositingMode = CompositingMode.SourceOver;
+            g.Clear(Color.Transparent);
+            g.DrawImage(squareCanvas, 0, 0, size, size);
         }
 
-        public Bitmap CopyToSquareCanvas(Color canvasBackground, Bitmap? addingBitmap = null)
+        // Create an HICON, clone the Icon so the clone owns its handle, then destroy the original HICON.
+        var hIcon = thumbnail.GetHicon();
+        try
         {
-            ArgumentNullException.ThrowIfNull(sourceBitmap);
+            using var iconFromHandle = Icon.FromHandle(hIcon);
+            var clone = (Icon)iconFromHandle.Clone();
+            return clone;
+        }
+        finally
+        {
+            DestroyIcon(hIcon);
+        }
+    }
 
-            var maxSide = sourceBitmap.Width > sourceBitmap.Height ? sourceBitmap.Width : sourceBitmap.Height;
+    public static Bitmap CopyToSquareCanvas(
+        this Bitmap sourceBitmap,
+        Color canvasBackground,
+        Bitmap? addingBitmap = null)
+    {
+        ArgumentNullException.ThrowIfNull(sourceBitmap);
 
-            var bitmapResult = new Bitmap(maxSide, maxSide, PixelFormat.Format32bppArgb);
+        var maxSide = Math.Max(sourceBitmap.Width, sourceBitmap.Height);
 
-            using var graphicsResult = Graphics.FromImage(bitmapResult);
-            graphicsResult.Clear(canvasBackground);
+        var bitmapResult = new Bitmap(maxSide, maxSide, PixelFormat.Format32bppArgb);
 
-            var xOffset = (sourceBitmap.Width - maxSide) / 2;
+        using var graphicsResult = Graphics.FromImage(bitmapResult);
+        graphicsResult.Clear(canvasBackground);
 
-            graphicsResult.DrawImage(sourceBitmap, new Point(xOffset, xOffset));
+        var xOffset = (maxSide - sourceBitmap.Width) / 2;
+        var yOffset = (maxSide - sourceBitmap.Height) / 2;
 
-            if (addingBitmap == null)
-            {
-                return bitmapResult;
-            }
+        graphicsResult.DrawImage(sourceBitmap, new Point(xOffset, yOffset));
 
-            graphicsResult.CompositingMode = CompositingMode.SourceOver;
-            var minSide = maxSide / 2;
-            graphicsResult.DrawImage(addingBitmap, new Rectangle(minSide, minSide, minSide, minSide));
-
+        if (addingBitmap == null)
+        {
             return bitmapResult;
         }
+
+        graphicsResult.CompositingMode = CompositingMode.SourceOver;
+        var minSide = maxSide / 2;
+        graphicsResult.DrawImage(addingBitmap, new Rectangle(minSide, minSide, minSide, minSide));
+
+        return bitmapResult;
     }
 
     public enum IconSize

@@ -40,13 +40,14 @@ public sealed class RightContextMenu(
             return;
         }
 
-        Items[nameof(MenuItm.StartupOnWindows)].Click -= StartWithWindowsOnClick;
-        Items[nameof(MenuItm.Sleep)].Click -= SleepOnClick;
-        Items[nameof(MenuItm.Exit)].Click -= ExitOnClick;
+        // Unsubscribe handlers and dispose images/items deterministically.
+        UnsubscribeAndDisposeItem(Items[nameof(MenuItm.StartupOnWindows)], StartWithWindowsOnClick);
+        UnsubscribeAndDisposeItem(Items[nameof(MenuItm.Sleep)], SleepOnClick);
+        UnsubscribeAndDisposeItem(Items[nameof(MenuItm.Exit)], ExitOnClick);
 
         if (Power.ExistsHibernate)
         {
-            Items[nameof(MenuItm.Hibernate)].Click -= HibernateOnClick;
+            UnsubscribeAndDisposeItem(Items[nameof(MenuItm.Hibernate)], HibernateOnClick);
         }
 
         #region SettingsMenu
@@ -54,26 +55,35 @@ public sealed class RightContextMenu(
         {
             var settingDropDownItems = settingsToolStripMenuItem.DropDownItems;
 
-            settingDropDownItems[nameof(MenuItm.RestoreDefaultPowerSchemes)].Click -=
-                RestoreDefaultPowerSchemesOnClick;
-            settingDropDownItems[nameof(MenuItm.ControlPanelSchemeWindows)].Click -= ItemCplSchemeOnClick;
-            settingDropDownItems[nameof(MenuItm.CreateTypicalSchemes)].Click -=
-                ItemCreateTypicalSchemesOnClick;
-            settingDropDownItems[nameof(MenuItm.DeleteTypicalSchemes)].Click -=
-                ItemDeleteTypicalSchemesOnClick;
+            UnsubscribeAndDisposeItem(settingDropDownItems[nameof(MenuItm.RestoreDefaultPowerSchemes)],
+                RestoreDefaultPowerSchemesOnClick);
+            UnsubscribeAndDisposeItem(settingDropDownItems[nameof(MenuItm.ControlPanelSchemeWindows)],
+                ItemCplSchemeOnClick);
+            UnsubscribeAndDisposeItem(settingDropDownItems[nameof(MenuItm.CreateTypicalSchemes)],
+                ItemCreateTypicalSchemesOnClick);
+            UnsubscribeAndDisposeItem(settingDropDownItems[nameof(MenuItm.DeleteTypicalSchemes)],
+                ItemDeleteTypicalSchemesOnClick);
 
             for (var index = settingDropDownItems.Count - 1; index >= 0; index--)
             {
                 var item = settingDropDownItems[index];
                 if (item is not ToolStripMenuItem toolStripItem)
                 {
+                    item.Dispose();
                     continue;
+                }
+
+                toolStripItem.Click -= ItemMenuActionPowerOnClick;
+                // Dispose image if any.
+                var img = toolStripItem.Image;
+                if (img is not null)
+                {
+                    toolStripItem.Image = null;
+                    img.Dispose();
                 }
 
                 toolStripItem.Tag = null;
                 toolStripItem.Text = null;
-                toolStripItem.Image = null;
-                toolStripItem.Click -= ItemMenuActionPowerOnClick;
                 toolStripItem.Dispose();
             }
 
@@ -94,13 +104,21 @@ public sealed class RightContextMenu(
                 var item = lidDropDownItems[index];
                 if (item is not ToolStripMenuItem toolStripItem)
                 {
+                    item.Dispose();
                     continue;
+                }
+
+                toolStripItem.Click -= LidOnClick;
+
+                var img = toolStripItem.Image;
+                if (img is not null)
+                {
+                    toolStripItem.Image = null;
+                    img.Dispose();
                 }
 
                 toolStripItem.Tag = null;
                 toolStripItem.Text = null;
-                toolStripItem.Image = null;
-                toolStripItem.Click -= LidOnClick;
                 toolStripItem.Dispose();
             }
 
@@ -110,6 +128,23 @@ public sealed class RightContextMenu(
             }
         }
         #endregion
+
+        // Dispose images for root-level items and items themselves.
+        for (var i = Items.Count - 1; i >= 0; i--)
+        {
+            var root = Items[i];
+            if (root is ToolStripMenuItem tsm)
+            {
+                var img = tsm.Image;
+                if (img is not null)
+                {
+                    tsm.Image = null;
+                    img.Dispose();
+                }
+            }
+
+            root.Dispose();
+        }
 
         Items.Clear();
     }
@@ -150,12 +185,13 @@ public sealed class RightContextMenu(
         };
 
         #region CplSchemeWindows
+        var srcCpl = GetImage(MenuItems[MenuItm.ControlPanelSchemeWindows].Picture);
         var itemCplScheme = new ToolStripMenuItem
         {
             Name = nameof(MenuItm.ControlPanelSchemeWindows),
             Text = MenuItems[MenuItm.ControlPanelSchemeWindows].Name,
             ImageScaling = ToolStripItemImageScaling.SizeToFit,
-            Image = GetImage(MenuItems[MenuItm.ControlPanelSchemeWindows].Picture)
+            Image = CloneBitmap(srcCpl)
         };
         itemCplScheme.Click += ItemCplSchemeOnClick;
 
@@ -163,13 +199,14 @@ public sealed class RightContextMenu(
         #endregion
 
         #region RestoreDefaultWindows
+        var srcRestore = GetImage(MenuItems[MenuItm.RestoreDefaultPowerSchemes].Picture);
         var itemRestore = new ToolStripMenuItem
         {
             Name = nameof(MenuItm.RestoreDefaultPowerSchemes),
             Text = MenuItems[MenuItm.RestoreDefaultPowerSchemes].Name,
             ToolTipText = MenuItems[MenuItm.RestoreDefaultPowerSchemes].Description,
             ImageScaling = ToolStripItemImageScaling.SizeToFit,
-            Image = GetImage(MenuItems[MenuItm.RestoreDefaultPowerSchemes].Picture)
+            Image = CloneBitmap(srcRestore)
         };
         itemRestore.Click += RestoreDefaultPowerSchemesOnClick;
 
@@ -179,12 +216,13 @@ public sealed class RightContextMenu(
         itemDropDownSetting.DropDownItems.Add(new ToolStripSeparator());
 
         #region AddTypicalSchemes
+        var srcTypical = GetImage(MenuItems[MenuItm.CreateTypicalSchemes].Picture);
         var itemTypicalSchemes = new ToolStripMenuItem
         {
             Name = nameof(MenuItm.CreateTypicalSchemes),
             Text = MenuItems[MenuItm.CreateTypicalSchemes].Name,
             ImageScaling = ToolStripItemImageScaling.SizeToFit,
-            Image = GetImage(MenuItems[MenuItm.CreateTypicalSchemes].Picture)
+            Image = CloneBitmap(srcTypical)
         };
         itemTypicalSchemes.Click += ItemCreateTypicalSchemesOnClick;
 
@@ -192,13 +230,13 @@ public sealed class RightContextMenu(
         #endregion
 
         #region DeleteTypicalSchemes
-
+        var srcDelete = GetImage(MenuItems[MenuItm.DeleteTypicalSchemes].Picture);
         var itemDeleteTypicalSchemes = new ToolStripMenuItem
         {
             Name = nameof(MenuItm.DeleteTypicalSchemes),
             Text = MenuItems[MenuItm.DeleteTypicalSchemes].Name,
             ImageScaling = ToolStripItemImageScaling.SizeToFit,
-            Image = GetImage(MenuItems[MenuItm.DeleteTypicalSchemes].Picture)
+            Image = CloneBitmap(srcDelete)
         };
         itemDeleteTypicalSchemes.Click += ItemDeleteTypicalSchemesOnClick;
 
@@ -209,11 +247,12 @@ public sealed class RightContextMenu(
 
         foreach (var powerScheme in Power.TypicalPowerSchemes)
         {
+            var src = GetImage(powerScheme.Picture);
             var item = new ToolStripMenuItem
             {
                 Tag = new StatePowerScheme(powerScheme, ActionWithPowerScheme.Create),
                 ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                Image = GetImage(powerScheme.Picture)
+                Image = CloneBitmap(src)
             };
 
             item.Click += ItemMenuActionPowerOnClick;
@@ -319,14 +358,16 @@ public sealed class RightContextMenu(
 
         for (var i = 0; i < 4; i++)
         {
+            var src = GetImage(MenuItems.Where(mi =>
+                HasLidValue(mi, i)).Select(mi => mi.Value.Picture).FirstOrDefault());
+
             var lidItem = new ToolStripMenuItem
             {
                 Tag = (Lid)i,
                 Text = MenuItems.Where(mi =>
                     HasLidValue(mi, i)).Select(mi => mi.Value.Name).FirstOrDefault(),
                 ImageScaling = ToolStripItemImageScaling.SizeToFit,
-                Image = GetImage(MenuItems.Where(mi =>
-                    HasLidValue(mi, i)).Select(mi => mi.Value.Picture).FirstOrDefault())
+                Image = CloneBitmap(src)
             };
             lidItem.Click += LidOnClick;
             itemsDropDown.Add(lidItem);
@@ -468,7 +509,13 @@ public sealed class RightContextMenu(
 
         isChecked = !b;
         menu.Tag = isChecked;
-        menu.Image = isChecked ? GetImage(ImageItem.Check) : null;
+
+        // Dispose previous image before assigning a new one to avoid leaking.
+        var prev = menu.Image;
+        var next = isChecked ? GetImage(ImageItem.Check) : null;
+        menu.Image = next;
+        prev?.Dispose();
+
         return true;
     }
 
@@ -499,7 +546,11 @@ public sealed class RightContextMenu(
                     HasLidValue(mi, valueTag)).Select(mi => mi.Value.Picture).FirstOrDefault();
             }
         }
-        Items[nameof(MenuItm.Lid)].Image = GetImage(pictureName);
+
+        var prev = Items[nameof(MenuItm.Lid)].Image;
+        var nextImg = GetImage(pictureName);
+        Items[nameof(MenuItm.Lid)].Image = CloneBitmap(nextImg);
+        prev?.Dispose();
     }
 
     private static void CheckMenu(ToolStripItem item, bool @checked)
@@ -508,7 +559,10 @@ public sealed class RightContextMenu(
 
         var addShield = item.Name == nameof(MenuItm.Hibernate) || item.Name == nameof(MenuItm.Sleep);
 
-        item.Image = GetImageIfCheck(@checked, addShield);
+        var prev = item.Image;
+        var next = GetImageIfCheck(@checked, addShield);
+        item.Image = next;
+        prev?.Dispose();
     }
 
     private static Bitmap GetImageIfCheck(bool @checked, bool addShield)
@@ -525,7 +579,44 @@ public sealed class RightContextMenu(
 
     protected override void Dispose(bool disposing)
     {
-        Power = null;
+        if (disposing)
+        {
+            ClearMenu();
+            Power = null;
+        }
+
         base.Dispose(disposing);
+    }
+
+    // Helper: clone a potentially shared Bitmap so the caller owns disposal.
+    private static Bitmap CloneBitmap(Bitmap? src) => src is null ? null : new Bitmap(src);
+
+    // Helper: unsubscribe click and dispose a ToolStripItem (if exists).
+    private static void UnsubscribeAndDisposeItem(ToolStripItem item, EventHandler handler)
+    {
+        if (item is null)
+        {
+            return;
+        }
+
+        if (item is ToolStripMenuItem menuItem)
+        {
+            menuItem.Click -= handler;
+
+            var img = menuItem.Image;
+            if (img is not null)
+            {
+                menuItem.Image = null;
+                img.Dispose();
+            }
+
+            menuItem.Tag = null;
+            menuItem.Text = null;
+            menuItem.Dispose();
+            return;
+        }
+
+        item.Click -= handler;
+        item.Dispose();
     }
 }

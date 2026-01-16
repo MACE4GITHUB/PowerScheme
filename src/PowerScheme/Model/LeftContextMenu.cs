@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PowerSchemeServiceAPI;
@@ -28,12 +29,24 @@ public sealed class LeftContextMenu(
         for (var index = Items.Count - 1; index >= 0; index--)
         {
             var toolStripItem = Items[index];
+
             toolStripItem.Click -= ItemMenuPowerOnClick;
+
+            // Dispose image assigned to the item to release GDI+/native resources.
+            // Remove reference from the ToolStripItem first to avoid holding a disposed Image.
+            var img = toolStripItem.Image;
+            if (img is not null)
+            {
+                toolStripItem.Image = null;
+                img.Dispose();
+            }
+
             toolStripItem.Tag = null;
             toolStripItem.Text = null;
-            toolStripItem.Image = null;
+
             toolStripItem.Dispose();
         }
+
         Items.Clear();
     }
 
@@ -43,11 +56,16 @@ public sealed class LeftContextMenu(
 
         foreach (var powerScheme in Power.DefaultPowerSchemes)
         {
+            var src = GetImage(powerScheme.Picture);
             var item = new ToolStripMenuItem
             {
                 Tag = new StatePowerScheme(powerScheme),
                 Text = powerScheme.Name,
-                Image = GetImage(powerScheme.Picture)
+                // Clone the source bitmap so each ToolStripItem owns its Image instance.
+                // That allows safe disposal in ClearMenu without affecting the shared resource.
+                Image = src is null
+                    ? null
+                    : new Bitmap(src)
             };
 
             item.Click += ItemMenuPowerOnClick;
@@ -64,18 +82,20 @@ public sealed class LeftContextMenu(
 
         foreach (var powerScheme in Power.UserPowerSchemes)
         {
+            var src = GetImage(powerScheme.Picture);
             var item = new ToolStripMenuItem
             {
                 Tag = new StatePowerScheme(powerScheme),
                 Text = powerScheme.Name,
-                Image = GetImage(powerScheme.Picture)
+                Image = src is null
+                    ? null
+                    : new Bitmap(src)
             };
 
             item.Click += ItemMenuPowerOnClick;
 
             Items.Add(item);
         }
-
     }
 
     private void ItemMenuPowerOnClick(object sender, EventArgs e)
@@ -95,7 +115,12 @@ public sealed class LeftContextMenu(
 
     protected override void Dispose(bool disposing)
     {
-        Power = null;
+        if (disposing)
+        {
+            ClearMenu();
+            Power = null;
+        }
+
         base.Dispose(disposing);
     }
 }

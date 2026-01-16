@@ -38,6 +38,8 @@ public sealed class ViewService : ApplicationContext, IViewService
         _viewModel.NotifyIcon.MouseClick -= NotifyIcon_MouseClick;
         _viewModel.NotifyIcon.Visible = false;
 
+        _viewModel.RemoveIcon();
+
         _viewModel.Power.Watchers.Stop();
         _viewModel.ClearAllMenu();
     }
@@ -53,16 +55,15 @@ public sealed class ViewService : ApplicationContext, IViewService
         var image = activePowerScheme.Picture;
         var icon = GetIcon(image);
 
-        _viewModel.NotifyIcon.Icon = icon;
+        _viewModel.UpdateIcon(icon);
         _viewModel.NotifyIcon.Text = activePowerScheme.Name;
     }
 
     private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
     {
-        _viewModel.NotifyIcon.ContextMenuStrip =
-            e.Button == MouseButtons.Right ?
-                _viewModel.ContextRightMenu :
-                _viewModel.ContextLeftMenu;
+        _viewModel.NotifyIcon.ContextMenuStrip = e.Button == MouseButtons.Right
+            ? _viewModel.ContextRightMenu
+            : _viewModel.ContextLeftMenu;
 
         if (e.Button == MouseButtons.Right)
         {

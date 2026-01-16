@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using PowerSchemeServiceAPI;
 
@@ -14,4 +15,8 @@ public interface IViewModel : IDisposable
     void BuildAllMenu();
 
     void ClearAllMenu();
+
+    void UpdateIcon(Icon icon);
+
+    void RemoveIcon();
 }

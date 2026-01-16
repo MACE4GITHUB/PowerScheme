@@ -1,15 +1,15 @@
-﻿namespace PowerScheme.Utility;
-
-using Common;
+﻿using Common;
 using System.Drawing;
 using static Common.Image;
+
+namespace PowerScheme.Utility;
 
 internal static class TrayIcon
 {
     public static Icon GetIcon(ImageItem iconName)
     {
         var bitmap = GetImage(iconName);
-        var icon = bitmap.CreateIcon(IconSize.Pixels16X16);
+        var icon = bitmap.CreateIcon(IconSize.Pixels24X24);
         return icon;
     }
 

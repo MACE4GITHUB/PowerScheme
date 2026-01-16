@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Drawing;
 using System.Windows.Forms;
 using PowerSchemeServiceAPI;
 
@@ -37,8 +38,30 @@ public sealed class ViewModel : IViewModel
 
     public IPowerSchemeService Power { get; }
 
+    public void UpdateIcon(Icon icon)
+    {
+        RemoveIcon();
+        NotifyIcon.Icon = icon;
+    }
+
+    public void RemoveIcon()
+    {
+        var currentIcon = NotifyIcon?.Icon;
+
+        if (currentIcon is null)
+        {
+            return;
+        }
+
+        // Remove reference from NotifyIcon first, then dispose the icon.
+        NotifyIcon.Icon = null;
+        currentIcon.Dispose();
+    }
+
     public void Dispose()
     {
+        RemoveIcon();
+
         _components?.Dispose();
     }
 }
