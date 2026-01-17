@@ -12,13 +12,12 @@ namespace PowerScheme;
 
 internal static class Program
 {
-    private static Mutex _mutexObj;
+    private static Mutex? _mutexObj;
 
     [STAThread]
     private static void Main()
     {
-        var diConfigurator = new DiConfigurator();
-        DiRoot.ConfigureServices(diConfigurator.Configure());
+        DiRoot.ConfigureServices(DiConfigurator.Configure());
 
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
