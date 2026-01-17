@@ -49,7 +49,7 @@ public partial class MainMessageBox : Form, IMainMessageBox
 
         if (isApplicationExit)
         {
-            FormClosed += (_, _) => Application.Exit();
+            FormClosed += OnFormClosed;
         }
 
         if (_hasTimer)
@@ -63,6 +63,11 @@ public partial class MainMessageBox : Form, IMainMessageBox
             : resultDialog;
 
         return result;
+    }
+
+    private static void OnFormClosed(object? sender, FormClosedEventArgs e)
+    {
+        Environment.Exit(0);
     }
 
     private void SetTimeout(int timeout)
