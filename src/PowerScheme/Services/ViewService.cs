@@ -61,17 +61,15 @@ public sealed class ViewService : ApplicationContext, IViewService
 
     private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
     {
-        _viewModel.NotifyIcon.ContextMenuStrip = e.Button == MouseButtons.Right
-            ? _viewModel.ContextRightMenu
-            : _viewModel.ContextLeftMenu;
-
         if (e.Button == MouseButtons.Right)
         {
             _viewModel.ContextRightMenu.UpdateMenu();
+            _viewModel.NotifyIcon.ContextMenuStrip = _viewModel.ContextRightMenu;
         }
         else
         {
             _viewModel.ContextLeftMenu.UpdateMenu();
+            _viewModel.NotifyIcon.ContextMenuStrip = _viewModel.ContextLeftMenu;
         }
 
         var mi = typeof(NotifyIcon)
