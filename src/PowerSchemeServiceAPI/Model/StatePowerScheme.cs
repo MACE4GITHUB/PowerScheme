@@ -1,14 +1,10 @@
 ﻿namespace PowerSchemeServiceAPI.Model;
 
-public class StatePowerScheme
+public class StatePowerScheme(
+    IPowerScheme powerScheme,
+    object value = null)
 {
-    public StatePowerScheme(IPowerScheme powerScheme, object value = null)
-    {
-        PowerScheme = powerScheme;
-        Value = value;
-    }
+    public IPowerScheme PowerScheme { get; } = powerScheme;
 
-    public IPowerScheme PowerScheme { get; }
-
-    public object Value { get; }
+    public object Value { get; } = value;
 }

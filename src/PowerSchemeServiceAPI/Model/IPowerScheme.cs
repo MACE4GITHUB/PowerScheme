@@ -6,12 +6,12 @@ namespace PowerSchemeServiceAPI.Model;
 public interface IPowerScheme
 {
     /// <summary>
-    /// Gets or sets PowerScheme Name
+    /// Gets PowerScheme Name
     /// </summary>
     string Name { get; }
 
     /// <summary>
-    /// Gets or sets PowerScheme Description
+    /// Gets PowerScheme Description
     /// </summary>
     string Description { get; }
 
@@ -41,7 +41,7 @@ public interface IPowerScheme
     Guid Guid { get; }
 
     /// <summary>
-    /// Gets or sets PowerScheme Picture
+    /// Gets PowerScheme Picture
     /// </summary>
-    ImageItem Picture { get; set; }
+    ImageItem Picture { get; }
 }

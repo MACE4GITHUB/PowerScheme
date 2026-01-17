@@ -10,7 +10,7 @@ public abstract class ContextMainMenu(
     IPowerSchemeService power) :
     ContextMenuStrip(components)
 {
-    protected IPowerSchemeService Power = power;
+    protected IPowerSchemeService? Power = power;
 
     public void BuildMenu()
     {

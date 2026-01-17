@@ -1,9 +1,9 @@
-﻿namespace PowerSchemeServiceAPI;
-
-using EventsArgs;
-using Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using PowerSchemeServiceAPI.EventsArgs;
+using PowerSchemeServiceAPI.Model;
+
+namespace PowerSchemeServiceAPI;
 
 public interface IPowerSchemeService
 {
@@ -29,7 +29,7 @@ public interface IPowerSchemeService
     bool ExistsHibernate { get; }
 
     bool ExistsSleep { get; }
-        
+
     bool ExistsAllTypicalScheme { get; }
 
     void RestoreDefaultPowerSchemes();
@@ -47,5 +47,4 @@ public interface IPowerSchemeService
     void ActionPowerScheme(StatePowerScheme statePowerScheme);
 
     event EventHandler<PowerSchemeEventArgs> ActivePowerSchemeChanged;
-
 }

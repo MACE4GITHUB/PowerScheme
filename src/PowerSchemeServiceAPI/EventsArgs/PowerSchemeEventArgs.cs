@@ -3,13 +3,9 @@ using PowerSchemeServiceAPI.Model;
 
 namespace PowerSchemeServiceAPI.EventsArgs;
 
-public class PowerSchemeEventArgs: EventArgs
+public class PowerSchemeEventArgs(
+    IPowerScheme powerScheme) :
+    EventArgs
 {
-        
-    public PowerSchemeEventArgs(IPowerScheme powerScheme)
-    {
-        PowerScheme = powerScheme;
-    }
-
-    public IPowerScheme PowerScheme { get; }
+    public IPowerScheme PowerScheme { get; } = powerScheme;
 }
