@@ -9,11 +9,13 @@ using static PowerScheme.Utility.TrayIcon;
 
 namespace PowerScheme.Model;
 
-public sealed class LeftContextMenu(
+internal sealed class LeftContextMenu(
     IContainer components,
     IPowerSchemeService power) :
     ContextMainMenu(components, power)
 {
+    private bool _isBuilt;
+
     public override void UpdateMenu()
     {
         BuildMenu();
@@ -21,7 +23,7 @@ public sealed class LeftContextMenu(
 
     public override void ClearMenu()
     {
-        if (Items.Count <= 0)
+        if (!_isBuilt || Items.Count == 0)
         {
             return;
         }
@@ -48,11 +50,18 @@ public sealed class LeftContextMenu(
         }
 
         Items.Clear();
+
+        _isBuilt = false;
     }
 
     protected override void BuildContextMenu()
     {
         ClearMenu();
+
+        if (Power == null)
+        {
+            return;
+        }
 
         foreach (var powerScheme in Power.DefaultPowerSchemes)
         {
@@ -68,6 +77,8 @@ public sealed class LeftContextMenu(
                     : new Bitmap(src)
             };
 
+            src?.Dispose();
+
             item.Click += ItemMenuPowerOnClick;
 
             Items.Add(item);
@@ -75,6 +86,8 @@ public sealed class LeftContextMenu(
 
         if (!Power.UserPowerSchemes.Any())
         {
+            _isBuilt = true;
+
             return;
         }
 
@@ -92,13 +105,17 @@ public sealed class LeftContextMenu(
                     : new Bitmap(src)
             };
 
+            src?.Dispose();
+
             item.Click += ItemMenuPowerOnClick;
 
             Items.Add(item);
         }
+
+        _isBuilt = true;
     }
 
-    private void ItemMenuPowerOnClick(object sender, EventArgs e)
+    private void ItemMenuPowerOnClick(object? sender, EventArgs e)
     {
         if (sender is not ToolStripMenuItem menu)
         {
@@ -110,7 +127,9 @@ public sealed class LeftContextMenu(
             return;
         }
 
-        Power.SetActivePowerScheme(statePowerScheme.PowerScheme);
+        Power?.SetActivePowerScheme(statePowerScheme.PowerScheme);
+
+        ClearMenu();
     }
 
     protected override void Dispose(bool disposing)
