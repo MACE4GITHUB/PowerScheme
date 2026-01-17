@@ -1,7 +1,7 @@
-﻿namespace PowerScheme.Configuration;
-
-using System;
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+
+namespace PowerScheme.Configuration;
 
 /// <summary>
 /// Creates dependency injection root.

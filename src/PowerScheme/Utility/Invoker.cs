@@ -1,14 +1,16 @@
 ﻿using System.ComponentModel;
+using System.Windows.Forms;
+using static System.Array;
 
 namespace PowerScheme.Utility;
 
 public static class Invoker
 {
-    public static void InvokeIfRequired(this ISynchronizeInvoke obj, System.Windows.Forms.MethodInvoker action)
+    public static void InvokeIfRequired(this ISynchronizeInvoke obj, MethodInvoker action)
     {
         if (obj.InvokeRequired)
         {
-            var args = new object[0];
+            var args = Empty<object>();
             try
             {
                 obj.Invoke(action, args);

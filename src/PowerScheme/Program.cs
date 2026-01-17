@@ -1,15 +1,14 @@
-﻿using System.Drawing;
-
-namespace PowerScheme;
-
-using Configuration;
-using MessageForm;
-using Model;
-using PowerSchemeServiceAPI;
-using Services;
-using System;
+﻿using System;
+using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
+using MessageForm;
+using PowerScheme.Configuration;
+using PowerScheme.Model;
+using PowerScheme.Services;
+using PowerSchemeServiceAPI;
+
+namespace PowerScheme;
 
 internal static class Program
 {
