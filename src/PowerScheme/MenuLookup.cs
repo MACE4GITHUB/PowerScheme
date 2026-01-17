@@ -1,9 +1,9 @@
-﻿namespace PowerScheme;
-
+﻿using System.Collections.Generic;
 using Common;
 using Languages;
-using Model;
-using System.Collections.Generic;
+using PowerScheme.Model;
+
+namespace PowerScheme;
 
 internal static class MenuLookup
 {
