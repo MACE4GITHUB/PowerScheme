@@ -24,7 +24,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<NoWarn>$(NoWarn);CA1416</NoWarn>
+		<NoWarn>$(NoWarn);CA1416;NU1702;</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>

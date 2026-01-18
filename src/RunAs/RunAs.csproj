@@ -9,6 +9,10 @@
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);CA1416;NU1702;</NoWarn>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\RunAs.Common\RunAs.Common.csproj" />
 	</ItemGroup>

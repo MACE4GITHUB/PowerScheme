@@ -17,8 +17,6 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
-        DiRoot.ConfigureServices(DiConfigurator.Configure());
-
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
         Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
