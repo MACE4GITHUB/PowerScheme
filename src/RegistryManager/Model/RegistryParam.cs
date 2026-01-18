@@ -50,7 +50,7 @@ public struct RegistryParam
 
     public override readonly string ToString()
     {
-        var value = CalculateStringValue(Value, RegistryValueKind);
+        var value = CalculateStringValue(Value!, RegistryValueKind);
         return $"{RegistryHive}{DELIMITER}{Path}{DELIMITER}{Section}{DELIMITER}{Name}{DELIMITER}{RegistryValueKind}{DELIMITER}{value}";
     }
 

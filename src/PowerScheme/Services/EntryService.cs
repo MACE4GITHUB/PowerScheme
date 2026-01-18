@@ -17,7 +17,7 @@ namespace PowerScheme.Services;
 internal sealed class EntryService : IDisposable
 {
     private const int RESTARTED_VALUE = 0;
-    private IPowerSchemeService _power;
+    private IPowerSchemeService? _power;
     private readonly IMainMessageBox _messageBox;
     private readonly string[] _args;
 
@@ -40,7 +40,7 @@ internal sealed class EntryService : IDisposable
     /// <summary>
     /// Gets Mutex to start one application instance.
     /// </summary>
-    public Mutex Mutex { get; private set; }
+    public Mutex? Mutex { get; private set; }
 
     public bool IsValidateOs { get; set; } = true;
 
@@ -63,7 +63,7 @@ internal sealed class EntryService : IDisposable
             return this;
         }
 
-        ActionFirstStart?.Invoke();
+        ActionFirstStart.Invoke();
 
         RegistryService.SetAppSettings(AppInfo.CompanyName, AppInfo.ProductName, RESTARTED_VALUE);
 
@@ -76,6 +76,8 @@ internal sealed class EntryService : IDisposable
         {
             return this;
         }
+
+        ArgumentNullException.ThrowIfNull(_power);
 
         var executorMainService = new ExecutorRunAsService($"{Role.Admin} {AttributeFile.Normal}");
 
@@ -140,6 +142,8 @@ internal sealed class EntryService : IDisposable
         {
             return;
         }
+
+        ArgumentNullException.ThrowIfNull(_power);
 
         _power.CreateTypicalSchemes();
     }
