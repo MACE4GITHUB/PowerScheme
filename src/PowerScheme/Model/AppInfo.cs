@@ -10,11 +10,11 @@ public static class AppInfo
 
     public static string CompanyName { get; } = GetExecutingAssembly
         .GetCustomAttribute<AssemblyCompanyAttribute>()?
-        .Company;
+        .Company ?? "BULAVA";
 
     public static string ProductName { get; } = GetExecutingAssembly
         .GetCustomAttribute<AssemblyProductAttribute>()?
-        .Product;
+        .Product ?? "PowerScheme";
 
     public static string ProductVersion { get; } = $"{GetExecutingAssembly
         .GetName()
@@ -22,5 +22,5 @@ public static class AppInfo
 
     public static string ProductGuid { get; } = GetExecutingAssembly
         .GetCustomAttribute<GuidAttribute>()?
-        .Value;
+        .Value ?? "23610885-8476-4388-afc8-bc564f6be09f";
 }
