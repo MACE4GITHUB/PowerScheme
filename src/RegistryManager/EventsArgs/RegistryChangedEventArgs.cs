@@ -11,34 +11,34 @@ public sealed class RegistryChangedEventArgs(
     : EventArgs
 {
     public RegistryChangedEventArgs(
-        RegChangeNotifyFilter regChangeNotifyFilter, 
+        RegChangeNotifyFilter regChangeNotifyFilter,
         RegistryParam registryParam) :
         this(
-            regChangeNotifyFilter, 
+            regChangeNotifyFilter,
             registryParam,
-            registryParam, 
+            registryParam,
             null)
     { }
 
     public RegistryChangedEventArgs(
-        RegChangeNotifyFilter regChangeNotifyFilter, 
-        RegistryParam registryParam, 
+        RegChangeNotifyFilter regChangeNotifyFilter,
+        RegistryParam registryParam,
         string[] subKeys) :
         this(
-            regChangeNotifyFilter, 
-            registryParam, 
-            registryParam, 
+            regChangeNotifyFilter,
+            registryParam,
+            registryParam,
             subKeys)
     { }
-        
+
     public RegistryChangedEventArgs(
-        RegChangeNotifyFilter regChangeNotifyFilter, 
-        RegistryParam previous, 
+        RegChangeNotifyFilter regChangeNotifyFilter,
+        RegistryParam previous,
         RegistryParam current) :
         this(
-            regChangeNotifyFilter, 
-            previous, 
-            current, 
+            regChangeNotifyFilter,
+            previous,
+            current,
             null)
     { }
 
