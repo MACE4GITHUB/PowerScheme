@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Win32;
 using RegistryManager.Model;
 
@@ -28,13 +29,32 @@ public static class Registry
             : Result<T>.Fail<T>("Registry Parameter is not found");
     }
 
-    public static IEnumerable<string> GetSubKeys(RegistryParam registryParam)
+    public static ICollection<string> GetSubKeys(RegistryParam registryParam)
     {
         using var regKey = GetRegistryKey(registryParam);
 
         return regKey != null
             ? regKey.GetSubKeyNames()
             : [];
+    }
+
+    public static ICollection<Guid> GetGuidSubKeys(RegistryParam registryParam)
+    {
+        var subKeys = GetSubKeys(registryParam);
+
+        if (subKeys.Count == 0)
+        {
+            return [];
+        }
+
+        return
+        [
+            .. subKeys
+                .Select(x => Guid.TryParse(x, out var guid)
+                    ? guid
+                    : Guid.Empty)
+                .Where(x => x != Guid.Empty)
+        ];
     }
 
     public static void SaveSetting(RegistryParam registryParam)

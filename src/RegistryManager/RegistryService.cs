@@ -23,7 +23,7 @@ public static class RegistryService
 
             var isPathCorrect =
                 result.Data?
-                    .Equals(Paths.ApplicationFullName, StringComparison.InvariantCultureIgnoreCase) 
+                    .Equals(Paths.ApplicationFullName, StringComparison.InvariantCultureIgnoreCase)
                 ?? false;
 
             if (!isPathCorrect)
@@ -91,7 +91,7 @@ public static class RegistryService
             DeleteSetting(registryParam);
         }
     }
-        
+
     public static int GetLidOption(Guid guid)
     {
         var result = GetSettings<int>(RegLidOption(guid));
@@ -121,13 +121,13 @@ public static class RegistryService
         return result.IsSuccess;
     }
 
-    private static IEnumerable<string> DefaultPowerSchemes => 
-        GetSubKeys(RegPowerSchemes(true));
+    private static ICollection<Guid> DefaultPowerSchemes =>
+        GetGuidSubKeys(RegPowerSchemes(true));
 
-    private static IEnumerable<string> CurrentPowerSchemes => 
-        GetSubKeys(RegPowerSchemes());
+    private static ICollection<Guid> CurrentPowerSchemes =>
+        GetGuidSubKeys(RegPowerSchemes());
 
-    public static IEnumerable<string> UserPowerSchemes =>
+    public static ICollection<Guid> UserPowerSchemes =>
         [.. CurrentPowerSchemes.Except(DefaultPowerSchemes)];
 
     public static RegistryWatcher<string> ActivePowerSchemeRegistryWatcher()
@@ -142,10 +142,10 @@ public static class RegistryService
             RegChangeNotifyFilter = RegChangeNotifyFilter.Key
         };
 
-    public static void SetHibernateOption(ResourceManager resourceManager, object value) => 
+    public static void SetHibernateOption(ResourceManager resourceManager, object value) =>
         SetRegistryValue(resourceManager, RegShowHibernateOption, value);
 
-    public static void SetSleepOption(ResourceManager resourceManager, object value) => 
+    public static void SetSleepOption(ResourceManager resourceManager, object value) =>
         SetRegistryValue(resourceManager, RegShowSleepOption, value);
 
     public static void SetAppSettings(string company, string product, object value)

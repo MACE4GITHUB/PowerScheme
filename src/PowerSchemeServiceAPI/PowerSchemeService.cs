@@ -117,7 +117,7 @@ public class PowerSchemeService : IPowerSchemeService
     }
 
     public bool ExistsAllTypicalScheme =>
-        !SettingSchemes.Where(p => !p.Value.IsNative).Select(s => s.Value.Guid.ToString())
+        !SettingSchemes.Where(p => !p.Value.IsNative).Select(s => s.Value.Guid)
             .Except(RegistryService.UserPowerSchemes).Any();
 
     private void DeleteTypicalScheme(Guid guid)
@@ -377,14 +377,14 @@ public class PowerSchemeService : IPowerSchemeService
         ActivePowerSchemeChanged?.Invoke(this, e);
     }
 
-    private static IPowerScheme NewPowerScheme(string guid)
+    private static IPowerScheme NewPowerScheme(Guid guid)
     {
         var powerSchemeParams =
             SettingSchemes
-                .Where(p => p.Value.Guid.ToString() == guid)
+                .Where(p => p.Value.Guid == guid)
                 .Select(p => p.Value).FirstOrDefault();
 
         return powerSchemeParams
-               ?? new PowerScheme(Guid.Parse(guid), false, ImageItem.Unknown);
+               ?? new PowerScheme(guid, false, ImageItem.Unknown);
     }
 }
