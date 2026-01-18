@@ -44,7 +44,7 @@ public sealed class ViewService : ApplicationContext, IViewService
         _viewModel.ClearAllMenu();
     }
 
-    private void ChangedActivePowerScheme(object sender, RegistryChangedEventArgs e)
+    private void ChangedActivePowerScheme(object? sender, RegistryChangedEventArgs e)
     {
         UpdateIcon();
     }
@@ -59,7 +59,7 @@ public sealed class ViewService : ApplicationContext, IViewService
         _viewModel.NotifyIcon.Text = activePowerScheme.Name;
     }
 
-    private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
+    private void NotifyIcon_MouseClick(object? sender, MouseEventArgs e)
     {
         if (e.Button == MouseButtons.Right)
         {

@@ -46,7 +46,7 @@ public sealed class ViewModel : IViewModel
 
     public void RemoveIcon()
     {
-        var currentIcon = NotifyIcon?.Icon;
+        var currentIcon = NotifyIcon.Icon;
 
         if (currentIcon is null)
         {
@@ -62,6 +62,6 @@ public sealed class ViewModel : IViewModel
     {
         RemoveIcon();
 
-        _components?.Dispose();
+        _components.Dispose();
     }
 }
