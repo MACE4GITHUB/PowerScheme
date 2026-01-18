@@ -40,6 +40,8 @@ public sealed class RightContextMenu(
             return;
         }
 
+        ArgumentNullException.ThrowIfNull(Power);
+
         // Unsubscribe handlers and dispose images/items deterministically.
         UnsubscribeAndDisposeItem(Items[nameof(MenuItm.StartupOnWindows)], StartWithWindowsOnClick);
         UnsubscribeAndDisposeItem(Items[nameof(MenuItm.Sleep)], SleepOnClick);
@@ -151,6 +153,8 @@ public sealed class RightContextMenu(
 
     public override void UpdateMenu()
     {
+        ArgumentNullException.ThrowIfNull(Power);
+
         CheckMenu(
             Items[nameof(MenuItm.StartupOnWindows)],
             RegistryService.IsRunOnStartup);
@@ -168,8 +172,8 @@ public sealed class RightContextMenu(
 
         if (Items[nameof(MenuItm.Settings)] is ToolStripMenuItem settingsToolStripMenuItem)
         {
-            settingsToolStripMenuItem.DropDownItems[nameof(MenuItm.DeleteTypicalSchemes)].Visible = Power.TypicalPowerSchemes.Any();
-            settingsToolStripMenuItem.DropDownItems[nameof(MenuItm.CreateTypicalSchemes)].Visible = !Power.ExistsAllTypicalScheme;
+            settingsToolStripMenuItem.DropDownItems[nameof(MenuItm.DeleteTypicalSchemes)]?.Visible = Power.TypicalPowerSchemes.Any();
+            settingsToolStripMenuItem.DropDownItems[nameof(MenuItm.CreateTypicalSchemes)]?.Visible = !Power.ExistsAllTypicalScheme;
             UpdateItemsTypicalScheme();
         }
 
@@ -178,6 +182,8 @@ public sealed class RightContextMenu(
 
     private void AddMenuItemSettings()
     {
+        ArgumentNullException.ThrowIfNull(Power);
+
         var itemDropDownSetting = new ToolStripMenuItem
         {
             Name = nameof(MenuItm.Settings),
@@ -287,6 +293,8 @@ public sealed class RightContextMenu(
 
     private void AddMenuItemHibernate()
     {
+        ArgumentNullException.ThrowIfNull(Power);
+
         if (!Power.ExistsHibernate)
         {
             return;
@@ -344,6 +352,8 @@ public sealed class RightContextMenu(
 
     private void AddMenuItemLid()
     {
+        ArgumentNullException.ThrowIfNull(Power);
+
         if (!Power.ExistsMobilePlatformRole)
         {
             return;
@@ -376,8 +386,10 @@ public sealed class RightContextMenu(
         Items.Add(item);
     }
 
-    private void LidOnClick(object sender, EventArgs e)
+    private void LidOnClick(object? sender, EventArgs e)
     {
+        ArgumentNullException.ThrowIfNull(Power);
+
         if (sender is not ToolStripMenuItem item)
         {
             return;
@@ -393,6 +405,8 @@ public sealed class RightContextMenu(
 
     private void UpdateItemsTypicalScheme()
     {
+        ArgumentNullException.ThrowIfNull(Power);
+
         if (Items[nameof(MenuItm.Settings)] is not ToolStripMenuItem settingsToolStripMenuItem)
         {
             return;
@@ -416,32 +430,40 @@ public sealed class RightContextMenu(
     }
 
 
-    private void RestoreDefaultPowerSchemesOnClick(object sender, EventArgs e)
+    private void RestoreDefaultPowerSchemesOnClick(object? sender, EventArgs e)
     {
+        ArgumentNullException.ThrowIfNull(Power);
+
         Power.RestoreDefaultPowerSchemes();
     }
 
-    private static void ItemCplSchemeOnClick(object sender, EventArgs e)
+    private static void ItemCplSchemeOnClick(object? sender, EventArgs e)
     {
         UacHelper.AttemptPrivilegeEscalation("powercfg.cpl");
     }
 
-    private void ItemCreateTypicalSchemesOnClick(object sender, EventArgs e)
+    private void ItemCreateTypicalSchemesOnClick(object? sender, EventArgs e)
     {
+        ArgumentNullException.ThrowIfNull(Power);
+
         Power.CreateTypicalSchemes();
     }
 
-    private void ItemDeleteTypicalSchemesOnClick(object sender, EventArgs e)
+    private void ItemDeleteTypicalSchemesOnClick(object? sender, EventArgs e)
     {
+        ArgumentNullException.ThrowIfNull(Power);
+
+        Power.Watchers.RaiseActionWithoutWatchers(DeleteTypicalScheme);
+
+        return;
+
         void DeleteTypicalScheme()
         {
             Power.DeleteAllTypicalScheme();
         }
-
-        Power.Watchers.RaiseActionWithoutWatchers(DeleteTypicalScheme);
     }
 
-    private static void StartWithWindowsOnClick(object sender, EventArgs e)
+    private static void StartWithWindowsOnClick(object? sender, EventArgs e)
     {
         if (!GetCheckedOption(sender, out var isChecked))
         {
@@ -451,7 +473,7 @@ public sealed class RightContextMenu(
         RegistryService.SetStartup(isChecked);
     }
 
-    private void HibernateOnClick(object sender, EventArgs e)
+    private static void HibernateOnClick(object? sender, EventArgs e)
     {
         if (!GetCheckedOption(sender, out var isChecked))
         {
@@ -462,7 +484,7 @@ public sealed class RightContextMenu(
         RegistryService.SetHibernateOption(Resources.ResourceManager, value);
     }
 
-    private void SleepOnClick(object sender, EventArgs e)
+    private static void SleepOnClick(object? sender, EventArgs e)
     {
         if (!GetCheckedOption(sender, out var isChecked))
         {
@@ -473,13 +495,15 @@ public sealed class RightContextMenu(
         RegistryService.SetSleepOption(Resources.ResourceManager, value);
     }
 
-    private static void ExitOnClick(object sender, EventArgs e)
+    private static void ExitOnClick(object? sender, EventArgs e)
     {
         Application.Exit();
     }
 
-    private void ItemMenuActionPowerOnClick(object sender, EventArgs e)
+    private void ItemMenuActionPowerOnClick(object? sender, EventArgs e)
     {
+        ArgumentNullException.ThrowIfNull(Power);
+
         if (sender is not ToolStripMenuItem menu)
         {
             return;
@@ -493,16 +517,12 @@ public sealed class RightContextMenu(
         Power.ActionPowerScheme(tag);
     }
 
-    private static bool GetCheckedOption(object sender, out bool isChecked)
+    private static bool GetCheckedOption(object? sender, out bool isChecked)
     {
         isChecked = false;
-        var menu = (ToolStripMenuItem)sender;
-        if (menu == null)
-        {
-            return false;
-        }
+        var menu = sender as ToolStripMenuItem;
 
-        if (menu.Tag is not bool b)
+        if (menu?.Tag is not bool b)
         {
             return false;
         }
@@ -521,6 +541,8 @@ public sealed class RightContextMenu(
 
     private void CheckLid()
     {
+        ArgumentNullException.ThrowIfNull(Power);
+
         if (Items[nameof(MenuItm.Lid)] is not ToolStripMenuItem lidItems)
         {
             return;
@@ -536,28 +558,32 @@ public sealed class RightContextMenu(
         var pictureName = ImageItem.Unknown;
         foreach (ToolStripMenuItem lidStripMenuItem in lidItems.DropDownItems)
         {
-            var valueTag = (int)(Lid)lidStripMenuItem.Tag;
+            var valueTag = (int)(Lid)lidStripMenuItem.Tag!;
             var @checked = valueLidOn == valueTag;
             // Uncomment if you want to change the Image style
             //lidStripMenuItem.Image = GetImage(@checked ? ImageItem.RadioOn : ImageItem.RadioOff);
             if (@checked)
             {
-                pictureName = MenuItems.Where(mi =>
-                    HasLidValue(mi, valueTag)).Select(mi => mi.Value.Picture).FirstOrDefault();
+                pictureName = MenuItems
+                    .Where(mi => HasLidValue(mi, valueTag))
+                    .Select(mi => mi.Value.Picture)
+                    .FirstOrDefault();
             }
         }
 
-        var prev = Items[nameof(MenuItm.Lid)].Image;
+        var prev = Items[nameof(MenuItm.Lid)]?.Image;
         var nextImg = GetImage(pictureName);
-        Items[nameof(MenuItm.Lid)].Image = CloneBitmap(nextImg);
+        Items[nameof(MenuItm.Lid)]?.Image = CloneBitmap(nextImg);
         prev?.Dispose();
     }
 
-    private static void CheckMenu(ToolStripItem item, bool @checked)
+    private static void CheckMenu(ToolStripItem? item, bool @checked)
     {
+        ArgumentNullException.ThrowIfNull(item);
+
         item.Tag = @checked;
 
-        var addShield = item.Name == nameof(MenuItm.Hibernate) || item.Name == nameof(MenuItm.Sleep);
+        var addShield = item.Name is nameof(MenuItm.Hibernate) or nameof(MenuItm.Sleep);
 
         var prev = item.Image;
         var next = GetImageIfCheck(@checked, addShield);
@@ -565,7 +591,7 @@ public sealed class RightContextMenu(
         prev?.Dispose();
     }
 
-    private static Bitmap GetImageIfCheck(bool @checked, bool addShield)
+    private static Bitmap? GetImageIfCheck(bool @checked, bool addShield)
     {
         var bitmap = GetImage(ImageItem.Check);
         if (!addShield)
@@ -574,7 +600,9 @@ public sealed class RightContextMenu(
         }
 
         var shield = GetImage(ImageItem.Shield);
-        return @checked ? bitmap.CopyToSquareCanvas(Color.Transparent, shield) : shield;
+        return @checked
+            ? bitmap.CopyToSquareCanvas(Color.Transparent, shield)
+            : shield;
     }
 
     protected override void Dispose(bool disposing)
@@ -589,10 +617,10 @@ public sealed class RightContextMenu(
     }
 
     // Helper: clone a potentially shared Bitmap so the caller owns disposal.
-    private static Bitmap CloneBitmap(Bitmap? src) => src is null ? null : new Bitmap(src);
+    private static Bitmap? CloneBitmap(Bitmap? src) => src is null ? null : new Bitmap(src);
 
     // Helper: unsubscribe click and dispose a ToolStripItem (if exists).
-    private static void UnsubscribeAndDisposeItem(ToolStripItem item, EventHandler handler)
+    private static void UnsubscribeAndDisposeItem(ToolStripItem? item, EventHandler handler)
     {
         if (item is null)
         {
