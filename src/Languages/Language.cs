@@ -9,7 +9,7 @@ public class Language
     public static Language GetLanguage()
     {
         var currentCulture = CultureInfo.CurrentCulture.Name;
-        
+
         if (currentCulture == "ru-RU")
         {
             return new LanguageRu();
@@ -74,7 +74,7 @@ public class Language
 
     public virtual string CreateExtremeScheme
         => "Create extreme scheme";
-        
+
     public virtual string DeleteExtremeScheme
         => "Delete extreme scheme";
 
@@ -155,5 +155,4 @@ public class Language
 
     public virtual string No
         => "No";
-
 }
