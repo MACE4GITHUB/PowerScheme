@@ -13,7 +13,7 @@ public interface IPowerScheme
     /// <summary>
     /// Gets PowerScheme Description
     /// </summary>
-    string Description { get; }
+    string? Description { get; }
 
     /// <summary>
     /// Gets true if PowerScheme is native (High, Balance, Low), otherwise false

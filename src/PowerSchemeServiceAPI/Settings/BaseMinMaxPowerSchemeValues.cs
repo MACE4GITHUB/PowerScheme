@@ -4,14 +4,14 @@ using PowerManagerAPI;
 namespace PowerSchemeServiceAPI.Settings;
 
 public abstract class BaseMinMaxPowerSchemeValues(
-    Guid powerSchemeGuid) : 
+    Guid powerSchemeGuid) :
     IApplicable
 {
-    protected virtual PowerSchemeValues MinState { get; set; }
+    protected abstract PowerSchemeValues MinState { get; }
 
-    protected virtual PowerSchemeValues MaxState { get; set; }
+    protected abstract PowerSchemeValues MaxState { get; }
 
-    protected virtual SettingSubgroup SettingSubgroup { get; }
+    protected abstract SettingSubgroup SettingSubgroup { get; }
 
     public Guid PowerSchemeGuid { get; } = powerSchemeGuid;
 
@@ -40,14 +40,14 @@ public abstract class BaseMinMaxPowerSchemeValues(
             throw new AccessViolationException(nameof(PowerSchemeGuid));
         }
 
-        if (powerSchemeValues.DCSettings >= 0)
+        if (powerSchemeValues.DcSettings >= 0)
         {
             PowerManager.SetPlanSetting(
                 PowerSchemeGuid,
                 SettingSubgroup,
                 powerSchemeValues.Setting,
                 PowerMode.DC,
-                (uint)powerSchemeValues.DCSettings
+                (uint)powerSchemeValues.DcSettings
             );
         }
     }
@@ -59,14 +59,14 @@ public abstract class BaseMinMaxPowerSchemeValues(
             throw new AccessViolationException(nameof(PowerSchemeGuid));
         }
 
-        if (powerSchemeValues.ACSettings >= 0)
+        if (powerSchemeValues.AcSettings >= 0)
         {
             PowerManager.SetPlanSetting(
                 PowerSchemeGuid,
                 SettingSubgroup,
                 powerSchemeValues.Setting,
                 PowerMode.AC,
-                (uint)powerSchemeValues.ACSettings
+                (uint)powerSchemeValues.AcSettings
             );
         }
     }

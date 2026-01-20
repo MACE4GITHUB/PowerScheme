@@ -141,7 +141,7 @@ public class PowerSchemeService : IPowerSchemeService
         var activeScheme = ActivePowerScheme;
 
         var listGuid = PowerSchemes.Select(p => p.Guid);
-        var powerSchemeDcAcValues = new PowerSchemeDCACValues(value, value);
+        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
 
         foreach (var guid in listGuid)
         {
@@ -239,7 +239,7 @@ public class PowerSchemeService : IPowerSchemeService
 
     }
 
-    public StatePowerScheme StatePowerSchemeToggle(StatePowerScheme statePowerScheme)
+    public StatePowerScheme? StatePowerSchemeToggle(StatePowerScheme statePowerScheme)
     {
         var guid = statePowerScheme.PowerScheme.Guid;
 
@@ -287,7 +287,11 @@ public class PowerSchemeService : IPowerSchemeService
     public void ActionPowerScheme(StatePowerScheme statePowerScheme)
     {
         var guid = statePowerScheme.PowerScheme.Guid;
-        var value = (ActionWithPowerScheme)statePowerScheme.Value;
+
+        if (statePowerScheme.Value is not ActionWithPowerScheme value)
+        {
+            throw new ArgumentOutOfRangeException(nameof(statePowerScheme));
+        }
 
         if (guid == SettingSchemes[SettingScheme.Stable].Guid)
         {
@@ -342,10 +346,14 @@ public class PowerSchemeService : IPowerSchemeService
                 : Language.Current.CreateExtremeScheme;
         }
 
-        return null;
+        return string.Empty;
     }
 
-    private static void CreateTypicalPowerScheme(Guid source, Guid destination, string name, string description = null)
+    private static void CreateTypicalPowerScheme(
+        Guid source,
+        Guid destination,
+        string name,
+        string? description = null)
     {
         var isExistsTypicalPowerScheme = ExistsTypicalPowerScheme(destination);
         if (isExistsTypicalPowerScheme)
@@ -370,7 +378,7 @@ public class PowerSchemeService : IPowerSchemeService
 
     public Watchers Watchers { get; } = new();
 
-    public event EventHandler<PowerSchemeEventArgs> ActivePowerSchemeChanged;
+    public event EventHandler<PowerSchemeEventArgs>? ActivePowerSchemeChanged;
 
     private void OnActivePowerSchemeChanged(PowerSchemeEventArgs e)
     {

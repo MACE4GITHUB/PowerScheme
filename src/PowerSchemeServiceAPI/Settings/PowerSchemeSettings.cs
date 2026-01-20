@@ -12,20 +12,20 @@ internal class PowerSchemeSettings(SettingScheme settingScheme)
             .Where(p => p.Key == settingScheme)
             .Select(p => p.Value.Guid).FirstOrDefault();
 
-    public PowerSchemeProcessorThrottle ProcessorThrottle(Values values) =>
+    public PowerSchemeProcessorThrottle ProcessorThrottle(RangeValues values) =>
         new(PowerSchemeGuid, values.MinState, values.MaxState);
 
-    public PowerSchemeSleep Sleep(Values values) => new(PowerSchemeGuid, values.State);
+    public PowerSchemeSleep Sleep(StateValues values) => new(PowerSchemeGuid, values.State);
 
-    public PowerSchemeTurnOffDisplay TurnOffDisplay(Values values) => new(PowerSchemeGuid, values.State);
+    public PowerSchemeTurnOffDisplay TurnOffDisplay(StateValues values) => new(PowerSchemeGuid, values.State);
 
-    public PowerSchemeWiFi WiFi(Values values) => new(PowerSchemeGuid, values.State);
+    public PowerSchemeWiFi WiFi(StateValues values) => new(PowerSchemeGuid, values.State);
 
-    public PowerSchemeMultimediaPlay MultimediaPlay(Values values) => new(PowerSchemeGuid, values.State);
+    public PowerSchemeMultimediaPlay MultimediaPlay(StateValues values) => new(PowerSchemeGuid, values.State);
 
-    public PowerSchemeMultimediaShare MultimediaShare(Values values) => new(PowerSchemeGuid, values.State);
+    public PowerSchemeMultimediaShare MultimediaShare(StateValues values) => new(PowerSchemeGuid, values.State);
 
-    public PowerSchemeMultimediaQuality MultimediaQuality(Values values) => new(PowerSchemeGuid, values.State);
+    public PowerSchemeMultimediaQuality MultimediaQuality(StateValues values) => new(PowerSchemeGuid, values.State);
 
     public void ApplyDefaultValues()
     {
@@ -35,7 +35,7 @@ internal class PowerSchemeSettings(SettingScheme settingScheme)
         var typeSetting = typeof(PowerSchemeSetting);
         foreach (var name in Enum.GetNames(typeSetting))
         {
-            var set = Enum.Parse<PowerSchemeSetting>(name);
+            var set = (PowerSchemeSetting)Enum.Parse(typeof(PowerSchemeSetting), name);
             var mi = typeof(PowerSchemeSettings).GetMethod(name, BindingFlags.Instance | BindingFlags.Public);
             var res = mi?.Invoke(this, [ds[set]]);
             var applicable = res as IApplicable;
@@ -47,7 +47,6 @@ internal class PowerSchemeSettings(SettingScheme settingScheme)
             {
                 // Do nothing. Setting is not exists.
             }
-
         }
     }
 }
@@ -67,14 +66,14 @@ internal class PowerSchemeDefaultSettings
 
         Settings = new Dictionary<PowerSchemeSetting, Values>
         {
-            {PowerSchemeSetting.ProcessorThrottle, new Values( new PowerSchemeDCACValues(defaultSetting[PowerSchemeSetting.ProcessorThrottle][0], defaultSetting[PowerSchemeSetting.ProcessorThrottle][1]),
-                new PowerSchemeDCACValues(defaultSetting[PowerSchemeSetting.ProcessorThrottle][2], defaultSetting[PowerSchemeSetting.ProcessorThrottle][3]))},
-            {PowerSchemeSetting.TurnOffDisplay, new Values( new PowerSchemeDCACValues(defaultSetting[PowerSchemeSetting.TurnOffDisplay][0], defaultSetting[PowerSchemeSetting.TurnOffDisplay][1]))},
-            {PowerSchemeSetting.Sleep, new Values( new PowerSchemeDCACValues(defaultSetting[PowerSchemeSetting.Sleep][0], defaultSetting[PowerSchemeSetting.Sleep][1]))},
-            {PowerSchemeSetting.WiFi, new Values( new PowerSchemeDCACValues(defaultSetting[PowerSchemeSetting.WiFi][0], defaultSetting[PowerSchemeSetting.WiFi][1]))},
-            {PowerSchemeSetting.MultimediaPlay, new Values( new PowerSchemeDCACValues(defaultSetting[PowerSchemeSetting.MultimediaPlay][0], defaultSetting[PowerSchemeSetting.MultimediaPlay][1]))},
-            {PowerSchemeSetting.MultimediaShare, new Values( new PowerSchemeDCACValues(defaultSetting[PowerSchemeSetting.MultimediaShare][0], defaultSetting[PowerSchemeSetting.MultimediaShare][1]))},
-            {PowerSchemeSetting.MultimediaQuality, new Values( new PowerSchemeDCACValues(defaultSetting[PowerSchemeSetting.MultimediaQuality][0], defaultSetting[PowerSchemeSetting.MultimediaQuality][1]))}
+            {PowerSchemeSetting.ProcessorThrottle, new RangeValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.ProcessorThrottle][0], defaultSetting[PowerSchemeSetting.ProcessorThrottle][1]),
+                new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.ProcessorThrottle][2], defaultSetting[PowerSchemeSetting.ProcessorThrottle][3]))},
+            {PowerSchemeSetting.TurnOffDisplay, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.TurnOffDisplay][0], defaultSetting[PowerSchemeSetting.TurnOffDisplay][1]))},
+            {PowerSchemeSetting.Sleep, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.Sleep][0], defaultSetting[PowerSchemeSetting.Sleep][1]))},
+            {PowerSchemeSetting.WiFi, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.WiFi][0], defaultSetting[PowerSchemeSetting.WiFi][1]))},
+            {PowerSchemeSetting.MultimediaPlay, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.MultimediaPlay][0], defaultSetting[PowerSchemeSetting.MultimediaPlay][1]))},
+            {PowerSchemeSetting.MultimediaShare, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.MultimediaShare][0], defaultSetting[PowerSchemeSetting.MultimediaShare][1]))},
+            {PowerSchemeSetting.MultimediaQuality, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.MultimediaQuality][0], defaultSetting[PowerSchemeSetting.MultimediaQuality][1]))}
         };
     }
 
@@ -129,24 +128,20 @@ internal class PowerSchemeDefaultSettings
         };
 }
 
-public class Values
+public class Values();
+
+public class StateValues(PowerSchemeDcAcValues state): Values
 {
-    public Values(PowerSchemeDCACValues state)
-    {
-        State = state;
-    }
+    public PowerSchemeDcAcValues State { get; } = state;
+}
 
-    public Values(PowerSchemeDCACValues minState, PowerSchemeDCACValues maxState)
-    {
-        MinState = minState;
-        MaxState = maxState;
-    }
+public class RangeValues(
+    PowerSchemeDcAcValues minState,
+    PowerSchemeDcAcValues maxState) : Values
+{
+    public PowerSchemeDcAcValues MinState { get; } = minState;
 
-    public PowerSchemeDCACValues State { get; }
-
-    public PowerSchemeDCACValues MinState { get; }
-
-    public PowerSchemeDCACValues MaxState { get; }
+    public PowerSchemeDcAcValues MaxState { get; } = maxState;
 }
 
 public enum PowerSchemeSetting

@@ -42,7 +42,7 @@ public interface IPowerSchemeService
 
     string TextActionToggle(StatePowerScheme statePowerScheme);
 
-    StatePowerScheme StatePowerSchemeToggle(StatePowerScheme statePowerScheme);
+    StatePowerScheme? StatePowerSchemeToggle(StatePowerScheme statePowerScheme);
 
     void ActionPowerScheme(StatePowerScheme statePowerScheme);
 

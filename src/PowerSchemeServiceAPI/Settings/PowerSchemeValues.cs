@@ -2,13 +2,11 @@
 
 namespace PowerSchemeServiceAPI.Settings;
 
-public class PowerSchemeValues : PowerSchemeDCACValues
+public class PowerSchemeValues(
+    Setting setting,
+    int dCSettings,
+    int aCSettings) :
+    PowerSchemeDcAcValues(dCSettings, aCSettings)
 {
-    public PowerSchemeValues(Setting setting, int dCSettings, int aCSettings) : 
-        base(dCSettings, aCSettings)
-    {
-        Setting = setting;
-    }
-
-    public Setting Setting { get; }
+    public Setting Setting { get; } = setting;
 }

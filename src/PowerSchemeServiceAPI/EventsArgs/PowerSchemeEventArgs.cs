@@ -9,3 +9,4 @@ public class PowerSchemeEventArgs(
 {
     public IPowerScheme PowerScheme { get; } = powerScheme;
 }
+

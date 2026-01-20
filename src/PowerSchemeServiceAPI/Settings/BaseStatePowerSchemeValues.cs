@@ -7,9 +7,9 @@ public abstract class BaseStatePowerSchemeValues(
     Guid powerSchemeGuid) :
     IApplicable
 {
-    protected virtual PowerSchemeValues State { get; }
+    protected abstract PowerSchemeValues State { get; }
 
-    protected virtual SettingSubgroup SettingSubgroup { get; }
+    protected abstract SettingSubgroup SettingSubgroup { get; }
 
     public Guid PowerSchemeGuid { get; } = powerSchemeGuid;
 
@@ -31,7 +31,7 @@ public abstract class BaseStatePowerSchemeValues(
 
     private void ApplyDcValues(PowerSchemeValues powerSchemeValues)
     {
-        if (powerSchemeValues.DCSettings == -1)
+        if (powerSchemeValues.DcSettings == -1)
         {
             return;
         }
@@ -41,21 +41,21 @@ public abstract class BaseStatePowerSchemeValues(
             throw new AccessViolationException(nameof(PowerSchemeGuid));
         }
 
-        if (powerSchemeValues.DCSettings >= 0)
+        if (powerSchemeValues.DcSettings >= 0)
         {
             PowerManager.SetPlanSetting(
                 PowerSchemeGuid,
                 SettingSubgroup,
                 powerSchemeValues.Setting,
                 PowerMode.DC,
-                (uint)powerSchemeValues.DCSettings
+                (uint)powerSchemeValues.DcSettings
             );
         }
     }
 
     private void ApplyAcValues(PowerSchemeValues powerSchemeValues)
     {
-        if (powerSchemeValues.ACSettings == -1)
+        if (powerSchemeValues.AcSettings == -1)
         {
             return;
         }
@@ -65,14 +65,14 @@ public abstract class BaseStatePowerSchemeValues(
             throw new AccessViolationException(nameof(PowerSchemeGuid));
         }
 
-        if (powerSchemeValues.ACSettings >= 0)
+        if (powerSchemeValues.AcSettings >= 0)
         {
             PowerManager.SetPlanSetting(
                 PowerSchemeGuid,
                 SettingSubgroup,
                 powerSchemeValues.Setting,
                 PowerMode.AC,
-                (uint)powerSchemeValues.ACSettings
+                (uint)powerSchemeValues.AcSettings
             );
         }
     }

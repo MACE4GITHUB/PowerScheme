@@ -5,11 +5,11 @@ namespace PowerSchemeServiceAPI.Model;
 
 public class Watchers
 {
-    public IRegistryWatcher ActivePowerScheme
-    { get; } = RegistryService.ActivePowerSchemeRegistryWatcher();
+    public IRegistryWatcher ActivePowerScheme { get; } =
+        RegistryService.ActivePowerSchemeRegistryWatcher();
 
-    public IRegistryWatcher PowerSchemes
-    { get; } = RegistryService.PowerSchemesRegistryWatcher();
+    public IRegistryWatcher PowerSchemes { get; } =
+        RegistryService.PowerSchemesRegistryWatcher();
 
     public void Start()
     {
@@ -55,5 +55,4 @@ public class Watchers
             PowerSchemes.Start();
         }
     }
-
 }

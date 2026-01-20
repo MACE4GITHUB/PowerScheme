@@ -2,9 +2,9 @@
 
 public class StatePowerScheme(
     IPowerScheme powerScheme,
-    object value = null)
+    object? value = null)
 {
     public IPowerScheme PowerScheme { get; } = powerScheme;
 
-    public object Value { get; } = value;
+    public object? Value { get; } = value;
 }

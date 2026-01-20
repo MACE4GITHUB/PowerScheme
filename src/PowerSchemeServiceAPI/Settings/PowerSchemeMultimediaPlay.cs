@@ -1,22 +1,18 @@
-﻿using PowerManagerAPI;
-using System;
+﻿using System;
+using PowerManagerAPI;
 
 namespace PowerSchemeServiceAPI.Settings;
 
-public class PowerSchemeMultimediaPlay : BaseStatePowerSchemeValues
+public class PowerSchemeMultimediaPlay(
+    Guid powerSchemeGuid,
+    PowerSchemeDcAcValues dcAcValues) :
+    BaseStatePowerSchemeValues(powerSchemeGuid)
 {
-    private readonly PowerSchemeDCACValues _DCACValues;
+    protected override SettingSubgroup SettingSubgroup =>
+        SettingSubgroup.MULTIMEDIA_SUBGROUP;
 
-    public PowerSchemeMultimediaPlay(Guid powerSchemeGuid, PowerSchemeDCACValues DCACValues) : base(powerSchemeGuid)
-    {
-        _DCACValues = DCACValues;
-    }
-    protected override SettingSubgroup SettingSubgroup
-        => SettingSubgroup.MULTIMEDIA_SUBGROUP;
-
-    protected override PowerSchemeValues State
-        => new(
+    protected override PowerSchemeValues State => new(
             Setting.MULTPLAY,
-            _DCACValues.DCSettings,
-            _DCACValues.ACSettings);
+            dcAcValues.DcSettings,
+            dcAcValues.AcSettings);
 }

@@ -12,9 +12,9 @@ public class PowerScheme(
     bool isMaxPerformance = false) :
     IPowerScheme
 {
-    public string Name { get; } = PowerManager.GetPlanName(guid);
+    public string Name { get; } = PowerManager.GetPlanName(guid) ?? string.Empty;
 
-    public string Description { get; } = PowerManager.GetPlanDescription(guid);
+    public string? Description { get; } = PowerManager.GetPlanDescription(guid);
 
     public bool IsNative { get; } = isNative;
 

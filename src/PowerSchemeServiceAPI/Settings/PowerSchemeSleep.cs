@@ -3,21 +3,16 @@ using PowerManagerAPI;
 
 namespace PowerSchemeServiceAPI.Settings;
 
-public class PowerSchemeSleep: BaseStatePowerSchemeValues
+public class PowerSchemeSleep(
+    Guid powerSchemeGuid,
+    PowerSchemeDcAcValues dcAcValues) :
+    BaseStatePowerSchemeValues(powerSchemeGuid)
 {
-    private readonly PowerSchemeDCACValues _DCACValues;
+    protected override PowerSchemeValues State => new(
+            Setting.STANDBYIDLE,
+            dcAcValues.DcSettings,
+            dcAcValues.AcSettings);
 
-    public PowerSchemeSleep(Guid powerSchemeGuid, PowerSchemeDCACValues DCACValues) : base(powerSchemeGuid)
-    {
-        _DCACValues = DCACValues;
-    }
-
-    protected override PowerSchemeValues State 
-        => new(
-            Setting.STANDBYIDLE, 
-            _DCACValues.DCSettings, 
-            _DCACValues.ACSettings);
-
-    protected override SettingSubgroup SettingSubgroup
-        => SettingSubgroup.SLEEP_SUBGROUP;
+    protected override SettingSubgroup SettingSubgroup =>
+        SettingSubgroup.SLEEP_SUBGROUP;
 }

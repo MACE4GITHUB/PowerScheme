@@ -1,14 +1,8 @@
 ﻿namespace PowerSchemeServiceAPI.Settings;
 
-public class PowerSchemeDCACValues
+public class PowerSchemeDcAcValues(int dCSettings, int aCSettings)
 {
-    public PowerSchemeDCACValues(int dCSettings, int aCSettings)
-    {
-        DCSettings = dCSettings;
-        ACSettings = aCSettings;
-    }
+    public virtual int DcSettings { get; } = dCSettings;
 
-    public virtual int DCSettings { get; }
-
-    public virtual int ACSettings { get; }
+    public virtual int AcSettings { get; } = aCSettings;
 }

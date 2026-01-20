@@ -3,24 +3,18 @@ using PowerManagerAPI;
 
 namespace PowerSchemeServiceAPI.Settings;
 
-public class PowerSchemeProcessorThrottle : BaseMinMaxPowerSchemeValues
+public class PowerSchemeProcessorThrottle(
+    Guid guid,
+    PowerSchemeDcAcValues minState,
+    PowerSchemeDcAcValues maxState) :
+    BaseMinMaxPowerSchemeValues(guid)
 {
-    private readonly PowerSchemeDCACValues _minState;
-    private readonly PowerSchemeDCACValues _maxState;
+    protected override PowerSchemeValues MinState =>
+        new(Setting.PROCTHROTTLEMIN, minState.DcSettings, minState.AcSettings);
 
-    public PowerSchemeProcessorThrottle(Guid guid, PowerSchemeDCACValues minState, PowerSchemeDCACValues maxState) :
-        base(guid)
-    {
-        _minState = minState;
-        _maxState = maxState;
-    }
+    protected override PowerSchemeValues MaxState =>
+        new(Setting.PROCTHROTTLEMAX, maxState.DcSettings, maxState.AcSettings);
 
-    protected override PowerSchemeValues MinState
-        => new(Setting.PROCTHROTTLEMIN, _minState.DCSettings, _minState.ACSettings);  
-
-    protected override PowerSchemeValues MaxState
-        => new(Setting.PROCTHROTTLEMAX, _maxState.DCSettings, _maxState.ACSettings); 
-
-    protected override SettingSubgroup SettingSubgroup
-        => SettingSubgroup.PROCESSOR_SETTINGS_SUBGROUP;
+    protected override SettingSubgroup SettingSubgroup =>
+        SettingSubgroup.PROCESSOR_SETTINGS_SUBGROUP;
 }
