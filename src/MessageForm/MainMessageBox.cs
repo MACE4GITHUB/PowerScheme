@@ -1,7 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static MessageForm.DialogResultScheme;
 
@@ -27,6 +26,11 @@ public partial class MainMessageBox : Form, IMainMessageBox
         _labelTimerTick.Text = "";
 
         _owner = new WindowWrapper(Handle);
+
+        Font = new Font(new FontFamily("Microsoft Sans Serif"),
+            8.25f,
+            FontStyle.Regular,
+            GraphicsUnit.Point);
     }
 
     public DialogResult Show(
@@ -220,29 +224,53 @@ public partial class MainMessageBox : Form, IMainMessageBox
 
     private void SetSizeMessageBox()
     {
+        const int MAX_STRING_LENGTH = 40;
+        const int MIN_LINE_COUNT = 10;
+
         var message = _lblMessage.Text;
 
-        var height = 125;
+        var messageLength = _lblMessage.Text.Length > MAX_STRING_LENGTH
+            ? MAX_STRING_LENGTH
+            : _lblMessage.Text.Length;
 
-        var scale = DeviceDpi / 96f;
+        var measureSize = TextRenderer.MeasureText("W", Font);
+        var sHeight = measureSize.Height;
+        var width = messageLength * sHeight;
 
-        SizeF size = TextRenderer.MeasureText("W",
-            new Font(new FontFamily("Microsoft Sans Serif"),
-            8.25f,
-            0,
-            (GraphicsUnit)3));
-        var sHeight = (int)(size.Height * scale);
-        var sWidth = (int)(_lblMessage.Width / size.Width * 3);
-
-        var groups = (from Match m in Regex.Matches(message, ".{1," + sWidth + "}") select m.Value).ToArray();
-        var groupsInline = (from Match m in MyRegex().Matches(message) select m.Value).ToArray();
-        var lines = groups.Length + 1;
-        var fHeight = sHeight * groupsInline.Length;
-
-        height += (int)(((sHeight * lines) + fHeight) * scale);
-        var width = (int)(350 * scale);
+        var countLines = CountSplitByWidth(message, messageLength);
+        var countEmptyLines = CountEmptyLines(message);
+        var height = sHeight * (MIN_LINE_COUNT + countLines + countEmptyLines);
 
         Size = new Size(width, height);
+    }
+
+    private static int CountSplitByWidth(string text, int width)
+    {
+        if (string.IsNullOrEmpty(text))
+            return 0;
+
+        var result = new List<string>((text.Length / width) + 1);
+
+        for (var i = 0; i < text.Length; i += width)
+        {
+            var len = Math.Min(width, text.Length - i);
+            result.Add(text.Substring(i, len));
+        }
+
+        return result.Count;
+    }
+
+    private static int CountEmptyLines(string text)
+    {
+        var count = 0;
+
+        for (var i = 0; i < text.Length - 1; i++)
+        {
+            if (text[i] == '\n' && text[i + 1] == '\n')
+                count++;
+        }
+
+        return count;
     }
 
     private void AddButton(DialogResult buttonDialogResult, bool isDefault = false)
@@ -312,7 +340,4 @@ public partial class MainMessageBox : Form, IMainMessageBox
         _timer?.Tick -= TimerOnTick;
         _timer?.Dispose();
     }
-
-    [GeneratedRegex("\n\n{1,1}")]
-    private static partial Regex MyRegex();
 }
