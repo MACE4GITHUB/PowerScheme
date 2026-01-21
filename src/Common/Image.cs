@@ -16,7 +16,10 @@ public static class Image
         IconSize iconSize,
         Bitmap? addingBitmap = null)
     {
-        ArgumentNullException.ThrowIfNull(sourceBitmap);
+        if (sourceBitmap == null)
+        {
+            throw new ArgumentNullException(nameof(sourceBitmap));
+        }
 
         // Create a squared and resized thumbnail as managed Bitmaps and dispose them deterministically.
         using var squareCanvas = sourceBitmap.CopyToSquareCanvas(Color.Transparent, addingBitmap);
@@ -50,7 +53,10 @@ public static class Image
         Color canvasBackground,
         Bitmap? addingBitmap = null)
     {
-        ArgumentNullException.ThrowIfNull(sourceBitmap);
+        if (sourceBitmap == null)
+        {
+            throw new ArgumentNullException(nameof(sourceBitmap));
+        }
 
         var maxSide = Math.Max(sourceBitmap.Width, sourceBitmap.Height);
 

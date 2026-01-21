@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 using MessageForm;
@@ -19,12 +18,6 @@ internal static class Program
     {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-        Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
-        Application.SetDefaultFont(
-            new Font(new FontFamily("Microsoft Sans Serif"),
-            8.25f,
-            0,
-            (GraphicsUnit)3));
 
         using (var entry = new EntryService(
                    DiRoot.GetService<IPowerSchemeService>(),

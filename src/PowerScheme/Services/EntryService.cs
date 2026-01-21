@@ -72,16 +72,20 @@ internal sealed class EntryService : IDisposable
 
     private EntryService ValidateAdmin()
     {
+        if (_power == null)
+        {
+            throw new ArgumentNullException(nameof(_power));
+        }
+
         if (!IsValidateAdmin)
         {
             return this;
         }
 
-        ArgumentNullException.ThrowIfNull(_power);
-
         var executorMainService = new ExecutorRunAsService($"{Role.Admin} {AttributeFile.Normal}");
 
         var isNeedAdminAccess = _power.IsNeedAdminAccessForChangePowerScheme;
+
         if (isNeedAdminAccess)
         {
             if (_args.Length == 1)
@@ -97,6 +101,7 @@ internal sealed class EntryService : IDisposable
             }
 
             executorMainService.Execute();
+
             Environment.Exit(0);
         }
         else
@@ -108,9 +113,13 @@ internal sealed class EntryService : IDisposable
 
         void ExitBecauseNotAdmin()
         {
-            _messageBox.Show(Language.Current.CannotGetAdministratorRights,
-                Language.Current.Error, MessageBoxButtons.OK, MessageBoxIcon.Error,
-                isApplicationExit: true, timeout: 15);
+            _messageBox.Show(
+                Language.Current.CannotGetAdministratorRights,
+                Language.Current.Error,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error,
+                isApplicationExit: true,
+                timeout: 15);
         }
     }
 
@@ -137,13 +146,21 @@ internal sealed class EntryService : IDisposable
 
     private void ShowFirstStartDialog()
     {
-        var result = _messageBox.Show(Language.Current.FirstStartDescription, Language.Current.FirstStartCaption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+        if (_power == null)
+        {
+            throw new ArgumentNullException(nameof(_power));
+        }
+
+        var result = _messageBox.Show(
+            Language.Current.FirstStartDescription,
+            Language.Current.FirstStartCaption,
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question);
+
         if (result != DialogResult.Yes)
         {
             return;
         }
-
-        ArgumentNullException.ThrowIfNull(_power);
 
         _power.CreateTypicalSchemes();
     }
@@ -158,8 +175,11 @@ internal sealed class EntryService : IDisposable
             return;
         }
 
-        _messageBox.Show(Language.Current.AlreadyRunning,
-            Language.Current.Information, isApplicationExit: true, timeout: 5);
+        _messageBox.Show(
+            Language.Current.AlreadyRunning,
+            Language.Current.Information,
+            isApplicationExit: true,
+            timeout: 5);
     }
 
     private EntryService ValidateOnceApplication()

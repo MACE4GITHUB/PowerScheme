@@ -35,12 +35,15 @@ public sealed class RightContextMenu(
 
     public override void ClearMenu()
     {
+        if (Power == null)
+        {
+            throw new ArgumentNullException(nameof(Power));
+        }
+
         if (Items.Count <= 0)
         {
             return;
         }
-
-        ArgumentNullException.ThrowIfNull(Power);
 
         // Unsubscribe handlers and dispose images/items deterministically.
         UnsubscribeAndDisposeItem(Items[nameof(MenuItm.StartupOnWindows)], StartWithWindowsOnClick);
@@ -153,7 +156,10 @@ public sealed class RightContextMenu(
 
     public override void UpdateMenu()
     {
-        ArgumentNullException.ThrowIfNull(Power);
+        if (Power == null)
+        {
+            throw new ArgumentNullException(nameof(Power));
+        }
 
         CheckMenu(
             Items[nameof(MenuItm.StartupOnWindows)],
@@ -182,7 +188,10 @@ public sealed class RightContextMenu(
 
     private void AddMenuItemSettings()
     {
-        ArgumentNullException.ThrowIfNull(Power);
+        if (Power == null)
+        {
+            throw new ArgumentNullException(nameof(Power));
+        }
 
         var itemDropDownSetting = new ToolStripMenuItem
         {
@@ -293,7 +302,10 @@ public sealed class RightContextMenu(
 
     private void AddMenuItemHibernate()
     {
-        ArgumentNullException.ThrowIfNull(Power);
+        if (Power == null)
+        {
+            throw new ArgumentNullException(nameof(Power));
+        }
 
         if (!Power.ExistsHibernate)
         {
@@ -352,7 +364,10 @@ public sealed class RightContextMenu(
 
     private void AddMenuItemLid()
     {
-        ArgumentNullException.ThrowIfNull(Power);
+        if (Power == null)
+        {
+            throw new ArgumentNullException(nameof(Power));
+        }
 
         if (!Power.ExistsMobilePlatformRole)
         {
@@ -388,7 +403,10 @@ public sealed class RightContextMenu(
 
     private void LidOnClick(object? sender, EventArgs e)
     {
-        ArgumentNullException.ThrowIfNull(Power);
+        if (Power == null)
+        {
+            throw new ArgumentNullException(nameof(Power));
+        }
 
         if (sender is not ToolStripMenuItem item)
         {
@@ -405,7 +423,10 @@ public sealed class RightContextMenu(
 
     private void UpdateItemsTypicalScheme()
     {
-        ArgumentNullException.ThrowIfNull(Power);
+        if (Power == null)
+        {
+            throw new ArgumentNullException(nameof(Power));
+        }
 
         if (Items[nameof(MenuItm.Settings)] is not ToolStripMenuItem settingsToolStripMenuItem)
         {
@@ -432,7 +453,10 @@ public sealed class RightContextMenu(
 
     private void RestoreDefaultPowerSchemesOnClick(object? sender, EventArgs e)
     {
-        ArgumentNullException.ThrowIfNull(Power);
+        if (Power == null)
+        {
+            throw new ArgumentNullException(nameof(Power));
+        }
 
         Power.RestoreDefaultPowerSchemes();
     }
@@ -444,14 +468,20 @@ public sealed class RightContextMenu(
 
     private void ItemCreateTypicalSchemesOnClick(object? sender, EventArgs e)
     {
-        ArgumentNullException.ThrowIfNull(Power);
+        if (Power == null)
+        {
+            throw new ArgumentNullException(nameof(Power));
+        }
 
         Power.CreateTypicalSchemes();
     }
 
     private void ItemDeleteTypicalSchemesOnClick(object? sender, EventArgs e)
     {
-        ArgumentNullException.ThrowIfNull(Power);
+        if (Power == null)
+        {
+            throw new ArgumentNullException(nameof(Power));
+        }
 
         Power.Watchers.RaiseActionWithoutWatchers(DeleteTypicalScheme);
 
@@ -502,7 +532,10 @@ public sealed class RightContextMenu(
 
     private void ItemMenuActionPowerOnClick(object? sender, EventArgs e)
     {
-        ArgumentNullException.ThrowIfNull(Power);
+        if (Power == null)
+        {
+            throw new ArgumentNullException(nameof(Power));
+        }
 
         if (sender is not ToolStripMenuItem menu)
         {
@@ -541,7 +574,10 @@ public sealed class RightContextMenu(
 
     private void CheckLid()
     {
-        ArgumentNullException.ThrowIfNull(Power);
+        if (Power == null)
+        {
+            throw new ArgumentNullException(nameof(Power));
+        }
 
         if (Items[nameof(MenuItm.Lid)] is not ToolStripMenuItem lidItems)
         {
@@ -579,7 +615,10 @@ public sealed class RightContextMenu(
 
     private static void CheckMenu(ToolStripItem? item, bool @checked)
     {
-        ArgumentNullException.ThrowIfNull(item);
+        if (item == null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
 
         item.Tag = @checked;
 

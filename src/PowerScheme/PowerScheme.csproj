@@ -2,12 +2,11 @@
 
 	<PropertyGroup>
 		<Nullable>enable</Nullable>
-		<TargetFramework>net10.0-windows</TargetFramework>
+		<TargetFramework>net48</TargetFramework>
+		<LangVersion>14</LangVersion>
 		<UseWindowsForms>true</UseWindowsForms>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<OutputType>WinExe</OutputType>
-		<PublishSingleFile>true</PublishSingleFile>
-		<SelfContained>false</SelfContained>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<RootNamespace>PowerScheme</RootNamespace>
 		<AssemblyName>PowerScheme</AssemblyName>

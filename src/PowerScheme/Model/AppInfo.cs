@@ -6,7 +6,7 @@ namespace PowerScheme.Model;
 public static class AppInfo
 {
     private static Assembly GetExecutingAssembly { get; } =
-        Assembly.GetExecutingAssembly();
+        typeof(Program).Assembly;
 
     public static string CompanyName { get; } = GetExecutingAssembly
         .GetCustomAttribute<AssemblyCompanyAttribute>()?
