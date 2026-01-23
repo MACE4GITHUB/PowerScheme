@@ -1,0 +1,70 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<TargetFramework>net48</TargetFramework>
+		<LangVersion>14</LangVersion>
+		<UseWindowsForms>true</UseWindowsForms>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<OutputType>WinExe</OutputType>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<RootNamespace>PowerScheme</RootNamespace>
+		<AssemblyName>PowerScheme</AssemblyName>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<Deterministic>false</Deterministic>
+		<StartupObject>PowerScheme.Program</StartupObject>
+		<ApplicationIcon>Resources\Start.ico</ApplicationIcon>
+		<PreBuildEvent>
+			taskkill /fi "pid gt 0" /im PowerScheme.exe
+			taskkill /f /fi "pid gt 0" /im PowerScheme.exe
+			EXIT 0
+		</PreBuildEvent>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);CA1416;NU1702;</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Common\Common.csproj" />
+		<ProjectReference Include="..\Languages\Languages.csproj" />
+		<ProjectReference Include="..\MessageForm\MessageForm.csproj" />
+		<ProjectReference Include="..\PowerSchemeServiceAPI\PowerSchemeServiceAPI.csproj" />
+		<ProjectReference Include="..\RegistryManager\RegistryManager.csproj" />
+		<ProjectReference Include="..\RunAs.Common\RunAs.Common.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="Resources\Add.png" />
+		<Content Include="Resources\Balance.png" />
+		<None Include="Resources\Check.png" />
+		<None Include="Resources\Delete.png" />
+		<None Include="Resources\Hibernate.png" />
+		<None Include="Resources\Extreme.png" />
+		<Content Include="Resources\Low.png" />
+		<None Include="Resources\Media.png" />
+		<None Include="Resources\Restore.png" />
+		<None Include="Resources\Stable.png" />
+		<None Include="Resources\Panel.png" />
+		<None Include="Resources\Simple.png" />
+		<None Include="Resources\RadioOff.png" />
+		<None Include="Resources\RadioOn.png" />
+		<None Include="Resources\Nothing.png" />
+		<Content Include="Resources\RegWriter.exe" />
+		<None Include="Resources\RunAs.exe" />
+		<None Include="Resources\Shutdown.png" />
+		<None Include="Resources\Sleep.png" />
+		<Content Include="Resources\Shield.png" />
+		<Content Include="Resources\Start.ico" />
+		<None Include="Resources\Unknown.png" />
+		<Content Include="Resources\Stop.png" />
+		<None Include="Resources\Ultimate.png" />
+		<Content Include="Start.ico" />
+	</ItemGroup>
+
+</Project>

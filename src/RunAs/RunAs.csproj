@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<OutputType>exe</OutputType>
+		<TargetFramework>net48</TargetFramework>
+		<LangVersion>14.0</LangVersion>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);CA1416;NU1702;</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\RunAs.Common\RunAs.Common.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.44.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<Target Name="ILRepacker" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+		<ItemGroup>
+			<InputAssemblies Include="$(TargetPath)"/>
+		</ItemGroup>
+
+		<ILRepack
+			AllowDuplicateResources="false"
+			DebugInfo="false"
+			Internalize="false"
+			InputAssemblies="@(InputAssemblies)"
+			OutputFile="$(TargetPath)"
+			Parallel="true"
+			TargetKind="SameAsPrimaryAssembly" />
+
+	</Target>
+
+</Project>

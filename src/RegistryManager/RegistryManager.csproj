@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<TargetFramework>net48</TargetFramework>
+		<LangVersion>14.0</LangVersion>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);CA1416;CA2101;SYSLIB1054</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\PowerManagerAPI\PowerManagerAPI.csproj" />
+		<ProjectReference Include="..\RunAs.Common\RunAs.Common.csproj" />
+	</ItemGroup>
+
+</Project>
