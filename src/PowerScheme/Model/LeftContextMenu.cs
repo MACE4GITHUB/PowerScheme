@@ -70,14 +70,10 @@ internal sealed class LeftContextMenu(
             {
                 Tag = new StatePowerScheme(powerScheme),
                 Text = powerScheme.Name,
-                // Clone the source bitmap so each ToolStripItem owns its Image instance.
-                // That allows safe disposal in ClearMenu without affecting the shared resource.
-                Image = src is null
-                    ? null
-                    : new Bitmap(src)
+                Image = new Bitmap(src)
             };
 
-            src?.Dispose();
+            src.Dispose();
 
             item.Click += ItemMenuPowerOnClick;
 
@@ -100,12 +96,10 @@ internal sealed class LeftContextMenu(
             {
                 Tag = new StatePowerScheme(powerScheme),
                 Text = powerScheme.Name,
-                Image = src is null
-                    ? null
-                    : new Bitmap(src)
+                Image = new Bitmap(src)
             };
 
-            src?.Dispose();
+            src.Dispose();
 
             item.Click += ItemMenuPowerOnClick;
 
