@@ -5,12 +5,18 @@ namespace RegistryManager;
 
 public static class Paths
 {
-    public static string ApplicationPath
-        => Path.GetDirectoryName(ApplicationFullName)!;
+    public static string ApplicationPath =>
+        Path.GetDirectoryName(ApplicationFileName)!;
 
-    public static string ApplicationFullName
-        => Process.GetCurrentProcess().MainModule!.ModuleName;
+    public static string ApplicationFileName =>
+        MainModule.FileName;
 
-    public static string ApplicationNameWithoutExtension
-        => Path.GetFileNameWithoutExtension(ApplicationFullName);
+    public static string ApplicationName =>
+        MainModule.ModuleName;
+
+    public static string ApplicationNameWithoutExtension =>
+        Path.GetFileNameWithoutExtension(ApplicationName);
+
+    private static ProcessModule MainModule =>
+        Process.GetCurrentProcess().MainModule;
 }
