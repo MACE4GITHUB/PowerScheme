@@ -10,7 +10,7 @@ public static class AppInfo
 
     public static string CompanyName { get; } = GetExecutingAssembly
         .GetCustomAttribute<AssemblyCompanyAttribute>()?
-        .Company ?? "BULAVA";
+        .Company ?? "Bulava";
 
     public static string ProductName { get; } = GetExecutingAssembly
         .GetCustomAttribute<AssemblyProductAttribute>()?

@@ -23,7 +23,7 @@ public static class RegistryService
 
             var isPathCorrect =
                 result.Data?
-                    .Equals(Paths.ApplicationFullName, StringComparison.InvariantCultureIgnoreCase)
+                    .Equals(Paths.ApplicationFileName, StringComparison.InvariantCultureIgnoreCase)
                 ?? false;
 
             if (!isPathCorrect)
@@ -222,7 +222,7 @@ public static class RegistryService
         get
         {
             var rp = RegRunOnStartup;
-            rp.Value = Paths.ApplicationFullName;
+            rp.Value = Paths.ApplicationFileName;
             return rp;
         }
     }

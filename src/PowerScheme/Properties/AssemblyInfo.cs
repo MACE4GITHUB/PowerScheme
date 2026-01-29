@@ -4,10 +4,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("PowerScheme")]
 [assembly: AssemblyDescription("Create, change and restore native power scheme")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("BULAVA")]
+[assembly: AssemblyCompany("Bulava")]
 [assembly: AssemblyProduct("PowerScheme")]
 [assembly: AssemblyCopyright("Copyright ©  2020-2026 Dmitriy Bulava")]
-[assembly: AssemblyTrademark("BULAVA")]
+[assembly: AssemblyTrademark("Bulava")]
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
