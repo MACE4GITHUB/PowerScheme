@@ -6,6 +6,8 @@
 *.txt
 *.exe
 *.bat
+!CreateRelease.bat
+
 [Ii]nstall/
 [Ss]etup*/
 

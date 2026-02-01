@@ -1,16 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Nullable>enable</Nullable>
 		<OutputType>exe</OutputType>
-		<TargetFramework>net48</TargetFramework>
-		<LangVersion>14.0</LangVersion>
-		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<NoWarn>$(NoWarn);CA1416;NU1702;</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<NoWarn>$(NoWarn);CA1416;NU1702;</NoWarn>
+		<AssemblyTitle>Elevate privileges</AssemblyTitle>
+		<Product>RunAs</Product>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -24,17 +21,17 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<Target Name="ILRepacker" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+	<Target Name="ILRepacker" AfterTargets="Build">
 		<ItemGroup>
 			<InputAssemblies Include="$(TargetPath)"/>
 		</ItemGroup>
 
 		<ILRepack
-			AllowDuplicateResources="false"
-			DebugInfo="false"
-			Internalize="false"
-			InputAssemblies="@(InputAssemblies)"
 			OutputFile="$(TargetPath)"
+			InputAssemblies="@(InputAssemblies)"
+			AllowDuplicateResources="false"
+			Internalize="false"
+			DebugInfo="false"
 			Parallel="true"
 			TargetKind="SameAsPrimaryAssembly" />
 
