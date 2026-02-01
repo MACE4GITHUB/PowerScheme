@@ -1,15 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Nullable>enable</Nullable>
 		<OutputType>Library</OutputType>
-		<TargetFramework>net48</TargetFramework>
-		<LangVersion>14</LangVersion>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<UseWindowsForms>true</UseWindowsForms>
-	</PropertyGroup>
-
-	<PropertyGroup>
 		<NoWarn>$(NoWarn);CA1416</NoWarn>
 	</PropertyGroup>
 

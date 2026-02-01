@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>14.0</LangVersion>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Deterministic>false</Deterministic>
+    <Copyright>Copyright © 2020-2026 Dmitriy Bulava</Copyright>
+    <Company>Bulava</Company>
+    <AppVersion>2.1.$([System.DateTime]::UtcNow.ToString("yM.dhh"))</AppVersion>
+    <Version>$(AppVersion)</Version>
+    <FileVersion>$(AppVersion)</FileVersion>
+  </PropertyGroup>
+</Project>
