@@ -1,158 +1,67 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 
 namespace Languages;
 
-public class Language
+public abstract class Language
 {
+    private static readonly List<string> _ruLanguages = ["ru", "ru-ru", "be", "be-by"];
+
     public static Language Current { get; } = GetLanguage();
 
-    public static Language GetLanguage()
-    {
-        var currentCulture = CultureInfo.CurrentCulture.Name;
+    public static Language GetLanguage() =>
+        IsRuLocale(CultureInfo.CurrentCulture.Name)
+            ? new LanguageRu()
+            : new LanguageEn();
 
-        if (currentCulture == "ru-RU")
-        {
-            return new LanguageRu();
-        }
+    public static bool IsRuLocale(string locale) =>
+        !string.IsNullOrWhiteSpace(locale) &&
+        _ruLanguages.Contains(locale.Trim().ToLowerInvariant());
 
-        return new Language();
-    }
-
-    public virtual string Exit
-        => "Exit";
-
-    public virtual string StartupOnWindows
-        => "Run automatically at startup in Windows";
-
-    public virtual string RestoreDefaultPowerSchemesName
-        => "Restore default Windows PowerSchemes";
-
-    public virtual string RestoreDefaultPowerSchemesDescription
-        => "All other schemes will be deleted";
-
-    public virtual string Settings
-        => "Settings";
-
-    public virtual string HibernateName
-        => "Hibernate";
-
-    public virtual string HibernateDescription
-        => "Show in Power menu";
-
-    public virtual string SleepName
-        => "Sleep";
-
-    public virtual string SleepDescription
-        => "Show in Power menu";
-
-    public virtual string PowerOptions
-        => "Power Options";
-
-    public virtual string CreateTypicalSchemes
-        => "Create typical schemes";
-
-    public virtual string DeleteTypicalSchemes
-        => "Delete typical schemes";
-
-    public virtual string CreateStableScheme
-        => "Create stable scheme";
-
-    public virtual string DeleteStableScheme
-        => "Delete stable scheme";
-
-    public virtual string CreateMediaScheme
-        => "Create media scheme";
-
-    public virtual string DeleteMediaScheme
-        => "Delete media scheme";
-
-    public virtual string CreateSimpleScheme
-        => "Create simple scheme";
-
-    public virtual string DeleteSimpleScheme
-        => "Delete simple scheme";
-
-    public virtual string CreateExtremeScheme
-        => "Create extreme scheme";
-
-    public virtual string DeleteExtremeScheme
-        => "Delete extreme scheme";
-
-    public virtual string MediaName
-        => "Media";
-
-    public virtual string MediaDescription
-        => "Show media (video, etc.)";
-
-    public virtual string StableName
-        => "Stable";
-
-    public virtual string StableDescription
-        => "Constant CPU Speed";
-
-    public virtual string SimpleName
-        => "Simple";
-
-    public virtual string SimpleDescription
-        => "Power saver";
-
-    public virtual string ExtremeName
-        => "Extreme";
-
-    public virtual string ExtremeDescription
-        => "Ultimate CPU Speed";
-
-    public virtual string ShutDown
-        => "Shut down";
-
-    public virtual string DoNothing
-        => "Do nothing";
-
-    public virtual string WhenICloseTheLid
-        => "When I close the lid";
-
-    public virtual string AlreadyRunning
-        => "Another instance is already running.";
-
-    public virtual string Error
-        => "Error";
-
-    public virtual string Information
-        => "Information";
-
-    public virtual string CannotGetAdministratorRights
-        => "This application cannot get administrator rights. \n\nSee yours access policy.";
-
-    public virtual string ApplicationLatter
-        => "This application does not run on the current Windows version. \n\nWorks it on Vista and latter.";
-
-    public virtual string FirstStartCaption
-        => "First start";
-
-    public virtual string FirstStartDescription
-        => $"Create typical power schemes {StableName}, {MediaName}, {SimpleName}?";
-
-    public virtual string None
-        => "None";
-
-    public virtual string Ok
-        => "OK";
-
-    public virtual string Cancel
-        => "Cancel";
-
-    public virtual string Abort
-        => "Abort";
-
-    public virtual string Retry
-        => "Retry";
-
-    public virtual string Ignore
-        => "Ignore";
-
-    public virtual string Yes
-        => "Yes";
-
-    public virtual string No
-        => "No";
+    public abstract string Exit {  get; }
+    public abstract string StartupOnWindows { get; }
+    public abstract string RestoreDefaultPowerSchemesName { get; }
+    public abstract string RestoreDefaultPowerSchemesDescription { get; }
+    public abstract string Settings { get; }
+    public abstract string HibernateName { get; }
+    public abstract string HibernateDescription { get; }
+    public abstract string SleepName { get; }
+    public abstract string SleepDescription { get; }
+    public abstract string PowerOptions { get; }
+    public abstract string CreateTypicalSchemes { get; }
+    public abstract string DeleteTypicalSchemes { get; }
+    public abstract string CreateStableScheme { get; }
+    public abstract string DeleteStableScheme { get; }
+    public abstract string CreateMediaScheme { get; }
+    public abstract string DeleteMediaScheme { get; }
+    public abstract string CreateSimpleScheme { get; }
+    public abstract string DeleteSimpleScheme { get; }
+    public abstract string CreateExtremeScheme { get; }
+    public abstract string DeleteExtremeScheme { get; }
+    public abstract string MediaName { get; }
+    public abstract string MediaDescription { get; }
+    public abstract string StableName { get; }
+    public abstract string StableDescription { get; }
+    public abstract string SimpleName { get; }
+    public abstract string SimpleDescription { get; }
+    public abstract string ExtremeName { get; }
+    public abstract string ExtremeDescription { get; }
+    public abstract string ShutDown { get; }
+    public abstract string DoNothing { get; }
+    public abstract string WhenICloseTheLid { get; }
+    public abstract string AlreadyRunning { get; }
+    public abstract string Error { get; }
+    public abstract string Information { get; }
+    public abstract string CannotGetAdministratorRights { get; }
+    public abstract string ApplicationLatter { get; }
+    public abstract string FirstStartCaption { get; }
+    public abstract string FirstStartDescription { get; }
+    public abstract string None { get; }
+    public abstract string Ok { get; }
+    public abstract string Cancel { get; }
+    public abstract string Abort { get; }
+    public abstract string Retry { get; }
+    public abstract string Ignore { get; }
+    public abstract string Yes { get; }
+    public abstract string No { get; }
 }
