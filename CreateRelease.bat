@@ -6,6 +6,7 @@ set FRAMEWORK=net48
 set RID=win-x64
 set REGWRITER_EXE=RegWriter.exe
 set RUNAS_EXE=RunAs.exe
+set UPDATER_EXE=Updater.exe
 set RESOURCES_DIR=.\src\PowerScheme\Resources
 set APP_DIR=.\src\PowerScheme\bin\%CONFIG%\%FRAMEWORK%\%RID%
 set MSBUILD="C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
@@ -18,6 +19,10 @@ copy .\src\RegWriter\bin\%CONFIG%\%FRAMEWORK%\%RID%\%REGWRITER_EXE% %RESOURCES_D
 call :PrintHeader "Build RunAs project"
 call :BuildProject ".\src\RunAs\RunAs.csproj"
 copy .\src\RunAs\bin\%CONFIG%\%FRAMEWORK%\%RID%\%RUNAS_EXE% %RESOURCES_DIR%
+
+call :PrintHeader "Build Updater project"
+call :BuildProject ".\src\Updater\Updater.csproj"
+copy .\src\Updater\bin\%CONFIG%\%FRAMEWORK%\%RID%\%UPDATER_EXE% %RESOURCES_DIR%
 
 call :PrintHeader "Build PowerScheme project"
 call :BuildProject ".\src\PowerScheme\PowerScheme.csproj"
@@ -51,15 +56,15 @@ call :PrintHeader "All operations completed"
 
 pause
 
-exit /b 
+exit /b
 
 REM Function header definition
-:PrintHeader 
-echo. 
-echo ========================================= 
-echo %~1 
-echo ========================================= 
-echo. 
+:PrintHeader
+echo.
+echo =========================================
+echo %~1
+echo =========================================
+echo.
 exit /b
 
 REM Function Build Project

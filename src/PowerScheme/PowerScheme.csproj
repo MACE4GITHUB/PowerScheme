@@ -17,7 +17,7 @@
 
 	<PropertyGroup>
 		<AssemblyGuid>23610885-8476-4388-afc8-bc564f6be09f</AssemblyGuid>
-		<AssemblyTitle>Create, change and restore native power scheme</AssemblyTitle>
+		<AssemblyTitle>Power Scheme</AssemblyTitle>
 		<Product>PowerScheme</Product>
 	</PropertyGroup>
 
@@ -64,6 +64,7 @@
 		<None Include="Resources\Stop.png" />
 		<None Include="Resources\Ultimate.png" />
 		<None Include="Resources\Unknown.png" />
+		<None Include="Resources\Updater.exe" />
 	</ItemGroup>
 
 </Project>
