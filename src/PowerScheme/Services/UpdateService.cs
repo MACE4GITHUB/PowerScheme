@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Common.Paths;
 using PowerScheme.Properties;
-using RegistryManager;
 using RunAs.Common.Services;
 using Updater.Common;
 
@@ -12,7 +12,7 @@ public sealed class UpdateService : ExecutorService, IUpdateService
 
     private static readonly string[] _arguments = [
                            "--api:\"https://api.github.com/repos/MACE4GITHUB/PowerScheme/releases/latest\"",
-                           $"--path:\"{Paths.ApplicationFileName}\"",
+                           $"--path:\"{Default.ApplicationFileName}\"",
                            "--suffix:\"_new\"",
                            "--quit",
                            "--replace",

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Resources;
-using RegistryManager.Model;
+using RegistryManager.Common;
+using RegistryManager.Savers;
 using RunAs.Common.Services;
 
 namespace RegistryManager;
@@ -13,7 +14,7 @@ public class RegistryExecutorService : ExecutorService
     public RegistryExecutorService(
         ResourceManager resourceManager,
         RegistryParam registryParam,
-        RegistryAdminAction registryAdminAction,
+        RegistryAction registryAdminAction,
         object fileName) :
         base(NAME, "", resourceManager)
     {
@@ -33,7 +34,7 @@ public class RegistryExecutorService : ExecutorService
 
     public RegistrySaver RegistrySaver { get; }
 
-    public RegistryAdminAction RegistryAdminAction { get; }
+    public RegistryAction RegistryAdminAction { get; }
 
     public string RegistryFileName { get; }
 

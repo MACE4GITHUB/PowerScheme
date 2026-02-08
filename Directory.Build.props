@@ -7,7 +7,7 @@
     <Deterministic>false</Deterministic>
     <Copyright>Copyright © 2020-2026 Dmitriy Bulava</Copyright>
     <Company>Bulava</Company>
-    <AppVersion>2.2.$([System.DateTime]::UtcNow.ToString("yM.dhh"))</AppVersion>
+    <AppVersion>2.2.$([System.DateTime]::UtcNow.ToString("yM.dHH"))</AppVersion>
     <Version>$(AppVersion)</Version>
     <FileVersion>$(AppVersion)</FileVersion>
   </PropertyGroup>

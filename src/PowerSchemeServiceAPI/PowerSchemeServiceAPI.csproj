@@ -8,7 +8,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\Languages\Languages.csproj" />
-		<ProjectReference Include="..\PowerManagerAPI\PowerManagerAPI.csproj" />
 		<ProjectReference Include="..\RegistryManager\RegistryManager.csproj" />
 	</ItemGroup>
 

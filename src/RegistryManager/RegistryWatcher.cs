@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.Win32;
+using RegistryManager.Common;
 using RegistryManager.EventsArgs;
-using RegistryManager.Model;
 using static RegistryManager.NativeMethods;
-using static RegistryManager.Registry;
+using static RegistryManager.Savers.Registry;
 
 namespace RegistryManager;
 
@@ -303,6 +303,7 @@ public sealed class RegistryWatcher<T> : IRegistryWatcher, IDisposable
 
         var result = RegOpenKeyEx(_registryHive, _registryParam.RegistrySubKey, 0, STANDARD_RIGHTS_READ | KEY_QUERY_VALUE | KEY_NOTIFY,
             out var registryKey);
+
         if (result != 0)
         {
             throw new Win32Exception(result);
@@ -317,6 +318,7 @@ public sealed class RegistryWatcher<T> : IRegistryWatcher, IDisposable
             while (!_eventTerminate.WaitOne(0, true))
             {
                 result = RegNotifyChangeKeyValue(registryKey, false, _regFilter, eventNotify, true);
+
                 if (result != 0)
                 {
                     throw new Win32Exception(result);

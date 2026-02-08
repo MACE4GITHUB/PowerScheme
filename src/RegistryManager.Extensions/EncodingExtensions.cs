@@ -4,7 +4,7 @@ using static System.Convert;
 
 namespace RegistryManager.Extensions;
 
-internal static class EncodingExtensions
+public static class EncodingExtensions
 {
     public static string? EncodeBase64(this Encoding encoding, string? text) =>
         text == null

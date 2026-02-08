@@ -1,6 +1,6 @@
-﻿namespace RegWriter;
+﻿using RegistryManager.Savers;
 
-using RegistryManager;
+namespace RegWriter;
 
 internal static class Program
 {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Win32;
-using RegistryManager.Model;
+using RegistryManager.Common;
 
-namespace RegistryManager;
+namespace RegistryManager.Savers;
 
 public static class Registry
 {

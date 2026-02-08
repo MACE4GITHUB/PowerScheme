@@ -5,7 +5,7 @@ namespace RegistryManager.Extensions;
 /// <summary>
 /// Contains common registry related utility methods.
 /// </summary>
-internal static class StringExtensions
+public static class StringExtensions
 {
     /// <summary>
     /// Split the given string by a string.

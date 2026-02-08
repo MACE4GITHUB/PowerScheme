@@ -1,6 +1,5 @@
 ﻿#pragma warning disable 693
-#pragma warning disable CA1000
-namespace RegistryManager;
+namespace RegistryManager.Savers;
 
 /// <summary>
 /// Represents an operation Result.
@@ -31,7 +30,7 @@ public class Result
     public bool IsError => !IsSuccess;
 
     /// <summary>
-    /// Gets a message if the operation is fail. 
+    /// Gets a message if the operation is fail.
     /// </summary>
     public string Message { get; }
 
@@ -48,7 +47,7 @@ public class Result
 /// Represents an operation Result.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class Result<T> : Result 
+public class Result<T> : Result
 {
     /// <summary>
     /// Creates Result.
@@ -57,7 +56,7 @@ public class Result<T> : Result
     /// <param name="message"></param>
     /// <param name="level"></param>
     /// <param name="data"></param>
-    protected Result(bool success, string message, LevelInfo level, T? data) : 
+    protected Result(bool success, string message, LevelInfo level, T? data) :
         base(success, message, level)
     {
         Data = data;
@@ -74,7 +73,7 @@ public class Result<T> : Result
     /// <typeparam name="T"></typeparam>
     /// <param name="data"></param>
     /// <returns></returns>
-    public static Result<T> Ok<T>(T data) => 
+    public static Result<T> Ok<T>(T data) =>
         new(true, string.Empty, LevelInfo.Silent, data);
 
     /// <summary>
@@ -83,6 +82,6 @@ public class Result<T> : Result
     /// <typeparam name="T"></typeparam>
     /// <param name="message"></param>
     /// <returns></returns>
-    public static Result<T> Fail<T>(string message) => 
+    public static Result<T> Fail<T>(string message) =>
         new(false, message, LevelInfo.Error, default);
 }

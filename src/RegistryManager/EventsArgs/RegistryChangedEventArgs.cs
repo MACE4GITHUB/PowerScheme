@@ -1,5 +1,5 @@
 ﻿using System;
-using RegistryManager.Model;
+using RegistryManager.Common;
 
 namespace RegistryManager.EventsArgs;
 

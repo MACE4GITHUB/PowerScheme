@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
+using Common.Paths;
+using RegistryManager.Common;
 using RegistryManager.Extensions;
-using RegistryManager.Model;
 
-namespace RegistryManager;
+namespace RegistryManager.Savers;
 
 public sealed class RegistrySaver(
     string operation,
@@ -12,18 +13,18 @@ public sealed class RegistrySaver(
 {
     private const string REG_EXTENSION = "";
 
-    public RegistrySaver(RegistryAdminAction registryAdminAction, string fileName) :
+    public RegistrySaver(RegistryAction registryAdminAction, string fileName) :
         this(registryAdminAction.ToString(), fileName)
     { }
 
-    public RegistrySaver(RegistryAdminAction registryAdminAction, Guid guid) :
+    public RegistrySaver(RegistryAction registryAdminAction, Guid guid) :
         this(registryAdminAction.ToString(), guid.ToString())
     { }
 
     public string FileName { get; } = fileName;
 
     public string FileFullName
-        => Path.Combine(Paths.ApplicationPath, FileName + REG_EXTENSION);
+        => Path.Combine(Default.ApplicationPath, FileName + REG_EXTENSION);
 
     public string Operation { get; } = operation;
 
@@ -45,13 +46,13 @@ public sealed class RegistrySaver(
 
             var registryParam = RegistryParam.FromString(decodeText);
 
-            var currentOperation = (RegistryAdminAction)Enum.Parse(typeof(RegistryAdminAction), Operation, true);
+            var currentOperation = (RegistryAction)Enum.Parse(typeof(RegistryAction), Operation, true);
             switch (currentOperation)
             {
-                case RegistryAdminAction.Set:
+                case RegistryAction.Set:
                     Registry.SaveSetting(registryParam);
                     break;
-                case RegistryAdminAction.Delete:
+                case RegistryAction.Delete:
                     Registry.DeleteSetting(registryParam);
                     break;
                 default:

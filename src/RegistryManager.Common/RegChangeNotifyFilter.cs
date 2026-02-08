@@ -1,4 +1,4 @@
-namespace RegistryManager.Model;
+namespace RegistryManager.Common;
 
 using System;
 

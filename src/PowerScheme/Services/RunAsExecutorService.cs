@@ -1,6 +1,6 @@
 ﻿using System;
+using Common.Paths;
 using PowerScheme.Properties;
-using RegistryManager;
 using RunAs.Common.Services;
 
 namespace PowerScheme.Services;
@@ -18,7 +18,7 @@ public class RunAsExecutorService(
     private bool _isExecuted;
 
     private static string NameMainProgram
-        => Paths.ApplicationNameWithoutExtension;
+        => Default.ApplicationNameWithoutExtension;
 
     public override void Execute()
     {

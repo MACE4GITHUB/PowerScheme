@@ -34,8 +34,6 @@
 		<ProjectReference Include="..\Languages\Languages.csproj" />
 		<ProjectReference Include="..\MessageForm\MessageForm.csproj" />
 		<ProjectReference Include="..\PowerSchemeServiceAPI\PowerSchemeServiceAPI.csproj" />
-		<ProjectReference Include="..\RegistryManager\RegistryManager.csproj" />
-		<ProjectReference Include="..\RunAs.Common\RunAs.Common.csproj" />
 		<ProjectReference Include="..\Updater.Common\Updater.Common.csproj" />
 	</ItemGroup>
 

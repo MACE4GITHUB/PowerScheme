@@ -1,7 +1,7 @@
-﻿using Common;
-using PowerSchemeServiceAPI.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Common;
+using PowerSchemeServiceAPI.Model;
 
 namespace PowerSchemeServiceAPI;
 
