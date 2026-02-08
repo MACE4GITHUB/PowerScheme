@@ -164,7 +164,7 @@ public static class RegistryService
     private static void SaveRegistryEx(ResourceManager resourceManager, RegistryParam registryParam)
     {
         var executorRegistryService =
-            new ExecutorRegistryService(
+            new RegistryExecutorService(
                 resourceManager,
                 registryParam,
                 RegistryAdminAction.Set,

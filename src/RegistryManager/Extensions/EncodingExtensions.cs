@@ -6,18 +6,15 @@ namespace RegistryManager.Extensions;
 
 internal static class EncodingExtensions
 {
-    extension(Encoding encoding)
-    {
-        public string? EncodeBase64(string? text) =>
-            text == null
-                ? null
-                : ToBase64String(encoding.GetBytes(text));
+    public static string? EncodeBase64(this Encoding encoding, string? text) =>
+        text == null
+            ? null
+            : ToBase64String(encoding.GetBytes(text));
 
-        public string? DecodeBase64(string? encodedText) =>
-            encodedText == null
-                ? null
-                : encoding.GetString(FromBase64String(encodedText));
-    }
+    public static string? DecodeBase64(this Encoding encoding, string? encodedText) =>
+        encodedText == null
+            ? null
+            : encoding.GetString(FromBase64String(encodedText));
 
     public static byte[] DecodeToBytes(this string str)
     {

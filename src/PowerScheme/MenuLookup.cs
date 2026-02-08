@@ -10,6 +10,7 @@ internal static class MenuLookup
     internal static readonly Dictionary<MenuItm, ViewMenu> MenuItems = new()
     {
         { MenuItm.StartupOnWindows, new ViewMenu(Language.Current.StartupOnWindows) },
+        { MenuItm.UpdateApp, new ViewMenu(Language.Current.UpdateApp, ImageItem.Update) },
         { MenuItm.Hibernate, new ViewMenu(Language.Current.HibernateName, Language.Current.HibernateDescription) },
         { MenuItm.Sleep, new ViewMenu(Language.Current.SleepName, Language.Current.SleepDescription) },
         { MenuItm.Lid, new ViewMenu(Language.Current.WhenICloseTheLid) },
@@ -22,11 +23,12 @@ internal static class MenuLookup
         { MenuItm.ControlPanelSchemeWindows, new ViewMenu(Language.Current.PowerOptions, ImageItem.Panel) },
         { MenuItm.CreateTypicalSchemes, new ViewMenu(Language.Current.CreateTypicalSchemes, ImageItem.Add) },
         { MenuItm.DeleteTypicalSchemes, new ViewMenu(Language.Current.DeleteTypicalSchemes, ImageItem.Delete) },
-        { MenuItm.Exit, new ViewMenu(Language.Current.Exit) }
+        { MenuItm.Exit, new ViewMenu(Language.Current.Quit) }
     };
 
     internal enum MenuItm
     {
+        UpdateApp,
         StartupOnWindows,
         Hibernate,
         Sleep,

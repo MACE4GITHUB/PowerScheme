@@ -9,7 +9,7 @@ using static PowerScheme.Utility.TrayIcon;
 
 namespace PowerScheme.Model;
 
-internal sealed class LeftContextMenu(
+public sealed class LeftContextMenu(
     IContainer components,
     IPowerSchemeService power) :
     ContextMainMenu(components, power)

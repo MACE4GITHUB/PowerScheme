@@ -45,8 +45,8 @@ public sealed class RegistrySaver(
 
             var registryParam = RegistryParam.FromString(decodeText);
 
-            var operation = (RegistryAdminAction)Enum.Parse(typeof(RegistryAdminAction), Operation, true);
-            switch (operation)
+            var currentOperation = (RegistryAdminAction)Enum.Parse(typeof(RegistryAdminAction), Operation, true);
+            switch (currentOperation)
             {
                 case RegistryAdminAction.Set:
                     Registry.SaveSetting(registryParam);
@@ -55,7 +55,7 @@ public sealed class RegistrySaver(
                     Registry.DeleteSetting(registryParam);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(operation));
+                    throw new InvalidOperationException(nameof(currentOperation));
             }
         }
         catch (Exception)

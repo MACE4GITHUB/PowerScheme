@@ -15,10 +15,8 @@ internal static class Program
             var attributeFile = TryGetAttributeFileOrExit(args[2]);
             var isHiddenFile = IsHiddenFile(attributeFile);
 
-            var executorService = new ExecutorService
+            ExecutorService executorService = new (programName, role, null)
             {
-                Name = programName,
-                Arguments = role,
                 IsHiddenFile = isHiddenFile,
                 IsWait = false,
                 IsRemoveFile = false,

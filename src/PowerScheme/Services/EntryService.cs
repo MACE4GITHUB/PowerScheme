@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using Languages;
@@ -34,8 +36,12 @@ internal sealed class EntryService : IDisposable
 
     public Action ActionFirstStart { get; }
 
-    public void Validate()
-        => ValidateOs().ValidateOnceApplication().ValidateAdmin().ValidateFirstStart();
+    public void Validate() =>
+        ValidateOs()
+        .ValidateOnceApplication()
+        .ValidateAdmin()
+        .ValidateFirstStart()
+        .ValidateExistArtifacts();
 
     /// <summary>
     /// Gets Mutex to start one application instance.
@@ -74,7 +80,7 @@ internal sealed class EntryService : IDisposable
     {
         if (_power == null)
         {
-            throw new ArgumentNullException(nameof(_power));
+            throw new ArgumentException("Power cannot be null.");
         }
 
         if (!IsValidateAdmin)
@@ -82,7 +88,7 @@ internal sealed class EntryService : IDisposable
             return this;
         }
 
-        var executorMainService = new ExecutorRunAsService($"{Role.Admin} {AttributeFile.Normal}");
+        var executorMainService = new RunAsExecutorService($"{Role.Admin} {AttributeFile.Normal}");
 
         var isNeedAdminAccess = _power.IsNeedAdminAccessForChangePowerScheme;
 
@@ -91,12 +97,9 @@ internal sealed class EntryService : IDisposable
             if (_args.Length == 1)
             {
                 var isRole = Enum.TryParse(_args[0], true, out Role role);
-                if (isRole)
+                if (isRole && role == Role.Admin)
                 {
-                    if (role == Role.Admin)
-                    {
-                        ExitBecauseNotAdmin();
-                    }
+                    ExitBecauseNotAdmin();
                 }
             }
 
@@ -106,7 +109,7 @@ internal sealed class EntryService : IDisposable
         }
         else
         {
-            executorMainService.RemoveIfExists();
+            executorMainService.RemoveFileIfExists();
         }
 
         return this;
@@ -148,7 +151,7 @@ internal sealed class EntryService : IDisposable
     {
         if (_power == null)
         {
-            throw new ArgumentNullException(nameof(_power));
+            throw new ArgumentException("Power cannot be null.");
         }
 
         var result = _messageBox.Show(
@@ -190,6 +193,18 @@ internal sealed class EntryService : IDisposable
         }
 
         OnceApplication();
+
+        return this;
+    }
+
+    private EntryService ValidateExistArtifacts()
+    {
+        string[] artifacts = [Paths.UpdaterFileName, Paths.RegWriterFileName];
+
+        foreach (var artifact in artifacts.Where(File.Exists))
+        {
+            File.Delete(artifact);
+        }
 
         return this;
     }

@@ -14,28 +14,4 @@
 		<ProjectReference Include="..\RegistryManager\RegistryManager.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.44.1">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-	</ItemGroup>
-
-	<Target Name="ILRepacker" AfterTargets="Build">
-
-		<ItemGroup>
-			<InputAssemblies Include="$(TargetPath)"/>
-		</ItemGroup>
-
-		<ILRepack
-			OutputFile="$(TargetPath)"
-			InputAssemblies="@(InputAssemblies)"
-			AllowDuplicateResources="false"
-			Internalize="false"
-			DebugInfo="false"
-			Parallel="true"
-			TargetKind="SameAsPrimaryAssembly" />
-
-	</Target>
-
 </Project>

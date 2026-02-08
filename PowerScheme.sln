@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30204.135
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36915.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerScheme", "src\PowerScheme\PowerScheme.csproj", "{23610885-8476-4388-AFC8-BC564F6BE09F}"
 EndProject
@@ -24,6 +24,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Languages", "src\Languages\Languages.csproj", "{FC9D0998-254A-46A3-AC5B-317F80150175}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupPowerScheme", "src\SetupPowerScheme\SetupPowerScheme.vdproj", "{2CC5F1B1-2F4D-4233-8A22-52018445FEC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Updater", "src\Updater\Updater.csproj", "{B4B8D59D-5693-4B75-B53A-1A9978A8EB28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logger", "src\Logger\Logger.csproj", "{24F69444-C8B6-44DB-8A17-B874274B6D86}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Updater.Common", "src\Updater.Common\Updater.Common.csproj", "{332D9BB1-75F1-42CD-BE14-5A4C39B84E2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -117,6 +123,30 @@ Global
 		{2CC5F1B1-2F4D-4233-8A22-52018445FEC6}.Debug|x64.ActiveCfg = Debug
 		{2CC5F1B1-2F4D-4233-8A22-52018445FEC6}.Release|Any CPU.ActiveCfg = Release
 		{2CC5F1B1-2F4D-4233-8A22-52018445FEC6}.Release|x64.ActiveCfg = Release
+		{B4B8D59D-5693-4B75-B53A-1A9978A8EB28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4B8D59D-5693-4B75-B53A-1A9978A8EB28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4B8D59D-5693-4B75-B53A-1A9978A8EB28}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B4B8D59D-5693-4B75-B53A-1A9978A8EB28}.Debug|x64.Build.0 = Debug|Any CPU
+		{B4B8D59D-5693-4B75-B53A-1A9978A8EB28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4B8D59D-5693-4B75-B53A-1A9978A8EB28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4B8D59D-5693-4B75-B53A-1A9978A8EB28}.Release|x64.ActiveCfg = Release|Any CPU
+		{B4B8D59D-5693-4B75-B53A-1A9978A8EB28}.Release|x64.Build.0 = Release|Any CPU
+		{24F69444-C8B6-44DB-8A17-B874274B6D86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24F69444-C8B6-44DB-8A17-B874274B6D86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24F69444-C8B6-44DB-8A17-B874274B6D86}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{24F69444-C8B6-44DB-8A17-B874274B6D86}.Debug|x64.Build.0 = Debug|Any CPU
+		{24F69444-C8B6-44DB-8A17-B874274B6D86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24F69444-C8B6-44DB-8A17-B874274B6D86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24F69444-C8B6-44DB-8A17-B874274B6D86}.Release|x64.ActiveCfg = Release|Any CPU
+		{24F69444-C8B6-44DB-8A17-B874274B6D86}.Release|x64.Build.0 = Release|Any CPU
+		{332D9BB1-75F1-42CD-BE14-5A4C39B84E2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{332D9BB1-75F1-42CD-BE14-5A4C39B84E2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{332D9BB1-75F1-42CD-BE14-5A4C39B84E2B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{332D9BB1-75F1-42CD-BE14-5A4C39B84E2B}.Debug|x64.Build.0 = Debug|Any CPU
+		{332D9BB1-75F1-42CD-BE14-5A4C39B84E2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{332D9BB1-75F1-42CD-BE14-5A4C39B84E2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{332D9BB1-75F1-42CD-BE14-5A4C39B84E2B}.Release|x64.ActiveCfg = Release|Any CPU
+		{332D9BB1-75F1-42CD-BE14-5A4C39B84E2B}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

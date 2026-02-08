@@ -6,28 +6,21 @@ using RunAs.Common.Utils;
 
 namespace RunAs.Common.Services;
 
-public class ExecutorService
+public class ExecutorService(
+    string name,
+    string arguments,
+    ResourceManager? resourceManager)
 {
     private const string EXE_EXTENSION = ".exe";
 
-    public ExecutorService()
-    { }
-
-    public ExecutorService(string name, string arguments, ResourceManager resourceManager)
-    {
-        Name = name;
-        Arguments = arguments;
-        ResourceManager = resourceManager;
-    }
-
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; } = name;
 
     public string FullName
         => Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule?.FileName)!, $"{Name}{EXE_EXTENSION}");
 
-    public string Arguments { get; set; } = string.Empty;
+    public string Arguments { get; set; } = arguments;
 
-    public ResourceManager? ResourceManager { get; set; }
+    public ResourceManager? ResourceManager { get; set; } = resourceManager;
 
     public ProcessWindowStyle ProcessWindowStyle { get; set; } = ProcessWindowStyle.Hidden;
 
@@ -45,6 +38,7 @@ public class ExecutorService
     {
         if (UseExecutor)
         {
+            RemoveFileIfExists();
             File.WriteAllBytes(FullName, Executor);
         }
 
@@ -66,12 +60,12 @@ public class ExecutorService
         {
             if (IsRemoveFile)
             {
-                RemoveIfExists();
+                RemoveFileIfExists();
             }
         }
     }
 
-    public virtual void RemoveIfExists()
+    public virtual void RemoveFileIfExists()
     {
         if (File.Exists(FullName))
         {
@@ -81,5 +75,5 @@ public class ExecutorService
 
     private byte[] Executor
         => (byte[])(ResourceManager?.GetObject(Name)
-                    ?? throw new ArgumentNullException(nameof(Name)));
+                    ?? throw new ArgumentException("The application resource executable file was not found."));
 }
