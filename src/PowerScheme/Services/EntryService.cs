@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using Common.Paths;
 using Languages;
 using MessageForm;
 using PowerScheme.Model;
@@ -199,7 +200,7 @@ internal sealed class EntryService : IDisposable
 
     private EntryService ValidateExistArtifacts()
     {
-        string[] artifacts = [Paths.UpdaterFileName, Paths.RegWriterFileName];
+        string[] artifacts = [Default.UpdaterFileName, Default.RegWriterFileName];
 
         foreach (var artifact in artifacts.Where(File.Exists))
         {

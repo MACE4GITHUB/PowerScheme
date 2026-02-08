@@ -3,7 +3,7 @@ using System.ComponentModel;
 using Microsoft.Win32;
 using RegistryManager.Extensions;
 
-namespace RegistryManager.Model;
+namespace RegistryManager.Common;
 
 public struct RegistryParam
 {

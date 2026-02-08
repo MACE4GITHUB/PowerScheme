@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<NoWarn>$(NoWarn);CA1416;CA2101;SYSLIB1054</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\RegistryManager.Extensions\RegistryManager.Extensions.csproj" />
+	</ItemGroup>
+
+</Project>

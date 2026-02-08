@@ -21,9 +21,10 @@ call :BuildProject ".\src\RegWriter\RegWriter.csproj"
 ILRepack.exe ^
  /out:%RESOURCES_DIR%\RegWriter.exe ^
  %REGWRITER_DIR%\RegWriter.exe ^
- %REGWRITER_DIR%\PowerManagerAPI.dll ^
- %REGWRITER_DIR%\RegistryManager.dll ^
- %REGWRITER_DIR%\RunAs.Common.dll ^
+ %REGWRITER_DIR%\Common.Paths.dll ^
+ %REGWRITER_DIR%\RegistryManager.Common.dll ^
+ %REGWRITER_DIR%\RegistryManager.Extensions.dll ^
+ %REGWRITER_DIR%\RegistryManager.Savers.dll ^
  /skipconfig ^
  /ndebug ^
  /parallel
@@ -57,6 +58,7 @@ ILRepack.exe ^
  /out:install\PowerScheme.exe ^
  %APP_DIR%\PowerScheme.exe ^
  %APP_DIR%\Common.dll ^
+ %APP_DIR%\Common.Paths.dll ^
  %APP_DIR%\Languages.dll ^
  %APP_DIR%\MessageForm.dll ^
  %APP_DIR%\Microsoft.Bcl.AsyncInterfaces.dll ^
@@ -64,7 +66,10 @@ ILRepack.exe ^
  %APP_DIR%\Microsoft.Extensions.DependencyInjection.Abstractions.dll ^
  %APP_DIR%\PowerManagerAPI.dll ^
  %APP_DIR%\PowerSchemeServiceAPI.dll ^
+ %APP_DIR%\RegistryManager.Common.dll ^
  %APP_DIR%\RegistryManager.dll ^
+ %APP_DIR%\RegistryManager.Extensions.dll ^
+ %APP_DIR%\RegistryManager.Savers.dll ^
  %APP_DIR%\RunAs.Common.dll ^
  %APP_DIR%\System.Runtime.CompilerServices.Unsafe.dll ^
  %APP_DIR%\System.Threading.Tasks.Extensions.dll ^

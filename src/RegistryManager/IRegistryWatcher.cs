@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
+using RegistryManager.Common;
 using RegistryManager.EventsArgs;
-using RegistryManager.Model;
 
 namespace RegistryManager;
 

@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Resources;
+using Common.Paths;
 using Microsoft.Win32;
 using PowerManagerAPI;
-using RegistryManager.Model;
-using static RegistryManager.Registry;
+using RegistryManager.Common;
+using static RegistryManager.Savers.Registry;
 
 namespace RegistryManager;
 
@@ -23,7 +24,7 @@ public static class RegistryService
 
             var isPathCorrect =
                 result.Data?
-                    .Equals(Paths.ApplicationFileName, StringComparison.InvariantCultureIgnoreCase)
+                    .Equals(Default.ApplicationFileName, StringComparison.InvariantCultureIgnoreCase)
                 ?? false;
 
             if (!isPathCorrect)
@@ -167,7 +168,7 @@ public static class RegistryService
             new RegistryExecutorService(
                 resourceManager,
                 registryParam,
-                RegistryAdminAction.Set,
+                RegistryAction.Set,
                 Guid.NewGuid());
 
         executorRegistryService.Execute();
@@ -222,7 +223,7 @@ public static class RegistryService
         get
         {
             var rp = RegRunOnStartup;
-            rp.Value = Paths.ApplicationFileName;
+            rp.Value = Default.ApplicationFileName;
             return rp;
         }
     }

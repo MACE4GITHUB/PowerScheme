@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.IO;
 
-namespace RegistryManager;
+namespace Common.Paths;
 
-public static class Paths
+public static class Default
 {
     private const string EXE_EXTENSION = ".exe";
     private const string UPDATER = "Updater";
