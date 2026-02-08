@@ -23,5 +23,6 @@ public enum ImageItem
     Sleep,
     Hibernate,
     Shutdown,
-    Shield
+    Shield,
+    Update
 }

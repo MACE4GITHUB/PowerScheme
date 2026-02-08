@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using System.Windows.Forms;
+using PowerScheme.EventArguments;
 using PowerScheme.Model;
+using PowerScheme.Timers;
 using RegistryManager.EventsArgs;
 using static PowerScheme.Utility.TrayIcon;
 
@@ -10,10 +12,15 @@ public sealed class ViewService : ApplicationContext, IViewService
 {
     private const string SHOW_CONTEXT_MENU = "ShowContextMenu";
     private readonly IViewModel _viewModel;
+    private readonly UpdateTimer _updateTimer;
 
-    public ViewService(IViewModel viewModel)
+    public ViewService(
+        IViewModel viewModel,
+        IUpdateService updateService)
     {
         _viewModel = viewModel;
+        _updateTimer = new UpdateTimer(updateService);
+        _updateTimer.NotifyUpdate += NotifyAppUpdate;
         Start();
     }
 
@@ -29,6 +36,8 @@ public sealed class ViewService : ApplicationContext, IViewService
 
         _viewModel.Power.Watchers.Start();
         _viewModel.BuildAllMenu();
+
+        _updateTimer.Start();
     }
 
     public void Stop()
@@ -77,6 +86,17 @@ public sealed class ViewService : ApplicationContext, IViewService
         mi?.Invoke(_viewModel.NotifyIcon, null);
 
         _viewModel.NotifyIcon.ContextMenuStrip = null;
+    }
+
+    private void NotifyAppUpdate(object sender, UpdateEventArgs e)
+    {
+        var releaseInfo = e.ReleaseInfo;
+
+        if (releaseInfo.NewVersionAvailable)
+        {
+            ((RightContextMenu)_viewModel.ContextRightMenu)
+                .SetNewVersion(releaseInfo);
+        }
     }
 
     protected override void Dispose(bool disposing)

@@ -5,24 +5,19 @@ using PowerSchemeServiceAPI;
 
 namespace PowerScheme.Model;
 
-public sealed class ViewModel : IViewModel
+public sealed class ViewModel(
+    IContainer container,
+    LeftContextMenu leftContextMenu,
+    RightContextMenu rightContextMenu,
+    IPowerSchemeService power) : IViewModel
 {
-    private readonly Container _components;
+    public NotifyIcon NotifyIcon { get; } = new NotifyIcon(container);
 
-    public ViewModel(IPowerSchemeService power)
-    {
-        _components = new Container();
-        Power = power;
-        ContextLeftMenu = new LeftContextMenu(_components, power);
-        ContextRightMenu = new RightContextMenu(_components, power);
-        NotifyIcon = new NotifyIcon(_components);
-    }
+    public ContextMainMenu ContextLeftMenu { get; } = leftContextMenu;
 
-    public NotifyIcon NotifyIcon { get; }
+    public ContextMainMenu ContextRightMenu { get; } = rightContextMenu;
 
-    public ContextMainMenu ContextLeftMenu { get; }
-
-    public ContextMainMenu ContextRightMenu { get; }
+    public IPowerSchemeService Power { get; } = power;
 
     public void ClearAllMenu()
     {
@@ -35,8 +30,6 @@ public sealed class ViewModel : IViewModel
         ContextLeftMenu.BuildMenu();
         ContextRightMenu.BuildMenu();
     }
-
-    public IPowerSchemeService Power { get; }
 
     public void UpdateIcon(Icon icon)
     {
@@ -61,7 +54,5 @@ public sealed class ViewModel : IViewModel
     public void Dispose()
     {
         RemoveIcon();
-
-        _components.Dispose();
     }
 }

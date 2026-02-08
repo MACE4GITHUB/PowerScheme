@@ -2,8 +2,14 @@
 
 public sealed class LanguageEn : Language
 {
-    public override string Exit
-        => "Exit";
+    public override string UpdateApp
+        => "Update the app";
+
+    public override string UpdateAppToVersion
+        => "Update the app to version";
+
+    public override string Quit
+        => "Quit";
 
     public override string StartupOnWindows
         => "Run automatically at startup in Windows";

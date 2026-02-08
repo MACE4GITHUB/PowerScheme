@@ -16,6 +16,12 @@ public sealed class ReleaseInfo
         AssetUrl = assetUrl;
     }
 
+    public static ReleaseInfo Empty =>
+        new(new Version(), new Version(), string.Empty);
+
+    public ReleaseInfo Clone() =>
+        new(LocalVersion, RemoteVersion, AssetUrl);
+
     public static async Task<ReleaseInfo> CreateAsync(Arguments arguments)
     {
         GitHubReleaseInfo gitHubReleaseInfo;
@@ -45,6 +51,13 @@ public sealed class ReleaseInfo
     public string AssetUrl { get; }
 
     public bool NewVersionAvailable { get; }
+
+    public override string ToString() =>
+        $"""
+            New version available: {NewVersionAvailable}
+            Current version: {LocalVersion}, Latest version: {RemoteVersion}"
+            Download URL: {AssetUrl}
+            """;
 
     private static async Task<GitHubReleaseInfo> GetGitHubReleaseInfoAsync(ApiUrl apiUrl, FileExtension fileExtension)
     {

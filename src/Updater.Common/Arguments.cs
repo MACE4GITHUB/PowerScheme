@@ -16,7 +16,7 @@ public sealed class Arguments
         FileNameWithoutExtension = new FileNameWithoutExtension(Path.GetFileNameWithoutExtension(LocalFilePath.Value));
         DownloadFilePath = new DownloadFilePath(Path.Combine(LocalDirectoryPath.Value, $"{FileNameWithoutExtension}{Suffix}{FileExtension}"));
 
-        KillOldVersion = HasKey(args, "--kill") && IsExecutable();
+        KillOldVersion = HasKey(args, "--quit") && IsExecutable();
         ReplaceOldVersion = HasKey(args, "--replace") || KillOldVersion;
         LaunchAfterUpdate = HasKey(args, "--launchAfterUpdate") && KillOldVersion;
     }
@@ -27,7 +27,7 @@ public sealed class Arguments
             !args.Any(x => x.StartsWith("--api")) ||
             !args.Any(x => x.StartsWith("--path")))
         {
-            throw new ArgumentException("Usage: Updater --api:\"apiUrl\" --path:\"path-to-app.exe\" [--suffix:\"_new\"] [--kill] [--replace] [--launchAfterUpdate]");
+            throw new ArgumentException("Usage: Updater --api:\"apiUrl\" --path:\"path-to-app.exe\" [--suffix:\"_new\"] [--quit] [--replace] [--launchAfterUpdate]");
         }
 
         return new Arguments(args);
@@ -67,7 +67,7 @@ public sealed class Arguments
 
         if (parts != null && parts.Length == 2)
         {
-            value = parts[1].Trim();
+            value = parts[1].Trim().Trim('"');
         }
 
         return value;

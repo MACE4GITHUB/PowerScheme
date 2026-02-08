@@ -5,32 +5,30 @@ using RunAs.Common.Services;
 
 namespace RegistryManager;
 
-public class ExecutorRegistryService : ExecutorService
+public class RegistryExecutorService : ExecutorService
 {
     private const string NAME = "RegWriter";
     private bool _isExecuted;
 
-    public ExecutorRegistryService(ResourceManager resourceManager, RegistryParam registryParam, RegistryAdminAction registryAdminAction, object fileName)
+    public RegistryExecutorService(
+        ResourceManager resourceManager,
+        RegistryParam registryParam,
+        RegistryAdminAction registryAdminAction,
+        object fileName) :
+        base(NAME, "", resourceManager)
     {
         RegistryAdminAction = registryAdminAction;
-        
-        if (fileName is Guid guidFileName)
-        {
-            RegistryFileName = guidFileName.ToString();
-        }
-        else
-        {
-            RegistryFileName = (string) fileName;
-        }
+
+        RegistryFileName = fileName is Guid guidFileName
+            ? $"{guidFileName}"
+            : (string)fileName;
 
         RegistrySaver = new RegistrySaver(registryAdminAction, RegistryFileName)
         {
             RegistryParam = registryParam
         };
 
-        Name = NAME;
         Arguments = RegistrySaver.Arguments;
-        ResourceManager = resourceManager;
     }
 
     public RegistrySaver RegistrySaver { get; }
@@ -43,7 +41,7 @@ public class ExecutorRegistryService : ExecutorService
     {
         if (_isExecuted)
         {
-            throw new ArgumentNullException(nameof(RegistrySaver));
+            throw new ArgumentException(nameof(RegistrySaver));
         }
 
         RegistrySaver.SaveToStore();

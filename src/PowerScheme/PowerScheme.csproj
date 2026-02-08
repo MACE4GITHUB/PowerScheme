@@ -36,6 +36,7 @@
 		<ProjectReference Include="..\PowerSchemeServiceAPI\PowerSchemeServiceAPI.csproj" />
 		<ProjectReference Include="..\RegistryManager\RegistryManager.csproj" />
 		<ProjectReference Include="..\RunAs.Common\RunAs.Common.csproj" />
+		<ProjectReference Include="..\Updater.Common\Updater.Common.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -64,6 +65,7 @@
 		<None Include="Resources\Stop.png" />
 		<None Include="Resources\Ultimate.png" />
 		<None Include="Resources\Unknown.png" />
+		<None Include="Resources\Update.png" />
 		<None Include="Resources\Updater.exe" />
 	</ItemGroup>
 

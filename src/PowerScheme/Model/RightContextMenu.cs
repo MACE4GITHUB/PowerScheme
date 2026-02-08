@@ -5,11 +5,14 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Common;
+using Languages;
 using PowerScheme.Properties;
+using PowerScheme.Services;
 using PowerSchemeServiceAPI;
 using PowerSchemeServiceAPI.Model;
 using RegistryManager;
 using RunAs.Common.Utils;
+using Updater.Common;
 using static PowerScheme.MenuLookup;
 using static PowerScheme.Utility.TrayIcon;
 
@@ -17,12 +20,17 @@ namespace PowerScheme.Model;
 
 public sealed class RightContextMenu(
     IContainer components,
-    IPowerSchemeService power) :
+    IPowerSchemeService power,
+    IUpdateService updateService) :
     ContextMainMenu(components, power)
 {
+    private const string POWER_CANNOT_BE_NULL = "Power cannot be null .";
+    private ReleaseInfo _releaseInfo = ReleaseInfo.Empty;
+
     protected override void BuildContextMenu()
     {
         AddMenuItemInfo();
+        AddMenuItemUpdateApp();
         AddMenuItemSeparator();
         AddMenuItemStartWithWindows();
         AddMenuItemHibernate();
@@ -33,11 +41,34 @@ public sealed class RightContextMenu(
         AddMenuItemExit();
     }
 
+    public void SetNewVersion(ReleaseInfo releaseInfo)
+    {
+        var menu = Items[nameof(MenuItm.UpdateApp)];
+
+        var previousReleaseInfo = _releaseInfo.Clone();
+        _releaseInfo = releaseInfo.Clone();
+
+        menu.Visible = _releaseInfo.NewVersionAvailable;
+
+        if (_releaseInfo.NewVersionAvailable)
+        {
+            if (previousReleaseInfo != _releaseInfo)
+            {
+                menu.Text = $"{Language.Current.UpdateAppToVersion} {_releaseInfo.RemoteVersion}";
+
+            }
+        }
+        else
+        {
+            menu.Text = MenuItems[MenuItm.UpdateApp].Name;
+        }
+    }
+
     public override void ClearMenu()
     {
         if (Power == null)
         {
-            throw new ArgumentNullException(nameof(Power));
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
         }
 
         if (Items.Count <= 0)
@@ -46,6 +77,7 @@ public sealed class RightContextMenu(
         }
 
         // Unsubscribe handlers and dispose images/items deterministically.
+        UnsubscribeAndDisposeItem(Items[nameof(MenuItm.UpdateApp)], UpdateAppOnClick);
         UnsubscribeAndDisposeItem(Items[nameof(MenuItm.StartupOnWindows)], StartWithWindowsOnClick);
         UnsubscribeAndDisposeItem(Items[nameof(MenuItm.Sleep)], SleepOnClick);
         UnsubscribeAndDisposeItem(Items[nameof(MenuItm.Exit)], ExitOnClick);
@@ -158,7 +190,7 @@ public sealed class RightContextMenu(
     {
         if (Power == null)
         {
-            throw new ArgumentNullException(nameof(Power));
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
         }
 
         CheckMenu(
@@ -190,7 +222,7 @@ public sealed class RightContextMenu(
     {
         if (Power == null)
         {
-            throw new ArgumentNullException(nameof(Power));
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
         }
 
         var itemDropDownSetting = new ToolStripMenuItem
@@ -278,6 +310,22 @@ public sealed class RightContextMenu(
         Items.Add(itemDropDownSetting);
     }
 
+    private void AddMenuItemUpdateApp()
+    {
+        var image = GetImage(MenuItems[MenuItm.UpdateApp].Picture);
+        var item = new ToolStripMenuItem
+        {
+            Name = nameof(MenuItm.UpdateApp),
+            Text = MenuItems[MenuItm.UpdateApp].Name,
+            Visible = _releaseInfo.NewVersionAvailable,
+            ImageScaling = ToolStripItemImageScaling.SizeToFit,
+            Image = CloneBitmap(image)
+        };
+
+        item.Click += UpdateAppOnClick;
+        Items.Add(item);
+    }
+
     private void AddMenuItemStartWithWindows()
     {
         var item = new ToolStripMenuItem
@@ -304,7 +352,7 @@ public sealed class RightContextMenu(
     {
         if (Power == null)
         {
-            throw new ArgumentNullException(nameof(Power));
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
         }
 
         if (!Power.ExistsHibernate)
@@ -366,7 +414,7 @@ public sealed class RightContextMenu(
     {
         if (Power == null)
         {
-            throw new ArgumentNullException(nameof(Power));
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
         }
 
         if (!Power.ExistsMobilePlatformRole)
@@ -405,7 +453,7 @@ public sealed class RightContextMenu(
     {
         if (Power == null)
         {
-            throw new ArgumentNullException(nameof(Power));
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
         }
 
         if (sender is not ToolStripMenuItem item)
@@ -425,7 +473,7 @@ public sealed class RightContextMenu(
     {
         if (Power == null)
         {
-            throw new ArgumentNullException(nameof(Power));
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
         }
 
         if (Items[nameof(MenuItm.Settings)] is not ToolStripMenuItem settingsToolStripMenuItem)
@@ -455,7 +503,7 @@ public sealed class RightContextMenu(
     {
         if (Power == null)
         {
-            throw new ArgumentNullException(nameof(Power));
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
         }
 
         Power.RestoreDefaultPowerSchemes();
@@ -470,7 +518,7 @@ public sealed class RightContextMenu(
     {
         if (Power == null)
         {
-            throw new ArgumentNullException(nameof(Power));
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
         }
 
         Power.CreateTypicalSchemes();
@@ -480,7 +528,7 @@ public sealed class RightContextMenu(
     {
         if (Power == null)
         {
-            throw new ArgumentNullException(nameof(Power));
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
         }
 
         Power.Watchers.RaiseActionWithoutWatchers(DeleteTypicalScheme);
@@ -492,6 +540,9 @@ public sealed class RightContextMenu(
             Power.DeleteAllTypicalScheme();
         }
     }
+
+    private void UpdateAppOnClick(object? sender, EventArgs e) =>
+        updateService.Update();
 
     private static void StartWithWindowsOnClick(object? sender, EventArgs e)
     {
@@ -534,7 +585,7 @@ public sealed class RightContextMenu(
     {
         if (Power == null)
         {
-            throw new ArgumentNullException(nameof(Power));
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
         }
 
         if (sender is not ToolStripMenuItem menu)
@@ -576,7 +627,7 @@ public sealed class RightContextMenu(
     {
         if (Power == null)
         {
-            throw new ArgumentNullException(nameof(Power));
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
         }
 
         if (Items[nameof(MenuItm.Lid)] is not ToolStripMenuItem lidItems)

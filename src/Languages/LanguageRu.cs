@@ -2,7 +2,13 @@
 
 public sealed class LanguageRu : Language
 {
-    public override string Exit
+    public override string UpdateApp
+        => "Обновить приложение";
+
+    public override string UpdateAppToVersion
+        => "Обновить приложение до версии";
+
+    public override string Quit
         => "Выход";
 
     public override string StartupOnWindows
@@ -118,8 +124,8 @@ public sealed class LanguageRu : Language
     public override string FirstStartDescription
         => $"Создать типовые схемы электропитания ({StableName}, {MediaName}, {SimpleName})? " +
            $"\n\n {StableName} - схема на основе Высокая производительность.\n Частота постоянная. \n Для повседневных не критических задач." +
-           $"\n\n {MediaName} - схема на основе Сбалансированная. \n Частота переменная. \n Для просмотра видео, прослушивания аудио."+
-           $"\n\n {SimpleName} - схема на основе Экономия энергии. \n Частота переменная, преимущественно низкая. \n Для просмотра интернет."+
+           $"\n\n {MediaName} - схема на основе Сбалансированная. \n Частота переменная. \n Для просмотра видео, прослушивания аудио." +
+           $"\n\n {SimpleName} - схема на основе Экономия энергии. \n Частота переменная, преимущественно низкая. \n Для просмотра интернет." +
            $"\n\n При нажатии \"Нет\" типовые схемы можно будет создать позже из меню \"Настройки\".";
 
     public override string None
