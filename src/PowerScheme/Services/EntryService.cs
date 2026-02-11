@@ -27,7 +27,9 @@ internal sealed class EntryService : IDisposable
     /// <summary>
     /// Determines the application startup order.
     /// </summary>
-    public EntryService(IPowerSchemeService power, IMainMessageBox messageBox)
+    public EntryService(
+        IPowerSchemeService power,
+        IMainMessageBox messageBox)
     {
         ActionFirstStart = ShowFirstStartDialog;
         _power = power;

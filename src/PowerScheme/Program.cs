@@ -11,7 +11,7 @@ namespace PowerScheme;
 
 internal static class Program
 {
-    private static Mutex? _mutexObj;
+    public static Mutex? OnceAppMutex { get; set; }
 
     [STAThread]
     private static void Main()
@@ -29,12 +29,12 @@ internal static class Program
                    DiRoot.GetService<IMainMessageBox>()))
         {
             entry.Validate();
-            _mutexObj = entry.Mutex;
+            OnceAppMutex = entry.Mutex;
         }
 
         Application.Run((ApplicationContext)DiRoot.GetService<IViewService>());
 
-        _mutexObj?.Dispose();
+        OnceAppMutex?.Dispose();
     }
 
     #region Exception Handlers

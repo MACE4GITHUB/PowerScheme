@@ -4,7 +4,7 @@ using RegistryManager.Common;
 using RegistryManager.Savers;
 using RunAs.Common.Services;
 
-namespace RegistryManager;
+namespace RegistryManager.Executor;
 
 public class RegistryExecutorService : ExecutorService
 {

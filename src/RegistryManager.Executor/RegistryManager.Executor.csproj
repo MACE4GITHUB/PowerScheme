@@ -6,8 +6,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Common.Paths\Common.Paths.csproj" />
-		<ProjectReference Include="..\RegistryManager.Api\RegistryManager.Api.csproj" />
+		<ProjectReference Include="..\RegistryManager.Savers\RegistryManager.Savers.csproj" />
+		<ProjectReference Include="..\RunAs.Common\RunAs.Common.csproj" />
 	</ItemGroup>
 
 </Project>
+

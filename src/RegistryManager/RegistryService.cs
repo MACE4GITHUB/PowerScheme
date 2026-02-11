@@ -6,7 +6,8 @@ using Common.Paths;
 using Microsoft.Win32;
 using PowerManagerAPI;
 using RegistryManager.Common;
-using static RegistryManager.Savers.Registry;
+using RegistryManager.Executor;
+using static RegistryManager.Api.Registry;
 
 namespace RegistryManager;
 

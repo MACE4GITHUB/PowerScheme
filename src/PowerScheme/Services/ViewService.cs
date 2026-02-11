@@ -1,8 +1,10 @@
 ﻿using System.Reflection;
 using System.Windows.Forms;
+using Common.Paths;
 using PowerScheme.EventArguments;
 using PowerScheme.Model;
 using PowerScheme.Timers;
+using RegistryManager.Dpi;
 using RegistryManager.EventsArgs;
 using static PowerScheme.Utility.TrayIcon;
 
@@ -13,6 +15,7 @@ public sealed class ViewService : ApplicationContext, IViewService
     private const string SHOW_CONTEXT_MENU = "ShowContextMenu";
     private readonly IViewModel _viewModel;
     private readonly UpdateTimer _updateTimer;
+    private readonly DpiWatchers _dpiWatchers;
 
     public ViewService(
         IViewModel viewModel,
@@ -21,6 +24,10 @@ public sealed class ViewService : ApplicationContext, IViewService
         _viewModel = viewModel;
         _updateTimer = new UpdateTimer(updateService);
         _updateTimer.NotifyUpdate += NotifyAppUpdate;
+
+        _dpiWatchers = new DpiWatchers();
+        _dpiWatchers.Changed += DpiWatchers_Changed;
+
         Start();
     }
 
@@ -38,19 +45,31 @@ public sealed class ViewService : ApplicationContext, IViewService
         _viewModel.BuildAllMenu();
 
         _updateTimer.Start();
+        _dpiWatchers.Start();
     }
 
     public void Stop()
     {
         _viewModel.Power.Watchers.ActivePowerScheme.Changed -= ChangedActivePowerScheme;
 
+        _viewModel.Power.Watchers.Stop();
+        _viewModel.ClearAllMenu();
+
+        _dpiWatchers.Stop();
+        _dpiWatchers.Changed -= DpiWatchers_Changed;
+
         _viewModel.NotifyIcon.MouseClick -= NotifyIcon_MouseClick;
         _viewModel.NotifyIcon.Visible = false;
 
         _viewModel.RemoveIcon();
+    }
 
-        _viewModel.Power.Watchers.Stop();
-        _viewModel.ClearAllMenu();
+    private static void DpiWatchers_Changed(object sender, RegistryChangedEventArgs e)
+    {
+        Program.OnceAppMutex?.Dispose();
+
+        System.Diagnostics.Process.Start(Default.ApplicationFileName);
+        Application.Exit();
     }
 
     private void ChangedActivePowerScheme(object? sender, RegistryChangedEventArgs e)

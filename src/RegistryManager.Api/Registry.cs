@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.Win32;
 using RegistryManager.Common;
 
-namespace RegistryManager.Savers;
+namespace RegistryManager.Api;
 
 public static class Registry
 {
@@ -61,7 +61,7 @@ public static class Registry
     {
         if (registryParam.Value == null)
         {
-            throw new ArgumentNullException(nameof(registryParam.Value));
+            throw new ArgumentException(nameof(registryParam.Value));
         }
 
         using var regKey = GetRegistryKey(registryParam, true, true);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Common.Paths;
+using RegistryManager.Api;
 using RegistryManager.Common;
 using RegistryManager.Extensions;
 
