@@ -69,7 +69,7 @@ public static class PowerManager
 
             if (res == (uint)ErrorCode.MORE_DATA)
             {
-                // The buffer was too small. The API function has already updated the value that bufferSize points  
+                // The buffer was too small. The API function has already updated the value that bufferSize points
                 // to be the needed size, so all we need is to create a buffer of that size and run the API call again.
                 Marshal.FreeHGlobal(buffer);
                 buffer = Marshal.AllocHGlobal((int)bufferSize);
@@ -123,7 +123,7 @@ public static class PowerManager
 
             if (res == (uint)ErrorCode.MORE_DATA)
             {
-                // The buffer was too small. The API function has already updated the value that bufferSize points to 
+                // The buffer was too small. The API function has already updated the value that bufferSize points to
                 // to be the needed size, so all we need is to create a buffer of that size and run the API call again.
                 Marshal.FreeHGlobal(buffer);
                 buffer = Marshal.AllocHGlobal((int)bufferSize);
@@ -378,7 +378,7 @@ public static class PowerManager
 
     public static bool IsSleep()
         => GetCapabilities().SystemS1;
-        
+
     private static SYSTEM_POWER_CAPABILITIES GetCapabilities() => GetPwrCapabilities(out var c) ? c : default;
 
     #region DLL Imports

@@ -6,8 +6,8 @@ using System.Threading;
 using Microsoft.Win32;
 using RegistryManager.Common;
 using RegistryManager.EventsArgs;
+using static RegistryManager.Api.Registry;
 using static RegistryManager.NativeMethods;
-using static RegistryManager.Savers.Registry;
 
 namespace RegistryManager;
 
@@ -20,7 +20,7 @@ namespace RegistryManager;
 /// <para>The Windows API provides a function
 /// <a href="http://msdn.microsoft.com/library/en-us/sysinfo/base/regnotifychangekeyvalue.asp">
 /// RegNotifyChangeKeyValue</a>, which is not covered by the
-/// <see cref="Microsoft.Win32.RegistryKey"/> class. <see cref="IRegistryWatcher"/> imports
+/// <see cref="RegistryKey"/> class. <see cref="IRegistryWatcher"/> imports
 /// that function and encapsulates it in a convenient manner.
 /// </para>
 /// </remarks>
@@ -263,7 +263,9 @@ public sealed class RegistryWatcher<T> : IRegistryWatcher, IDisposable
             }
 
             _eventTerminate.Set();
-            thread.Join();
+            thread.Join(TimeSpan.FromSeconds(2));
+
+            _thread = null;
         }
     }
 
@@ -315,26 +317,35 @@ public sealed class RegistryWatcher<T> : IRegistryWatcher, IDisposable
             using var hEvent = eventNotify.SafeWaitHandle;
             WaitHandle[] waitHandles = [eventNotify, _eventTerminate];
 
-            while (!_eventTerminate.WaitOne(0, true))
+            while (true)
             {
-                result = RegNotifyChangeKeyValue(registryKey, false, _regFilter, eventNotify, true);
+                if (_eventTerminate.WaitOne(0))
+                {
+                    break;
+                }
 
+                result = RegNotifyChangeKeyValue(registryKey, false, _regFilter, eventNotify, true);
                 if (result != 0)
                 {
                     throw new Win32Exception(result);
                 }
 
-                if (WaitHandle.WaitAny(waitHandles) == 0)
+                var signaled = WaitHandle.WaitAny(waitHandles);
+                if (signaled == 0)
                 {
                     OnChanged();
+                }
+                else if (signaled == 1)
+                {
+                    break;
                 }
             }
         }
         finally
         {
-            if (registryKey != IntPtr.Zero && RegCloseKey(registryKey) != 0)
+            if (registryKey != IntPtr.Zero)
             {
-                // Do nothing
+                RegCloseKey(registryKey);
             }
         }
     }

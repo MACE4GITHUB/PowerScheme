@@ -1,5 +1,5 @@
 ﻿#pragma warning disable 693
-namespace RegistryManager.Savers;
+namespace RegistryManager.Api;
 
 /// <summary>
 /// Represents an operation Result.

@@ -22,6 +22,7 @@ ILRepack.exe ^
  /out:%RESOURCES_DIR%\RegWriter.exe ^
  %REGWRITER_DIR%\RegWriter.exe ^
  %REGWRITER_DIR%\Common.Paths.dll ^
+ %REGWRITER_DIR%\RegistryManager.Api.dll ^
  %REGWRITER_DIR%\RegistryManager.Common.dll ^
  %REGWRITER_DIR%\RegistryManager.Extensions.dll ^
  %REGWRITER_DIR%\RegistryManager.Savers.dll ^
@@ -66,8 +67,11 @@ ILRepack.exe ^
  %APP_DIR%\Microsoft.Extensions.DependencyInjection.Abstractions.dll ^
  %APP_DIR%\PowerManagerAPI.dll ^
  %APP_DIR%\PowerSchemeServiceAPI.dll ^
+ %APP_DIR%\RegistryManager.Api.dll ^
  %APP_DIR%\RegistryManager.Common.dll ^
  %APP_DIR%\RegistryManager.dll ^
+ %APP_DIR%\RegistryManager.Dpi.dll ^
+ %APP_DIR%\RegistryManager.Executor.dll ^
  %APP_DIR%\RegistryManager.Extensions.dll ^
  %APP_DIR%\RegistryManager.Savers.dll ^
  %APP_DIR%\RunAs.Common.dll ^
