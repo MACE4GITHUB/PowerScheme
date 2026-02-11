@@ -66,4 +66,5 @@ public abstract class Language
     public abstract string Ignore { get; }
     public abstract string Yes { get; }
     public abstract string No { get; }
+    public abstract string RunAsAdministrator { get; }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Threading;
 using System.Windows.Forms;
 using Common.Paths;
@@ -44,7 +46,8 @@ internal sealed class EntryService : IDisposable
         .ValidateOnceApplication()
         .ValidateAdmin()
         .ValidateFirstStart()
-        .ValidateExistArtifacts();
+        .ValidateExistArtifacts()
+        .ValidateDirectoryPermissions();
 
     /// <summary>
     /// Gets Mutex to start one application instance.
@@ -207,6 +210,50 @@ internal sealed class EntryService : IDisposable
         foreach (var artifact in artifacts.Where(File.Exists))
         {
             File.Delete(artifact);
+        }
+
+        return this;
+    }
+
+    private EntryService ValidateDirectoryPermissions()
+    {
+        try
+        {
+            var folderPath = Default.ApplicationPath;
+            if (string.IsNullOrEmpty(folderPath))
+            {
+                return this;
+            }
+
+            var dInfo = new DirectoryInfo(folderPath);
+            var dSecurity = dInfo.GetAccessControl();
+            var authUserSid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
+            var rules = dSecurity.GetAccessRules(true, true, typeof(SecurityIdentifier));
+            var groupExists = rules
+                .Cast<FileSystemAccessRule>()
+                .Any(r => r.IdentityReference == authUserSid);
+
+            if (!groupExists)
+            {
+                var accessRule = new FileSystemAccessRule(
+                    authUserSid,
+                    FileSystemRights.Modify,
+                    InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                    PropagationFlags.None,
+                    AccessControlType.Allow);
+
+                dSecurity.AddAccessRule(accessRule);
+                dInfo.SetAccessControl(dSecurity);
+            }
+        }
+        catch
+        {
+            _messageBox.Show(
+                Language.Current.RunAsAdministrator,
+                Language.Current.Error,
+                icon: MessageBoxIcon.Warning,
+                isApplicationExit: true,
+            timeout: 15);
         }
 
         return this;

@@ -145,4 +145,7 @@ public sealed class LanguageEn : Language
 
     public override string No
         => "No";
+
+    public override string RunAsAdministrator
+        => "You don't have permission to manage power settings. \n\nRun the app once as an administrator to set permissions.";
 }
