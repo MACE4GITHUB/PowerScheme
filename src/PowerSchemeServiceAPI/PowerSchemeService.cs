@@ -39,7 +39,7 @@ public class PowerSchemeService : IPowerSchemeService
     public IEnumerable<IPowerScheme> UserPowerSchemes
         => RegistryService.UserPowerSchemes.Select(NewPowerScheme);
 
-    private IEnumerable<IPowerScheme> PowerSchemes
+    public IEnumerable<IPowerScheme> PowerSchemes
         => DefaultPowerSchemes.Union(UserPowerSchemes);
 
     public IPowerScheme ActivePowerScheme
@@ -70,15 +70,16 @@ public class PowerSchemeService : IPowerSchemeService
         }
     }
 
-    public void SetActivePowerScheme(IPowerScheme powerScheme, bool isForce = false)
+    public void SetActivePowerScheme(IPowerScheme newPowerScheme, bool isForce = false)
     {
-        if (powerScheme.Guid == ActivePowerScheme.Guid && !isForce)
+        var currentPowerScheme = ActivePowerScheme;
+        if (newPowerScheme.Guid == currentPowerScheme.Guid && !isForce)
         {
             return;
         }
 
-        PowerManager.SetActivePlan(powerScheme.Guid);
-        OnActivePowerSchemeChanged(new PowerSchemeEventArgs(powerScheme));
+        PowerManager.SetActivePlan(newPowerScheme.Guid);
+        OnActivePowerSchemeChanged(new PowerSchemeEventArgs(currentPowerScheme, newPowerScheme));
     }
 
     private void SetActivePowerScheme(Guid guid)

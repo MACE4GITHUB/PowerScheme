@@ -100,6 +100,15 @@ public static class RegistryService
         return result.IsError ? 1 : result.Data;
     }
 
+    public static Guid GetIdleMonitoring(string company, string product)
+    {
+        var result = GetSettings<string>(RegIdlePowerScheme(company, product));
+
+        return result.IsError || result.Data == null
+            ? Guid.Empty
+            : new Guid(result.Data);
+    }
+
     public static bool IsFirstStart(string company, string product)
     {
         var result = GetSettings<int>(RegAppSettings(company, product));
@@ -149,6 +158,13 @@ public static class RegistryService
 
     public static void SetSleepOption(ResourceManager resourceManager, object value) =>
         SetRegistryValue(resourceManager, RegShowSleepOption, value);
+
+    public static void SetIdlePowerScheme(string company, string product, object value)
+    {
+        var regAppSettings = RegIdlePowerScheme(company, product);
+        regAppSettings.Value = value;
+        SaveSetting(regAppSettings);
+    }
 
     public static void SetAppSettings(string company, string product, object value)
     {
@@ -208,6 +224,15 @@ public static class RegistryService
             Path = @"SOFTWARE\Microsoft\Windows\CurrentVersion",
             Section = "Run",
             Name = "PowerScheme",
+        };
+
+    private static RegistryParam RegIdlePowerScheme(string company, string product) =>
+        new()
+        {
+            RegistryHive = RegistryHive.CurrentUser,
+            Path = @"SOFTWARE\" + company,
+            Section = product,
+            Name = "IdlePowerScheme"
         };
 
     private static RegistryParam RegAppSettings(string company, string product) =>

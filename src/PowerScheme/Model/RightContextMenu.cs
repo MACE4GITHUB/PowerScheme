@@ -36,6 +36,7 @@ public sealed class RightContextMenu(
         AddMenuItemHibernate();
         AddMenuItemSleep();
         AddMenuItemLid();
+        AddMenuItemIdleMonitoring();
         AddMenuItemSeparator();
         AddMenuItemSettings();
         AddMenuItemExit();
@@ -216,6 +217,7 @@ public sealed class RightContextMenu(
         }
 
         CheckLid();
+        CheckIdleMonitoring();
     }
 
     private void AddMenuItemSettings()
@@ -449,6 +451,74 @@ public sealed class RightContextMenu(
         Items.Add(item);
     }
 
+    private void AddMenuItemIdleMonitoring()
+    {
+        if (Power == null)
+        {
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
+        }
+
+        var idleMonitoringItem = new ToolStripMenuItem
+        {
+            Name = nameof(MenuItm.IdleMonitoring),
+            Text = MenuItems[MenuItm.IdleMonitoring].Name
+        };
+        var itemsDropDown = idleMonitoringItem.DropDownItems;
+
+        var idleDoNothingSrc = GetImage(MenuItems[MenuItm.IdleDoNothing].Picture);
+        var doNothingItem = new ToolStripMenuItem
+        {
+            Name = nameof(MenuItm.IdleDoNothing),
+            Text = MenuItems[MenuItm.IdleDoNothing].Name,
+            ImageScaling = ToolStripItemImageScaling.SizeToFit,
+            Image = CloneBitmap(idleDoNothingSrc),
+            Tag = Guid.Empty
+        };
+        doNothingItem.Click += ItemMenuIdleOnClick;
+
+        itemsDropDown.Add(doNothingItem);
+
+        foreach (var powerScheme in Power.PowerSchemes
+                     .Where(x => !x.IsMaxPerformance))
+        {
+            var src = GetImage(powerScheme.Picture);
+            var item = new ToolStripMenuItem
+            {
+                Tag = powerScheme.Guid,
+                Text = powerScheme.Name,
+                Image = new Bitmap(src)
+            };
+
+            src.Dispose();
+
+            item.Click += ItemMenuIdleOnClick;
+
+            itemsDropDown.Add(item);
+        }
+
+        Items.Add(idleMonitoringItem);
+    }
+
+    private void ItemMenuIdleOnClick(object sender, EventArgs e)
+    {
+        if (Power == null)
+        {
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
+        }
+
+        if (sender is not ToolStripMenuItem item)
+        {
+            return;
+        }
+
+        if (item.Tag is not Guid value)
+        {
+            return;
+        }
+
+        RegistryService.SetIdlePowerScheme(AppInfo.CompanyName, AppInfo.ProductName, value);
+    }
+
     private void LidOnClick(object? sender, EventArgs e)
     {
         if (Power == null)
@@ -661,6 +731,49 @@ public sealed class RightContextMenu(
         var prev = Items[nameof(MenuItm.Lid)]?.Image;
         var nextImg = GetImage(pictureName);
         Items[nameof(MenuItm.Lid)]?.Image = CloneBitmap(nextImg);
+        prev?.Dispose();
+    }
+
+    private void CheckIdleMonitoring()
+    {
+        if (Power == null)
+        {
+            throw new ArgumentException(POWER_CANNOT_BE_NULL);
+        }
+
+        if (Items[nameof(MenuItm.IdleMonitoring)] is not ToolStripMenuItem idleMonitoringItem)
+        {
+            return;
+        }
+
+        var idlePowerSchemeGuid = RegistryService.GetIdleMonitoring(AppInfo.CompanyName, AppInfo.ProductName);
+
+        var pictureName = ImageItem.Unknown;
+
+        if (idlePowerSchemeGuid == Guid.Empty)
+        {
+            pictureName = ImageItem.Nothing;
+        }
+        else
+        {
+            foreach (ToolStripMenuItem idleStripMenuItem in idleMonitoringItem.DropDownItems)
+            {
+                var valueTag = (Guid)idleStripMenuItem.Tag!;
+                var @checked = idlePowerSchemeGuid == valueTag;
+
+                if (@checked)
+                {
+                    pictureName = Power.PowerSchemes
+                        .Where(x => x.Guid == valueTag)
+                        .Select(x => x.Picture)
+                        .FirstOrDefault();
+                }
+            }
+        }
+
+        var prev = Items[nameof(MenuItm.IdleMonitoring)]?.Image;
+        var nextImg = GetImage(pictureName);
+        Items[nameof(MenuItm.IdleMonitoring)]?.Image = CloneBitmap(nextImg);
         prev?.Dispose();
     }
 

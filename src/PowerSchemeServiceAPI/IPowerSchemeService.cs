@@ -11,6 +11,7 @@ public interface IPowerSchemeService
     IEnumerable<IPowerScheme> DefaultPowerSchemes { get; }
     IEnumerable<IPowerScheme> TypicalPowerSchemes { get; }
     IEnumerable<IPowerScheme> UserPowerSchemes { get; }
+    IEnumerable<IPowerScheme> PowerSchemes { get; }
 
     Watchers Watchers { get; }
 
@@ -18,9 +19,9 @@ public interface IPowerSchemeService
     /// Set the Active Power Scheme.
     /// <para>isForce - Need to apply new AC & DC values</para>
     /// </summary>
-    /// <param name="powerScheme"></param>
+    /// <param name="newPowerScheme"></param>
     /// <param name="isForce">Need to apply new AC & DC values</param>
-    void SetActivePowerScheme(IPowerScheme powerScheme, bool isForce = false);
+    void SetActivePowerScheme(IPowerScheme newPowerScheme, bool isForce = false);
 
     bool IsNeedAdminAccessForChangePowerScheme { get; }
 
