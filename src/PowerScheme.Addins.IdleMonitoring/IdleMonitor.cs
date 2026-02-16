@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using static PowerScheme.Addins.IdleMonitoring.Constants;
 
 namespace PowerScheme.Addins.IdleMonitoring;
 
@@ -16,7 +15,7 @@ public class IdleMonitor(
     public event EventHandler? OnActive;
 
     public async Task StartAsync(
-        TimeSpan threshold)
+        IdleMonitorOption idleMonitorOption)
     {
         lock (_sync)
         {
@@ -26,7 +25,7 @@ public class IdleMonitor(
             }
 
             _cts = new CancellationTokenSource();
-            _monitoringTask = MonitorLoopAsync(threshold, _cts.Token);
+            _monitoringTask = MonitorLoopAsync(idleMonitorOption, _cts.Token);
         }
 
         await Task.Yield();
@@ -55,9 +54,18 @@ public class IdleMonitor(
     }
 
     private async Task MonitorLoopAsync(
-        TimeSpan threshold,
+        IdleMonitorOption idleMonitorOption,
         CancellationToken token)
     {
+        if (!idleMonitorOption.IsValid)
+        {
+            idleMonitorOption = IdleMonitorOption.Default;
+        }
+
+        var idleThresholdInMilliseconds = TimeSpan.FromMilliseconds(idleMonitorOption.IdleThresholdInMilliseconds);
+        var pollingIdleTimeInMilliseconds = TimeSpan.FromMilliseconds(idleMonitorOption.PollingIdleTimeInMilliseconds);
+        var pollingActiveTimeInMilliseconds = TimeSpan.FromMilliseconds(idleMonitorOption.PollingActiveTimeInMilliseconds);
+
         var isIdle = false;
 
         try
@@ -68,19 +76,19 @@ public class IdleMonitor(
 
                 switch (isIdle)
                 {
-                    case false when idle >= threshold:
+                    case false when idle >= idleThresholdInMilliseconds:
                         isIdle = true;
                         RaiseEvent(OnIdle);
                         break;
-                    case true when idle < threshold:
+                    case true when idle < idleThresholdInMilliseconds:
                         isIdle = false;
                         RaiseEvent(OnActive);
                         break;
                 }
 
                 var delay = isIdle
-                    ? DEFAULT_POLLING_IDLE_TIME_IN_MILLISECONDS
-                    : DEFAULT_POLLING_ACTIVE_TIME_IN_MILLISECONDS;
+                    ? pollingIdleTimeInMilliseconds
+                    : pollingActiveTimeInMilliseconds;
 
                 await Task.Delay(delay, token);
             }

@@ -1,16 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Windows.Forms;
 using Common.Paths;
-using PowerScheme.Addins.IdleMonitoring;
 using PowerScheme.EventArguments;
 using PowerScheme.Model;
 using PowerScheme.Timers;
-using RegistryManager;
 using RegistryManager.Dpi;
 using RegistryManager.EventsArgs;
-using static PowerScheme.Addins.IdleMonitoring.Constants;
 using static PowerScheme.Utility.TrayIcon;
 
 namespace PowerScheme.Services;
@@ -19,14 +14,14 @@ public sealed class ViewService : ApplicationContext, IViewService
 {
     private const string SHOW_CONTEXT_MENU = "ShowContextMenu";
     private readonly IViewModel _viewModel;
-    private readonly IIdleMonitor _idleMonitor;
     private readonly UpdateTimer _updateTimer;
     private readonly DpiWatchers _dpiWatchers;
+    private readonly IIdleMonitorService _idleMonitorService;
 
     public ViewService(
         IViewModel viewModel,
         IUpdateService updateService,
-        IIdleMonitor idleMonitor)
+        IIdleMonitorService idleMonitorService)
     {
         _viewModel = viewModel;
         _updateTimer = new UpdateTimer(updateService);
@@ -35,37 +30,9 @@ public sealed class ViewService : ApplicationContext, IViewService
         _dpiWatchers = new DpiWatchers();
         _dpiWatchers.Changed += DpiWatchers_Changed;
 
-        _idleMonitor = idleMonitor;
-        _idleMonitor.OnIdle += IdleMonitor_OnIdle;
-        _idleMonitor.OnActive += IdleMonitor_OnActive;
+        _idleMonitorService = idleMonitorService;
 
         Start();
-    }
-
-    private void IdleMonitor_OnActive(object sender, EventArgs e)
-    {
-        var previousPowerScheme = _viewModel.Power
-            .DefaultPowerSchemes
-            .First(x => x.Guid == new Guid("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"));
-
-        _viewModel.Power.SetActivePowerScheme(previousPowerScheme);
-    }
-
-    private void IdleMonitor_OnIdle(object sender, EventArgs e)
-    {
-        var idlePowerSchemeGuid = GetIdlePowerSchemeGuid();
-
-        var idlePowerScheme = _viewModel.Power
-            .UserPowerSchemes
-            .FirstOrDefault(x => x.Guid == idlePowerSchemeGuid) ??
-             _viewModel.Power
-                .DefaultPowerSchemes
-                .FirstOrDefault(x => x.Guid == idlePowerSchemeGuid) ??
-            _viewModel.Power
-                .DefaultPowerSchemes
-                .Last(x => !x.IsMaxPerformance && x.IsNative);
-
-        _viewModel.Power.SetActivePowerScheme(idlePowerScheme);
     }
 
     public void Start()
@@ -83,18 +50,12 @@ public sealed class ViewService : ApplicationContext, IViewService
 
         _updateTimer.Start();
         _dpiWatchers.Start();
-
-        var idlePowerSchemeGuid = GetIdlePowerSchemeGuid();
-        if (idlePowerSchemeGuid != Guid.Empty)
-        {
-            _idleMonitor.StartAsync(TimeSpan.FromSeconds(IDLE_THRESHOLD_IN_SECONDS));
-        }
+        _idleMonitorService.Start();
     }
 
     public void Stop()
     {
         _updateTimer.Stop();
-        _idleMonitor.Stop();
 
         _viewModel.Power.Watchers.ActivePowerScheme.Changed -= ChangedActivePowerScheme;
 
@@ -103,6 +64,8 @@ public sealed class ViewService : ApplicationContext, IViewService
 
         _dpiWatchers.Stop();
         _dpiWatchers.Changed -= DpiWatchers_Changed;
+
+        _idleMonitorService.Stop();
 
         _viewModel.NotifyIcon.MouseClick -= NotifyIcon_MouseClick;
         _viewModel.NotifyIcon.Visible = false;
@@ -163,9 +126,6 @@ public sealed class ViewService : ApplicationContext, IViewService
                 .SetNewVersion(releaseInfo);
         }
     }
-
-    private static Guid GetIdlePowerSchemeGuid() =>
-        RegistryService.GetIdleMonitoring(AppInfo.CompanyName, AppInfo.ProductName);
 
     protected override void Dispose(bool disposing)
     {

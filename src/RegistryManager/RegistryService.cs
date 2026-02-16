@@ -13,6 +13,8 @@ namespace RegistryManager;
 
 public static class RegistryService
 {
+    private const string IDLE_MONITOR = "IdleMonitor";
+
     public static bool IsRunOnStartup
     {
         get
@@ -109,6 +111,42 @@ public static class RegistryService
             : new Guid(result.Data);
     }
 
+    public static Guid GetMainMonitoring(string company, string product)
+    {
+        var result = GetSettings<string>(RegMainPowerScheme(company, product));
+
+        return result.IsError || result.Data == null
+            ? Guid.Empty
+            : new Guid(result.Data);
+    }
+
+    public static int GetIdleThresholdInMilliseconds(string company, string product)
+    {
+        var result = GetSettings<int>(RegIdleThresholdInMilliseconds(company, product));
+
+        return result.IsError
+            ? -1
+            : result.Data;
+    }
+
+    public static int GetPollingActiveTimeInMilliseconds(string company, string product)
+    {
+        var result = GetSettings<int>(RegPollingActiveTimeInMilliseconds(company, product));
+
+        return result.IsError
+            ? -1
+            : result.Data;
+    }
+
+    public static int GetPollingIdleTimeInMilliseconds(string company, string product)
+    {
+        var result = GetSettings<int>(RegPollingIdleTimeInMilliseconds(company, product));
+
+        return result.IsError
+            ? -1
+            : result.Data;
+    }
+
     public static bool IsFirstStart(string company, string product)
     {
         var result = GetSettings<int>(RegAppSettings(company, product));
@@ -162,6 +200,34 @@ public static class RegistryService
     public static void SetIdlePowerScheme(string company, string product, object value)
     {
         var regAppSettings = RegIdlePowerScheme(company, product);
+        regAppSettings.Value = value;
+        SaveSetting(regAppSettings);
+    }
+
+    public static void SetMainPowerScheme(string company, string product, object value)
+    {
+        var regAppSettings = RegMainPowerScheme(company, product);
+        regAppSettings.Value = value;
+        SaveSetting(regAppSettings);
+    }
+
+    public static void SetIdleThresholdInMilliseconds(string company, string product, object value)
+    {
+        var regAppSettings = RegIdleThresholdInMilliseconds(company, product);
+        regAppSettings.Value = value;
+        SaveSetting(regAppSettings);
+    }
+
+    public static void SetPollingActiveTimeInMilliseconds(string company, string product, object value)
+    {
+        var regAppSettings = RegPollingActiveTimeInMilliseconds(company, product);
+        regAppSettings.Value = value;
+        SaveSetting(regAppSettings);
+    }
+
+    public static void SetPollingIdleTimeInMilliseconds(string company, string product, object value)
+    {
+        var regAppSettings = RegPollingIdleTimeInMilliseconds(company, product);
         regAppSettings.Value = value;
         SaveSetting(regAppSettings);
     }
@@ -230,10 +296,49 @@ public static class RegistryService
         new()
         {
             RegistryHive = RegistryHive.CurrentUser,
-            Path = @"SOFTWARE\" + company,
-            Section = product,
+            Path = GetAppPath(company, product),
+            Section = IDLE_MONITOR,
             Name = "IdlePowerScheme"
         };
+
+    private static RegistryParam RegMainPowerScheme(string company, string product) =>
+        new()
+        {
+            RegistryHive = RegistryHive.CurrentUser,
+            Path = GetAppPath(company, product),
+            Section = IDLE_MONITOR,
+            Name = "MainPowerScheme"
+        };
+
+    private static RegistryParam RegIdleThresholdInMilliseconds(string company, string product) =>
+        new()
+        {
+            RegistryHive = RegistryHive.CurrentUser,
+            Path = GetAppPath(company, product),
+            Section = IDLE_MONITOR,
+            Name = "IdleThresholdInMilliseconds"
+        };
+
+    private static RegistryParam RegPollingActiveTimeInMilliseconds(string company, string product) =>
+        new()
+        {
+            RegistryHive = RegistryHive.CurrentUser,
+            Path = GetAppPath(company, product),
+            Section = IDLE_MONITOR,
+            Name = "PollingActiveTimeInMilliseconds"
+        };
+
+    private static RegistryParam RegPollingIdleTimeInMilliseconds(string company, string product) =>
+        new()
+        {
+            RegistryHive = RegistryHive.CurrentUser,
+            Path = GetAppPath(company, product),
+            Section = IDLE_MONITOR,
+            Name = "PollingIdleTimeInMilliseconds"
+        };
+
+    private static string GetAppPath(string company, string product) =>
+        $@"SOFTWARE\{company}\{product}";
 
     private static RegistryParam RegAppSettings(string company, string product) =>
         new()

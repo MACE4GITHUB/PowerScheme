@@ -22,6 +22,7 @@ public static class DiRoot
             .AddSingleton<IViewModel, ViewModel>()
             .AddSingleton<IViewService, ViewService>()
             .AddSingleton<IUpdateService, UpdateService>()
+            .AddSingleton<IIdleMonitorService, IdleMonitorService>()
             .AddSingleton<IContainer, Container>()
             .AddSingleton<LeftContextMenu>()
             .AddSingleton<RightContextMenu>()

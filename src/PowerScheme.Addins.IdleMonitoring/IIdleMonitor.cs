@@ -21,7 +21,7 @@ public interface IIdleMonitor
 {
     event EventHandler? OnIdle;
     event EventHandler? OnActive;
-    Task StartAsync(TimeSpan threshold);
+    Task StartAsync(IdleMonitorOption idleMonitorOption);
     void Stop();
     Task WaitForStopAsync();
 }

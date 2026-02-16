@@ -75,11 +75,17 @@ public class PowerSchemeService : IPowerSchemeService
         var currentPowerScheme = ActivePowerScheme;
         if (newPowerScheme.Guid == currentPowerScheme.Guid && !isForce)
         {
+            OnActivePowerSchemeChanged(new PowerSchemeEventArgs(currentPowerScheme, newPowerScheme));
+
             return;
         }
 
         PowerManager.SetActivePlan(newPowerScheme.Guid);
-        OnActivePowerSchemeChanged(new PowerSchemeEventArgs(currentPowerScheme, newPowerScheme));
+
+        if (!isForce)
+        {
+            OnActivePowerSchemeChanged(new PowerSchemeEventArgs(currentPowerScheme, newPowerScheme));
+        }
     }
 
     private void SetActivePowerScheme(Guid guid)
