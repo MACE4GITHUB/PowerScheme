@@ -154,4 +154,7 @@ public sealed class LanguageRu : Language
 
     public override string RunAsAdministrator
         => "Нет разрешений для управления настройками электропитания. \n\nЗапустите приложение один раз как администратор для установки разрешений.";
+
+    public override string SwitchPowerSchemeWhenIdle
+        => "Действие при простое";
 }

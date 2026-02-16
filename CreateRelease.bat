@@ -67,6 +67,7 @@ ILRepack.exe ^
  %APP_DIR%\Microsoft.Extensions.DependencyInjection.Abstractions.dll ^
  %APP_DIR%\PowerManagerAPI.dll ^
  %APP_DIR%\PowerSchemeServiceAPI.dll ^
+ %APP_DIR%\PowerScheme.Addins.IdleMonitoring.dll ^
  %APP_DIR%\RegistryManager.Api.dll ^
  %APP_DIR%\RegistryManager.Common.dll ^
  %APP_DIR%\RegistryManager.dll ^

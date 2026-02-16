@@ -4,9 +4,10 @@ using PowerSchemeServiceAPI.Model;
 namespace PowerSchemeServiceAPI.EventsArgs;
 
 public class PowerSchemeEventArgs(
-    IPowerScheme powerScheme) :
+    IPowerScheme previousPowerScheme,
+    IPowerScheme activePowerScheme) :
     EventArgs
 {
-    public IPowerScheme PowerScheme { get; } = powerScheme;
+    public IPowerScheme PreviousPowerScheme { get; } = previousPowerScheme;
+    public IPowerScheme ActivePowerScheme { get; } = activePowerScheme;
 }
-

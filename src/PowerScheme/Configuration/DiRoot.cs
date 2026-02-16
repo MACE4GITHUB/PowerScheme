@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using MessageForm;
 using Microsoft.Extensions.DependencyInjection;
+using PowerScheme.Addins.IdleMonitoring;
 using PowerScheme.Model;
 using PowerScheme.Services;
 using PowerSchemeServiceAPI;
@@ -9,21 +10,24 @@ using PowerSchemeServiceAPI;
 namespace PowerScheme.Configuration;
 
 /// <summary>
-/// Provides access to application-wide services registered in the dependency injection container.
+/// Provides access to application-wide services registered
+/// in the dependency injection container.
 /// </summary>
 public static class DiRoot
 {
     static DiRoot()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<IPowerSchemeService, PowerSchemeService>();
-        services.AddSingleton<IViewModel, ViewModel>();
-        services.AddSingleton<IViewService, ViewService>();
-        services.AddSingleton<IUpdateService, UpdateService>();
-        services.AddSingleton<IContainer, Container>();
-        services.AddSingleton<LeftContextMenu>();
-        services.AddSingleton<RightContextMenu>();
-        services.AddTransient<IMainMessageBox, MainMessageBox>();
+        services.AddSingleton<IPowerSchemeService, PowerSchemeService>()
+            .AddSingleton<IViewModel, ViewModel>()
+            .AddSingleton<IViewService, ViewService>()
+            .AddSingleton<IUpdateService, UpdateService>()
+            .AddSingleton<IIdleMonitorService, IdleMonitorService>()
+            .AddSingleton<IContainer, Container>()
+            .AddSingleton<LeftContextMenu>()
+            .AddSingleton<RightContextMenu>()
+            .AddTransient<IMainMessageBox, MainMessageBox>()
+            .AddIdleMonitoring();
 
         ServiceProvider = services.BuildServiceProvider();
     }

@@ -6,14 +6,14 @@ namespace PowerScheme.Timers;
 internal abstract class BaseTimer : IDisposable
 {
     private readonly Timer _timer;
-    private bool disposedValue;
+    private bool _disposedValue;
     private bool _success = false;
 
-    protected BaseTimer(int IntervalInMilliseconds)
+    protected BaseTimer(int intervalInMilliseconds)
     {
         _timer = new Timer
         {
-            Interval = IntervalInMilliseconds
+            Interval = intervalInMilliseconds
         };
         _timer.Tick += TimerOnTick;
     }
@@ -60,14 +60,14 @@ internal abstract class BaseTimer : IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
                 _timer.Dispose();
             }
 
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
 

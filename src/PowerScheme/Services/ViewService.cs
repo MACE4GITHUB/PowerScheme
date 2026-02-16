@@ -16,10 +16,12 @@ public sealed class ViewService : ApplicationContext, IViewService
     private readonly IViewModel _viewModel;
     private readonly UpdateTimer _updateTimer;
     private readonly DpiWatchers _dpiWatchers;
+    private readonly IIdleMonitorService _idleMonitorService;
 
     public ViewService(
         IViewModel viewModel,
-        IUpdateService updateService)
+        IUpdateService updateService,
+        IIdleMonitorService idleMonitorService)
     {
         _viewModel = viewModel;
         _updateTimer = new UpdateTimer(updateService);
@@ -27,6 +29,8 @@ public sealed class ViewService : ApplicationContext, IViewService
 
         _dpiWatchers = new DpiWatchers();
         _dpiWatchers.Changed += DpiWatchers_Changed;
+
+        _idleMonitorService = idleMonitorService;
 
         Start();
     }
@@ -46,10 +50,13 @@ public sealed class ViewService : ApplicationContext, IViewService
 
         _updateTimer.Start();
         _dpiWatchers.Start();
+        _idleMonitorService.Start();
     }
 
     public void Stop()
     {
+        _updateTimer.Stop();
+
         _viewModel.Power.Watchers.ActivePowerScheme.Changed -= ChangedActivePowerScheme;
 
         _viewModel.Power.Watchers.Stop();
@@ -57,6 +64,8 @@ public sealed class ViewService : ApplicationContext, IViewService
 
         _dpiWatchers.Stop();
         _dpiWatchers.Changed -= DpiWatchers_Changed;
+
+        _idleMonitorService.Stop();
 
         _viewModel.NotifyIcon.MouseClick -= NotifyIcon_MouseClick;
         _viewModel.NotifyIcon.Visible = false;
