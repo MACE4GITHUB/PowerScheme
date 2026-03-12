@@ -5,9 +5,9 @@ using PowerSchemeServiceAPI.Model;
 
 namespace PowerSchemeServiceAPI;
 
-internal static class SettingSchemeLookup
+public static class SettingSchemeLookup
 {
-    internal static readonly Dictionary<SettingScheme, IPowerScheme> SettingSchemes
+    public static readonly Dictionary<SettingScheme, IPowerScheme> SettingSchemes
         = new()
         {
             { SettingScheme.High, new PowerScheme(new Guid("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"),true,ImageItem.High, true, true) },
@@ -23,7 +23,7 @@ internal static class SettingSchemeLookup
             { SettingScheme.Extreme, new PowerScheme(new Guid("f384acfa-ed71-4607-bf8e-747d56402f0c"), false, ImageItem.Extreme, true, true) }
         };
 
-    internal enum SettingScheme
+    public enum SettingScheme
     {
         High,
         Balance,

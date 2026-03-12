@@ -2,7 +2,7 @@
 
 namespace PowerScheme.Services;
 
-public interface IViewService : IDisposable
+internal interface IViewService : IDisposable
 {
     void Start();
 

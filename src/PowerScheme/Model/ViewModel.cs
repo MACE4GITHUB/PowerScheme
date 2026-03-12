@@ -5,27 +5,20 @@ using PowerSchemeServiceAPI;
 
 namespace PowerScheme.Model;
 
-public sealed class ViewModel : IViewModel
+internal sealed class ViewModel(
+    IContainer container,
+    LeftContextMenu leftContextMenu,
+    RightContextMenu rightContextMenu,
+    IPowerSchemeService power)
+    : IViewModel
 {
-    public ViewModel(
-        IContainer container,
-        LeftContextMenu leftContextMenu,
-        RightContextMenu rightContextMenu,
-        IPowerSchemeService power)
-    {
-        NotifyIcon = new NotifyIcon(container);
-        ContextLeftMenu = leftContextMenu;
-        ContextRightMenu = rightContextMenu;
-        Power = power;
-    }
+    public NotifyIcon NotifyIcon { get; } = new(container);
 
-    public NotifyIcon NotifyIcon { get; }
+    public ContextMainMenu ContextLeftMenu { get; } = leftContextMenu;
 
-    public ContextMainMenu ContextLeftMenu { get; }
+    public ContextMainMenu ContextRightMenu { get; } = rightContextMenu;
 
-    public ContextMainMenu ContextRightMenu { get; }
-
-    public IPowerSchemeService Power { get; }
+    public IPowerSchemeService Power { get; } = power;
 
     public void ClearAllMenu()
     {

@@ -18,9 +18,11 @@ public abstract class Language
         !string.IsNullOrWhiteSpace(locale) &&
         _ruLanguages.Contains(locale.Trim().ToLowerInvariant());
 
-    public abstract string UpdateApp {  get; }
-    public abstract string UpdateAppToVersion {  get; }
-    public abstract string Quit {  get; }
+    public abstract string UpdateApp { get; }
+    public abstract string NewVersionIsAvailable { get; }
+    public abstract string UpdateAppToVersion { get; }
+    public abstract string Version { get; }
+    public abstract string Quit { get; }
     public abstract string StartupOnWindows { get; }
     public abstract string RestoreDefaultPowerSchemesName { get; }
     public abstract string RestoreDefaultPowerSchemesDescription { get; }
@@ -68,4 +70,5 @@ public abstract class Language
     public abstract string No { get; }
     public abstract string RunAsAdministrator { get; }
     public abstract string SwitchPowerSchemeWhenIdle { get; }
+    public abstract string PowerSchemes { get; }
 }

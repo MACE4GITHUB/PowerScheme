@@ -1,54 +1,32 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
+﻿using System.ComponentModel;
+using PowerScheme.Model.Menu;
+using PowerScheme.Model.Menu.PowerSchemes;
 using PowerSchemeServiceAPI;
-using PowerSchemeServiceAPI.Model;
-using static PowerScheme.Utility.TrayIcon;
 
 namespace PowerScheme.Model;
 
-public sealed class LeftContextMenu(
+internal sealed class LeftContextMenu(
     IContainer components,
     IPowerSchemeService power) :
     ContextMainMenu(components, power)
 {
     private bool _isBuilt;
 
-    public override void UpdateMenu()
+    internal override void UpdateMenu()
     {
+        ClearMenu();
+
         BuildMenu();
     }
 
-    public override void ClearMenu()
+    internal override void ClearMenu()
     {
         if (!_isBuilt || Items.Count == 0)
         {
             return;
         }
 
-        for (var index = Items.Count - 1; index >= 0; index--)
-        {
-            var toolStripItem = Items[index];
-
-            toolStripItem.Click -= ItemMenuPowerOnClick;
-
-            // Dispose image assigned to the item to release GDI+/native resources.
-            // Remove reference from the ToolStripItem first to avoid holding a disposed Image.
-            var img = toolStripItem.Image;
-            if (img is not null)
-            {
-                toolStripItem.Image = null;
-                img.Dispose();
-            }
-
-            toolStripItem.Tag = null;
-            toolStripItem.Text = null;
-
-            toolStripItem.Dispose();
-        }
-
+        Items.RemoveMenu();
         Items.Clear();
 
         _isBuilt = false;
@@ -56,74 +34,15 @@ public sealed class LeftContextMenu(
 
     protected override void BuildContextMenu()
     {
-        ClearMenu();
+        var powerSchemeMenu = new PowerSchemeMenuBuilder(Power).Build();
 
-        if (Power == null)
+        while (powerSchemeMenu.DropDownItems.Count > 0)
         {
-            return;
-        }
-
-        foreach (var powerScheme in Power.DefaultPowerSchemes)
-        {
-            var src = GetImage(powerScheme.Picture);
-            var item = new ToolStripMenuItem
-            {
-                Tag = new StatePowerScheme(powerScheme),
-                Text = powerScheme.Name,
-                Image = new Bitmap(src)
-            };
-
-            src.Dispose();
-
-            item.Click += ItemMenuPowerOnClick;
-
-            Items.Add(item);
-        }
-
-        if (!Power.UserPowerSchemes.Any())
-        {
-            _isBuilt = true;
-
-            return;
-        }
-
-        Items.Add(new ToolStripSeparator());
-
-        foreach (var powerScheme in Power.UserPowerSchemes)
-        {
-            var src = GetImage(powerScheme.Picture);
-            var item = new ToolStripMenuItem
-            {
-                Tag = new StatePowerScheme(powerScheme),
-                Text = powerScheme.Name,
-                Image = new Bitmap(src)
-            };
-
-            src.Dispose();
-
-            item.Click += ItemMenuPowerOnClick;
-
+            var item = powerSchemeMenu.DropDownItems[0];
             Items.Add(item);
         }
 
         _isBuilt = true;
-    }
-
-    private void ItemMenuPowerOnClick(object? sender, EventArgs e)
-    {
-        if (sender is not ToolStripMenuItem menu)
-        {
-            return;
-        }
-
-        if (menu.Tag is not StatePowerScheme statePowerScheme)
-        {
-            return;
-        }
-
-        Power?.SetActivePowerScheme(statePowerScheme.PowerScheme);
-
-        ClearMenu();
     }
 
     protected override void Dispose(bool disposing)
@@ -131,7 +50,6 @@ public sealed class LeftContextMenu(
         if (disposing)
         {
             ClearMenu();
-            Power = null;
         }
 
         base.Dispose(disposing);

@@ -40,6 +40,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Include="Resources\Empty.png" />
 		<None Include="Resources\Add.png" />
 		<None Include="Resources\Balance.png" />
 		<None Include="Resources\Check.png" />

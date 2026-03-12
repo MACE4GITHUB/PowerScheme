@@ -14,40 +14,72 @@ namespace PowerSchemeServiceAPI;
 
 public class PowerSchemeService : IPowerSchemeService
 {
-    public IEnumerable<IPowerScheme> DefaultPowerSchemes
-        => SettingSchemes
-            .Where(p => p.Value.IsNative && p.Value.IsVisible)
-            .Select(p => p.Value);
-
-    public IEnumerable<IPowerScheme> TypicalPowerSchemes
+    public IEnumerable<IPowerScheme> PowerProfPowerSchemes
     {
         get
         {
-            if (CanCreateExtremePowerScheme)
-            {
-                return SettingSchemes
-                    .Where(p => !p.Value.IsNative && p.Value.IsVisible)
-                    .Select(p => p.Value);
-            }
+            var powerProfPowerSchemeIds = RegistryService.PowerProfPowerSchemeIds;
 
             return SettingSchemes
-                .Where(p => !p.Value.IsNative && p.Value.IsVisible && !p.Value.IsMaxPerformance)
+                .Where(p =>
+                    p.Value.IsNative &&
+                    p.Value.IsVisible &&
+                    powerProfPowerSchemeIds.Contains(p.Value.Guid))
                 .Select(p => p.Value);
         }
     }
 
+    public IEnumerable<IPowerScheme> TypicalPowerSchemesWithDeleted
+    {
+        get
+        {
+            var querySettingSchemes = SettingSchemes
+                .Where(p =>
+                    !p.Value.IsNative &&
+                    p.Value.IsVisible);
+
+            return CanCreateExtremePowerScheme
+                ? querySettingSchemes.Select(p => p.Value)
+                : querySettingSchemes
+                    .Where(p =>
+                        !p.Value.IsMaxPerformance)
+                    .Select(p => p.Value);
+        }
+    }
+
+    public IEnumerable<IPowerScheme> TypicalPowerSchemesWithoutDeleted
+    {
+        get
+        {
+            var userPowerSchemeIds = RegistryService.UserPowerSchemeIds;
+
+            var querySettingSchemes = SettingSchemes
+                .Where(p =>
+                    !p.Value.IsNative &&
+                    p.Value.IsVisible &&
+                    userPowerSchemeIds.Contains(p.Value.Guid));
+
+            return CanCreateExtremePowerScheme
+                ? querySettingSchemes.Select(p => p.Value)
+                : querySettingSchemes
+                    .Where(p =>
+                        !p.Value.IsMaxPerformance)
+                    .Select(p => p.Value);
+        }
+    }
+
     public IEnumerable<IPowerScheme> UserPowerSchemes
-        => RegistryService.UserPowerSchemes.Select(NewPowerScheme);
+        => RegistryService.UserPowerSchemeIds.Select(NewPowerScheme);
 
     public IEnumerable<IPowerScheme> PowerSchemes
-        => DefaultPowerSchemes.Union(UserPowerSchemes);
+        => PowerProfPowerSchemes.Union(UserPowerSchemes);
 
     public IPowerScheme ActivePowerScheme
     {
         get
         {
             var guidActivePlan = PowerManager.GetActivePlan();
-            return PowerSchemes.FirstOrDefault(p => p.Guid == guidActivePlan);
+            return PowerSchemes.First(p => p.Guid == guidActivePlan);
         }
     }
 
@@ -89,7 +121,7 @@ public class PowerSchemeService : IPowerSchemeService
     }
 
     private void SetActivePowerScheme(Guid guid)
-        => SetActivePowerScheme((PowerScheme)PowerSchemes.FirstOrDefault(p => p.Guid == guid));
+        => SetActivePowerScheme((PowerScheme)PowerSchemes.First(p => p.Guid == guid));
 
     public void RestoreDefaultPowerSchemes()
         => Watchers.RaiseActionWithoutWatchers(PowerManager.RestoreDefaultPlans);
@@ -125,7 +157,7 @@ public class PowerSchemeService : IPowerSchemeService
 
     public bool ExistsAllTypicalScheme =>
         !SettingSchemes.Where(p => !p.Value.IsNative).Select(s => s.Value.Guid)
-            .Except(RegistryService.UserPowerSchemes).Any();
+            .Except(RegistryService.UserPowerSchemeIds).Any();
 
     private void DeleteTypicalScheme(Guid guid)
     {
@@ -161,6 +193,10 @@ public class PowerSchemeService : IPowerSchemeService
 
     public void CreateTypicalSchemes()
     {
+        Watchers.RaiseActionWithoutWatchers(CreateTypicalSchemesIn);
+
+        return;
+
         void CreateTypicalSchemesIn()
         {
             CreateMediaPowerScheme();
@@ -169,11 +205,9 @@ public class PowerSchemeService : IPowerSchemeService
             CreateExtremePowerScheme();
             SetActivePowerScheme(SettingSchemes[SettingScheme.Stable].Guid);
         }
-
-        Watchers.RaiseActionWithoutWatchers(CreateTypicalSchemesIn);
     }
 
-    private void CreateStablePowerScheme()
+    private static void CreateStablePowerScheme()
     {
         CreateTypicalPowerScheme(SettingSchemes[SettingScheme.High].Guid, SettingSchemes[SettingScheme.Stable].Guid,
             Language.Current.StableName, Language.Current.StableDescription);
@@ -190,7 +224,7 @@ public class PowerSchemeService : IPowerSchemeService
     private void DeleteStablePowerScheme()
         => DeleteTypicalScheme(SettingSchemes[SettingScheme.Stable].Guid);
 
-    private void CreateMediaPowerScheme()
+    private static void CreateMediaPowerScheme()
     {
         CreateTypicalPowerScheme(SettingSchemes[SettingScheme.Balance].Guid,
             SettingSchemes[SettingScheme.Media].Guid,
@@ -202,7 +236,7 @@ public class PowerSchemeService : IPowerSchemeService
     private void DeleteMediaPowerScheme()
         => DeleteTypicalScheme(SettingSchemes[SettingScheme.Media].Guid);
 
-    private void CreateSimplePowerScheme()
+    private static void CreateSimplePowerScheme()
     {
         CreateTypicalPowerScheme(SettingSchemes[SettingScheme.Low].Guid, SettingSchemes[SettingScheme.Simple].Guid,
             Language.Current.SimpleName, Language.Current.SimpleDescription);
@@ -213,7 +247,7 @@ public class PowerSchemeService : IPowerSchemeService
     private void DeleteSimplePowerScheme()
         => DeleteTypicalScheme(SettingSchemes[SettingScheme.Simple].Guid);
 
-    private void CreateExtremePowerScheme()
+    private static void CreateExtremePowerScheme()
     {
         if (CanCreateExtremePowerScheme)
         {
@@ -392,14 +426,9 @@ public class PowerSchemeService : IPowerSchemeService
         ActivePowerSchemeChanged?.Invoke(this, e);
     }
 
-    private static IPowerScheme NewPowerScheme(Guid guid)
-    {
-        var powerSchemeParams =
-            SettingSchemes
-                .Where(p => p.Value.Guid == guid)
-                .Select(p => p.Value).FirstOrDefault();
-
-        return powerSchemeParams
-               ?? new PowerScheme(guid, false, ImageItem.Unknown);
-    }
+    private static IPowerScheme NewPowerScheme(Guid guid) =>
+        SettingSchemes
+            .Where(p => p.Value.Guid == guid)
+            .Select(p => p.Value).FirstOrDefault()
+        ?? new PowerScheme(guid, false, ImageItem.Unknown);
 }

@@ -5,7 +5,7 @@ using PowerSchemeServiceAPI;
 
 namespace PowerScheme.Model;
 
-public interface IViewModel : IDisposable
+internal interface IViewModel : IDisposable
 {
     NotifyIcon NotifyIcon { get; }
     ContextMainMenu ContextLeftMenu { get; }

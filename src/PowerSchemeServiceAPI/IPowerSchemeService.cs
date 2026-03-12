@@ -8,8 +8,9 @@ namespace PowerSchemeServiceAPI;
 public interface IPowerSchemeService
 {
     IPowerScheme ActivePowerScheme { get; }
-    IEnumerable<IPowerScheme> DefaultPowerSchemes { get; }
-    IEnumerable<IPowerScheme> TypicalPowerSchemes { get; }
+    IEnumerable<IPowerScheme> PowerProfPowerSchemes { get; }
+    IEnumerable<IPowerScheme> TypicalPowerSchemesWithDeleted { get; }
+    IEnumerable<IPowerScheme> TypicalPowerSchemesWithoutDeleted { get; }
     IEnumerable<IPowerScheme> UserPowerSchemes { get; }
     IEnumerable<IPowerScheme> PowerSchemes { get; }
 

@@ -5,7 +5,7 @@ namespace PowerScheme.Addins.IdleMonitoring;
 
 public class Win32IdleDetector : IIdleDetector
 {
-    private const int DEFAULT_IDLE_TIMEOUT_IN_SECONDS = 5;
+    private const int DEFAULT_IDLE_TIMEOUT_IN_SECONDS = 1;
 
     public TimeSpan GetIdleTime()
     {

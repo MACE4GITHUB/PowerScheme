@@ -127,15 +127,20 @@ public sealed class RegistryWatcher<T> : IRegistryWatcher, IDisposable
                 return;
             }
 
+            var changeType = ChangeType.Added;
             string[] subKeysExcept;
-            bool isChange;
 
-            subKeysExcept =
-                subKeysCurrent.Length > _subKeysPrevious.Length ?
-                    [.. subKeysCurrent.Except(_subKeysPrevious)] :
-                    [.. _subKeysPrevious.Except(subKeysCurrent)];
+            if (subKeysCurrent.Length > _subKeysPrevious.Length)
+            {
+                subKeysExcept = [.. subKeysCurrent.Except(_subKeysPrevious)];
+            }
+            else
+            {
+                changeType = ChangeType.Deleted;
+                subKeysExcept = [.. _subKeysPrevious.Except(subKeysCurrent)];
+            }
 
-            isChange = subKeysExcept.Length > 0;
+            var isChange = subKeysExcept.Length > 0;
             if (!isChange)
             {
                 return;
@@ -143,7 +148,11 @@ public sealed class RegistryWatcher<T> : IRegistryWatcher, IDisposable
 
             // Needs some time to create subKeys / params
             Thread.Sleep(1000);
-            Changed?.Invoke(this, new RegistryChangedEventArgs(RegChangeNotifyFilter, _registryParamCurrent, subKeysExcept));
+            Changed?.Invoke(this, new RegistryChangedEventArgs(
+                RegChangeNotifyFilter,
+                _registryParamCurrent,
+                changeType,
+                subKeysExcept));
             _subKeysPrevious = subKeysCurrent;
         }
     }

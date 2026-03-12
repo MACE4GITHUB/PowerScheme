@@ -41,7 +41,7 @@ public sealed class IdleMonitorOption
     public bool IsValid { get; }
 
     public static IdleMonitorOption Default { get; } =
-        new IdleMonitorOption(
+        new(
             DEFAULT_IDLE_THRESHOLD_IN_MILLISECONDS,
             DEFAULT_POLLING_ACTIVE_TIME_IN_MILLISECONDS,
             DEFAULT_POLLING_IDLE_TIME_IN_MILLISECONDS);
