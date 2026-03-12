@@ -41,10 +41,12 @@ internal sealed class EntryService : IDisposable
     public void Validate() =>
         ValidateOs()
         .ValidateOnceApplication()
+        .ValidateDirectoryPermissions()
+        .ValidateRestartLimiter()
         .ValidateAdmin()
+        .ValidateResetRestartLimiter()
         .ValidateFirstStart()
-        .ValidateExistArtifacts()
-        .ValidateDirectoryPermissions();
+        .ValidateExistArtifacts();
 
     /// <summary>
     /// Gets Mutex to start one application instance.
@@ -136,6 +138,27 @@ internal sealed class EntryService : IDisposable
             icon: MessageBoxIcon.Error,
             isApplicationExit: true,
             timeout: 15);
+
+        return this;
+    }
+
+    private EntryService ValidateRestartLimiter()
+    {
+        if (RestartLimiterService.CanRestart())
+        {
+            return this;
+        }
+
+        RestartLimiterService.Reset();
+
+        Environment.Exit(0);
+
+        return this;
+    }
+
+    private EntryService ValidateResetRestartLimiter()
+    {
+        RestartLimiterService.Reset();
 
         return this;
     }
