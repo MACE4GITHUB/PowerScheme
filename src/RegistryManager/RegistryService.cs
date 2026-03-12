@@ -158,6 +158,12 @@ public static class RegistryService
         return result.Data != 0;
     }
 
+    public static int RestartCount(string company, string product)
+    {
+        var result = GetSettings<int>(RegRestartCount(company, product));
+        return result.IsError ? 0 : result.Data;
+    }
+
     public static bool ExistsTypicalPowerScheme(Guid guid)
     {
         var result = GetSettings<string>(RegPowerSchemes(guid));
@@ -258,6 +264,19 @@ public static class RegistryService
         var regAppSettings = RegAppSettings(company, product);
         regAppSettings.Value = value;
         SaveSetting(regAppSettings);
+    }
+
+    public static void SetRestartCount(string company, string product, object value)
+    {
+        var regRestartCount = RegRestartCount(company, product);
+        regRestartCount.Value = value;
+        SaveSetting(regRestartCount);
+    }
+
+    public static void DeleteRestartCount(string company, string product)
+    {
+        var regRestartCount = RegRestartCount(company, product);
+        DeleteSetting(regRestartCount);
     }
 
     private static void SetRegistryValue(ResourceManager resourceManager, RegistryParam registryParam, object value)
@@ -376,6 +395,15 @@ public static class RegistryService
             Path = @"SOFTWARE\" + company,
             Section = product,
             Name = "ShowDialogFirstStart"
+        };
+
+    private static RegistryParam RegRestartCount(string company, string product) =>
+        new()
+        {
+            RegistryHive = RegistryHive.CurrentUser,
+            Path = @"SOFTWARE\" + company,
+            Section = product,
+            Name = "RestartCount"
         };
 
     private static RegistryParam RegStartup
