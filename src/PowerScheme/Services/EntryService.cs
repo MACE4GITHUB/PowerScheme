@@ -22,7 +22,7 @@ namespace PowerScheme.Services;
 internal sealed class EntryService : IDisposable
 {
     private const int RESTARTED_VALUE = 0;
-    private IPowerSchemeService? _power;
+    private readonly IPowerSchemeService _power;
     private readonly IMainMessageBox _messageBox;
     private readonly string[] _args;
 
@@ -33,13 +33,10 @@ internal sealed class EntryService : IDisposable
         IPowerSchemeService power,
         IMainMessageBox messageBox)
     {
-        ActionFirstStart = ShowFirstStartDialog;
-        _power = power;
+        _power = power ?? throw new ArgumentNullException(nameof(power)); ;
         _args = Environment.GetCommandLineArgs();
         _messageBox = messageBox;
     }
-
-    public Action ActionFirstStart { get; }
 
     public void Validate() =>
         ValidateOs()
@@ -75,7 +72,7 @@ internal sealed class EntryService : IDisposable
             return this;
         }
 
-        ActionFirstStart.Invoke();
+        ShowFirstStartDialog();
 
         RegistryService.SetAppSettings(AppInfo.CompanyName, AppInfo.ProductName, RESTARTED_VALUE);
 
@@ -84,11 +81,6 @@ internal sealed class EntryService : IDisposable
 
     private EntryService ValidateAdmin()
     {
-        if (_power == null)
-        {
-            throw new ArgumentException("Power cannot be null.");
-        }
-
         if (!IsValidateAdmin)
         {
             return this;
@@ -134,12 +126,7 @@ internal sealed class EntryService : IDisposable
 
     private EntryService ValidateOs()
     {
-        if (!IsValidateOs)
-        {
-            return this;
-        }
-
-        if (UacHelper.IsValidOs)
+        if (!IsValidateOs || UacHelper.IsValidOs)
         {
             return this;
         }
@@ -155,11 +142,6 @@ internal sealed class EntryService : IDisposable
 
     private void ShowFirstStartDialog()
     {
-        if (_power == null)
-        {
-            throw new ArgumentException("Power cannot be null.");
-        }
-
         var result = _messageBox.Show(
             Language.Current.FirstStartDescription,
             Language.Current.FirstStartCaption,
@@ -220,18 +202,35 @@ internal sealed class EntryService : IDisposable
         try
         {
             var folderPath = Default.ApplicationPath;
-            if (string.IsNullOrEmpty(folderPath))
-            {
+            if (string.IsNullOrWhiteSpace(folderPath))
                 return this;
-            }
+
+            var root = Path.GetPathRoot(folderPath);
+            if (string.IsNullOrEmpty(root))
+                return this;
+
+            var drive = new DriveInfo(root);
+
+            if (!drive.IsReady)
+                return this;
+
+            var format = drive.DriveFormat;
+            if (!SupportsAcl(format))
+                return this;
 
             var dInfo = new DirectoryInfo(folderPath);
+            if (!dInfo.Exists)
+                return this;
+
             var dSecurity = dInfo.GetAccessControl();
             var authUserSid = new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null);
             var rules = dSecurity.GetAccessRules(true, true, typeof(SecurityIdentifier));
+
             var groupExists = rules
                 .Cast<FileSystemAccessRule>()
-                .Any(r => r.IdentityReference == authUserSid);
+                .Any(r => r.IdentityReference == authUserSid &&
+                          (r.FileSystemRights & FileSystemRights.Modify) != 0 &&
+                          r.AccessControlType == AccessControlType.Allow);
 
             if (!groupExists)
             {
@@ -246,23 +245,30 @@ internal sealed class EntryService : IDisposable
                 dInfo.SetAccessControl(dSecurity);
             }
         }
-        catch
+        catch (UnauthorizedAccessException)
         {
             _messageBox.Show(
                 Language.Current.RunAsAdministrator,
                 Language.Current.Error,
                 icon: MessageBoxIcon.Warning,
                 isApplicationExit: true,
-            timeout: 15);
+                timeout: 15);
+        }
+        catch (Exception)
+        {
+            // Do nothing
         }
 
         return this;
     }
 
+    private static bool SupportsAcl(string driveFormat) =>
+        driveFormat.Equals("NTFS", StringComparison.OrdinalIgnoreCase) ||
+        driveFormat.Equals("ReFS", StringComparison.OrdinalIgnoreCase);
+
     public void Dispose()
     {
         Mutex = null;
-        _power = null;
         _messageBox.Dispose();
     }
 }

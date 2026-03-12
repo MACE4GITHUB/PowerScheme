@@ -113,7 +113,7 @@ public sealed class IdleMonitorService(
             .PowerSchemes
             .FirstOrDefault(x => x.Guid == mainPowerSchemeGuid) ??
             power
-            .DefaultPowerSchemes
+            .PowerProfPowerSchemes
             .First();
 
         power.SetActivePowerScheme(previousPowerScheme);
@@ -133,7 +133,7 @@ public sealed class IdleMonitorService(
             .PowerSchemes
             .FirstOrDefault(x => x.Guid == idlePowerSchemeGuid) ??
             power
-                .DefaultPowerSchemes
+                .PowerProfPowerSchemes
                 .Last(x => !x.IsMaxPerformance && x.IsNative);
 
         power.SetActivePowerScheme(idlePowerScheme);

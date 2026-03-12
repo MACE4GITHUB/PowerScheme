@@ -6,13 +6,11 @@ namespace PowerScheme.Timers;
 
 internal sealed class UpdateTimer(
     IUpdateService updateService) :
-    BaseTimer((int)TimeSpan.FromSeconds(5).TotalMilliseconds)
+    BaseTimer((int)TimeSpan.FromSeconds(1).TotalMilliseconds) // TODO: Change to 5
 {
-    private readonly IUpdateService _updateService = updateService;
-
     public override async void Action()
     {
-        var releaseInfo = await _updateService.GetReleaseInfoAsync();
+        var releaseInfo = await updateService.GetReleaseInfoAsync();
 
         if (releaseInfo.NewVersionAvailable)
         {

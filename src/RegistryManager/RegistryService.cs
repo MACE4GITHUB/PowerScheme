@@ -170,14 +170,35 @@ public static class RegistryService
         return result.IsSuccess;
     }
 
-    private static ICollection<Guid> DefaultPowerSchemes =>
+    private static ICollection<Guid> DefaultPowerSchemeIds =>
         GetGuidSubKeys(RegPowerSchemes(true));
 
-    private static ICollection<Guid> CurrentPowerSchemes =>
+    public static ICollection<Guid> PowerProfPowerSchemeIds
+    {
+        get
+        {
+            var defaultPowerSchemeIds = DefaultPowerSchemeIds;
+
+            var guids = (from defaultPowerSchemeId
+                    in defaultPowerSchemeIds
+                let result = GetSettings<string>(RegFriendlyNamePowerSchemes(defaultPowerSchemeId))
+                where result.IsSuccess && IsValid(result.Data)
+                select defaultPowerSchemeId).ToList();
+
+            return [.. guids];
+
+            static bool IsValid(string? value) =>
+                !string.IsNullOrEmpty(value)
+                && value![0] == '@'
+                && value.IndexOf(@"\powrprof.dll", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+    }
+
+    private static ICollection<Guid> CurrentPowerSchemeIds =>
         GetGuidSubKeys(RegPowerSchemes());
 
-    public static ICollection<Guid> UserPowerSchemes =>
-        [.. CurrentPowerSchemes.Except(DefaultPowerSchemes)];
+    public static ICollection<Guid> UserPowerSchemeIds =>
+        [.. CurrentPowerSchemeIds.Except(PowerProfPowerSchemeIds)];
 
     public static RegistryWatcher<string> ActivePowerSchemeRegistryWatcher()
         => new(RegActivePowerScheme)
@@ -280,6 +301,14 @@ public static class RegistryService
     {
         var regPowerSchemes = RegPowerSchemes(isDefault);
         regPowerSchemes.Section = guid.ToString();
+        return regPowerSchemes;
+    }
+
+    private static RegistryParam RegFriendlyNamePowerSchemes(Guid guid, bool isDefault = false)
+    {
+        var regPowerSchemes = RegPowerSchemes(isDefault);
+        regPowerSchemes.Section = guid.ToString();
+        regPowerSchemes.Name = "FriendlyName";
         return regPowerSchemes;
     }
 

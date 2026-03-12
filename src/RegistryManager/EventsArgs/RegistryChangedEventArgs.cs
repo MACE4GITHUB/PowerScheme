@@ -7,27 +7,20 @@ public sealed class RegistryChangedEventArgs(
     RegChangeNotifyFilter regChangeNotifyFilter,
     RegistryParam previous,
     RegistryParam current,
+    ChangeType changeType,
     string[]? subKeys)
     : EventArgs
 {
     public RegistryChangedEventArgs(
         RegChangeNotifyFilter regChangeNotifyFilter,
-        RegistryParam registryParam) :
-        this(
-            regChangeNotifyFilter,
-            registryParam,
-            registryParam,
-            null)
-    { }
-
-    public RegistryChangedEventArgs(
-        RegChangeNotifyFilter regChangeNotifyFilter,
         RegistryParam registryParam,
+        ChangeType changeType,
         string[] subKeys) :
         this(
             regChangeNotifyFilter,
             registryParam,
             registryParam,
+            changeType,
             subKeys)
     { }
 
@@ -39,6 +32,7 @@ public sealed class RegistryChangedEventArgs(
             regChangeNotifyFilter,
             previous,
             current,
+            ChangeType.Updated,
             null)
     { }
 
@@ -48,5 +42,14 @@ public sealed class RegistryChangedEventArgs(
 
     public RegistryParam Current { get; } = current;
 
-    public string[]? NewSubKeys { get; } = subKeys;
+    public string[]? SubKeys { get; } = subKeys;
+
+    public ChangeType ChangeType { get; } = changeType;
+}
+
+public enum ChangeType
+{
+    Added,
+    Updated,
+    Deleted
 }

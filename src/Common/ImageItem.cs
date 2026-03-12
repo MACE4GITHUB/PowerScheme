@@ -3,6 +3,7 @@
 public enum ImageItem
 {
     Unknown,
+    Empty,
     Restore,
     Panel,
     Add,

@@ -5,8 +5,14 @@ public sealed class LanguageRu : Language
     public override string UpdateApp
         => "Обновить приложение";
 
+    public override string NewVersionIsAvailable
+        => "Доступна новая версия";
+
     public override string UpdateAppToVersion
-        => "Обновить приложение до версии";
+        => "Обновить до версии";
+
+    public override string Version
+        => "Версия";
 
     public override string Quit
         => "Выход";
@@ -157,4 +163,7 @@ public sealed class LanguageRu : Language
 
     public override string SwitchPowerSchemeWhenIdle
         => "Действие при простое";
+
+    public override string PowerSchemes
+        => "Схемы электропитания";
 }

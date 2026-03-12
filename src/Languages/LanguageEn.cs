@@ -5,8 +5,14 @@ public sealed class LanguageEn : Language
     public override string UpdateApp
         => "Update the app";
 
+    public override string NewVersionIsAvailable
+        => "A new version is available";
+
     public override string UpdateAppToVersion
-        => "Update the app to version";
+        => "Update to version";
+
+    public override string Version
+        => "Version";
 
     public override string Quit
         => "Quit";
@@ -151,4 +157,7 @@ public sealed class LanguageEn : Language
 
     public override string SwitchPowerSchemeWhenIdle
         => "Action when Idle";
+
+    public override string PowerSchemes
+        => "Power Schemes";
 }

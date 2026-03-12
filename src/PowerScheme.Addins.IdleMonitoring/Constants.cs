@@ -2,7 +2,7 @@
 
 public static class Constants
 {
-    public static readonly int DEFAULT_IDLE_THRESHOLD_IN_MILLISECONDS = 5_000;
+    public static readonly int DEFAULT_IDLE_THRESHOLD_IN_MILLISECONDS = 15_000;
     public static readonly int DEFAULT_POLLING_ACTIVE_TIME_IN_MILLISECONDS = 4_500;
     public static readonly int DEFAULT_POLLING_IDLE_TIME_IN_MILLISECONDS = 2_500;
 

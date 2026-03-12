@@ -5,21 +5,21 @@ using PowerSchemeServiceAPI;
 
 namespace PowerScheme.Model;
 
-public abstract class ContextMainMenu(
+internal abstract class ContextMainMenu(
     IContainer components,
     IPowerSchemeService power) :
     ContextMenuStrip(components)
 {
-    protected IPowerSchemeService? Power = power;
+    protected IPowerSchemeService Power { get; } = power;
 
-    public void BuildMenu()
+    internal void BuildMenu()
     {
         this.InvokeIfRequired(BuildContextMenu);
     }
 
-    public abstract void UpdateMenu();
+    internal abstract void UpdateMenu();
 
-    public abstract void ClearMenu();
+    internal abstract void ClearMenu();
 
     protected abstract void BuildContextMenu();
 }

@@ -59,7 +59,6 @@ public enum Setting
     VIDEOIDLE,
     WIFISAVER,
     MULTPLAY,
-    MULTSHARE,
     MULTQUALITY
 }
 
@@ -677,7 +676,7 @@ public enum EventCode : uint
     /// <summary>Indicates a power action of shutdown/off.</summary>
     POWER_USER_NOTIFY_SHUTDOWN = 0x00000010,
 }
-    
+
 /// <summary>
 /// <para>
 /// Contains information about system battery drain policy settings. This structure is part of the GLOBAL_USER_POWER_POLICY structure.
@@ -795,7 +794,6 @@ public static class SettingLookup
         { Setting.VIDEOIDLE,        new Guid("3c0bc021-c8a8-4e07-a973-6b14cbcb2b7e") },
         { Setting.WIFISAVER,        new Guid("12bbebe6-58d6-4636-95bb-3217ef867c1a") },
         { Setting.MULTPLAY,         new Guid("34c7b99f-9a6d-4b3c-8dc7-b6693b78cef4") },
-        { Setting.MULTSHARE,        new Guid("03680956-93bc-4294-bba6-4e0f09bb717f") },
         { Setting.MULTQUALITY,      new Guid("10778347-1370-4ee0-8bbd-33bdacaade49") }
     };
 }

@@ -1,16 +1,20 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using Common.Paths;
-using PowerScheme.EventArguments;
 using PowerScheme.Model;
 using PowerScheme.Timers;
+using RegistryManager;
+using RegistryManager.Common;
 using RegistryManager.Dpi;
 using RegistryManager.EventsArgs;
-using static PowerScheme.Utility.TrayIcon;
+using static PowerScheme.Utility.ImageExtensions;
 
 namespace PowerScheme.Services;
 
-public sealed class ViewService : ApplicationContext, IViewService
+internal sealed class ViewService : ApplicationContext, IViewService
 {
     private const string SHOW_CONTEXT_MENU = "ShowContextMenu";
     private readonly IViewModel _viewModel;
@@ -25,10 +29,8 @@ public sealed class ViewService : ApplicationContext, IViewService
     {
         _viewModel = viewModel;
         _updateTimer = new UpdateTimer(updateService);
-        _updateTimer.NotifyUpdate += NotifyAppUpdate;
 
         _dpiWatchers = new DpiWatchers();
-        _dpiWatchers.Changed += DpiWatchers_Changed;
 
         _idleMonitorService = idleMonitorService;
 
@@ -37,9 +39,12 @@ public sealed class ViewService : ApplicationContext, IViewService
 
     public void Start()
     {
-        _viewModel.Power.Watchers.ActivePowerScheme.Changed += ChangedActivePowerScheme;
+        _viewModel.Power.Watchers.ActivePowerScheme.Changed += ActivePowerSchemeOnChanged;
+        _viewModel.Power.Watchers.PowerSchemes.Changed += PowerSchemesOnChanged;
 
         _viewModel.NotifyIcon.MouseClick += NotifyIcon_MouseClick;
+
+        _dpiWatchers.Changed += DpiWatchers_Changed;
 
         _viewModel.NotifyIcon.Visible = true;
 
@@ -53,11 +58,35 @@ public sealed class ViewService : ApplicationContext, IViewService
         _idleMonitorService.Start();
     }
 
+    private static void PowerSchemesOnChanged(object sender, RegistryChangedEventArgs e)
+    {
+        if (e is not { RegChangeNotifyFilter: RegChangeNotifyFilter.Key, ChangeType: ChangeType.Deleted })
+        {
+            return;
+        }
+
+        var idlePowerSchemeGuid = RegistryService.GetIdleMonitoring(AppInfo.CompanyName, AppInfo.ProductName);
+
+        if (e.SubKeys == null || e.SubKeys.Length == 0)
+        {
+            return;
+        }
+
+        List<Guid> subKeys = [..e.SubKeys
+            .Select(x => Guid.TryParse(x, out var guid) ? guid : Guid.Empty)
+            .Where(x=> x != Guid.Empty)];
+
+        if (subKeys.Contains(idlePowerSchemeGuid))
+        {
+            RegistryService.SetIdlePowerScheme(AppInfo.CompanyName, AppInfo.ProductName, Guid.Empty);
+        }
+    }
+
     public void Stop()
     {
         _updateTimer.Stop();
 
-        _viewModel.Power.Watchers.ActivePowerScheme.Changed -= ChangedActivePowerScheme;
+        _viewModel.Power.Watchers.ActivePowerScheme.Changed -= ActivePowerSchemeOnChanged;
 
         _viewModel.Power.Watchers.Stop();
         _viewModel.ClearAllMenu();
@@ -81,7 +110,7 @@ public sealed class ViewService : ApplicationContext, IViewService
         Application.Exit();
     }
 
-    private void ChangedActivePowerScheme(object? sender, RegistryChangedEventArgs e)
+    private void ActivePowerSchemeOnChanged(object? sender, RegistryChangedEventArgs e)
     {
         UpdateIcon();
     }
@@ -90,7 +119,7 @@ public sealed class ViewService : ApplicationContext, IViewService
     {
         var activePowerScheme = _viewModel.Power.ActivePowerScheme;
         var image = activePowerScheme.Picture;
-        var icon = GetIcon(image);
+        var icon = image.GetIcon();
 
         _viewModel.UpdateIcon(icon);
         _viewModel.NotifyIcon.Text = activePowerScheme.Name;
@@ -116,21 +145,10 @@ public sealed class ViewService : ApplicationContext, IViewService
         _viewModel.NotifyIcon.ContextMenuStrip = null;
     }
 
-    private void NotifyAppUpdate(object sender, UpdateEventArgs e)
-    {
-        var releaseInfo = e.ReleaseInfo;
-
-        if (releaseInfo.NewVersionAvailable)
-        {
-            ((RightContextMenu)_viewModel.ContextRightMenu)
-                .SetNewVersion(releaseInfo);
-        }
-    }
-
     protected override void Dispose(bool disposing)
     {
         Stop();
-        _viewModel?.Dispose();
+        _viewModel.Dispose();
         base.Dispose(disposing);
     }
 }

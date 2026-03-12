@@ -267,7 +267,7 @@ public static class PowerManager
     /// <param name="plan">The Guid for the plan you are changing</param>
     /// <param name="subgroup">The Guid for the subgroup the setting belongs to</param>
     /// <param name="setting">The Guid for the setting you are changing</param>
-    /// <param name="powerMode">You can chose to alter the AC value, the DC value or both using the bitwise OR operator (|) to join the flags.</param>
+    /// <param name="powerMode">You can choose to alter the AC value, the DC value or both using the bitwise OR operator (|) to join the flags.</param>
     /// <param name="value">The new value for the setting. Run <code>powercfg -q</code> from the command line to list possible values</param>
     public static void SetPlanSetting(Guid plan, SettingSubgroup subgroup, Setting setting, PowerMode powerMode, uint value)
     {
@@ -282,6 +282,7 @@ public static class PowerManager
                 throw new Win32Exception((int)res);
             }
         }
+
         if (powerMode.HasFlag(PowerMode.DC))
         {
             var res = PowerWriteDCValueIndex(IntPtr.Zero, ref plan, ref subgroupId, ref settingId, value);

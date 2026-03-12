@@ -23,8 +23,6 @@ internal class PowerSchemeSettings(SettingScheme settingScheme)
 
     public PowerSchemeMultimediaPlay MultimediaPlay(StateValues values) => new(PowerSchemeGuid, values.State);
 
-    public PowerSchemeMultimediaShare MultimediaShare(StateValues values) => new(PowerSchemeGuid, values.State);
-
     public PowerSchemeMultimediaQuality MultimediaQuality(StateValues values) => new(PowerSchemeGuid, values.State);
 
     public void ApplyDefaultValues()
@@ -43,7 +41,7 @@ internal class PowerSchemeSettings(SettingScheme settingScheme)
             {
                 applicable?.ApplyValues();
             }
-            catch (Exception)
+            catch
             {
                 // Do nothing. Setting is not exists.
             }
@@ -72,7 +70,6 @@ internal class PowerSchemeDefaultSettings
             {PowerSchemeSetting.Sleep, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.Sleep][0], defaultSetting[PowerSchemeSetting.Sleep][1]))},
             {PowerSchemeSetting.WiFi, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.WiFi][0], defaultSetting[PowerSchemeSetting.WiFi][1]))},
             {PowerSchemeSetting.MultimediaPlay, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.MultimediaPlay][0], defaultSetting[PowerSchemeSetting.MultimediaPlay][1]))},
-            {PowerSchemeSetting.MultimediaShare, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.MultimediaShare][0], defaultSetting[PowerSchemeSetting.MultimediaShare][1]))},
             {PowerSchemeSetting.MultimediaQuality, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.MultimediaQuality][0], defaultSetting[PowerSchemeSetting.MultimediaQuality][1]))}
         };
     }
@@ -87,7 +84,6 @@ internal class PowerSchemeDefaultSettings
             {PowerSchemeSetting.Sleep, [900,10800] },
             {PowerSchemeSetting.WiFi, [2,2] },
             {PowerSchemeSetting.MultimediaPlay, [1,1] },
-            {PowerSchemeSetting.MultimediaShare, [2,2] },
             {PowerSchemeSetting.MultimediaQuality, [1,1] }
         };
 
@@ -99,7 +95,6 @@ internal class PowerSchemeDefaultSettings
             {PowerSchemeSetting.Sleep, [1800,10800] },
             {PowerSchemeSetting.WiFi, [2,3] },
             {PowerSchemeSetting.MultimediaPlay, [2,1] },
-            {PowerSchemeSetting.MultimediaShare, [0,1] },
             {PowerSchemeSetting.MultimediaQuality, [1,1] }
         };
 
@@ -111,7 +106,6 @@ internal class PowerSchemeDefaultSettings
             {PowerSchemeSetting.Sleep, [1800,10800] },
             {PowerSchemeSetting.WiFi, [3,3] },
             {PowerSchemeSetting.MultimediaPlay, [2,2] },
-            {PowerSchemeSetting.MultimediaShare, [0,2] },
             {PowerSchemeSetting.MultimediaQuality, [0,0] }
         };
 
@@ -123,12 +117,11 @@ internal class PowerSchemeDefaultSettings
             {PowerSchemeSetting.Sleep, [900,10800] },
             {PowerSchemeSetting.WiFi, [0,0] },
             {PowerSchemeSetting.MultimediaPlay, [0,0] },
-            {PowerSchemeSetting.MultimediaShare, [2,2] },
             {PowerSchemeSetting.MultimediaQuality, [1,1] }
         };
 }
 
-public class Values();
+public class Values;
 
 public class StateValues(PowerSchemeDcAcValues state): Values
 {
@@ -151,6 +144,5 @@ public enum PowerSchemeSetting
     TurnOffDisplay,
     WiFi,
     MultimediaPlay,
-    MultimediaShare,
     MultimediaQuality
 }
