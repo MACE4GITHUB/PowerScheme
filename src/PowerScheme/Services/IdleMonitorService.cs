@@ -128,6 +128,11 @@ public sealed class IdleMonitorService(
             return;
         }
 
+        if (GetKeepBrightness())
+        {
+            power.CopyBrightness(GetMainPowerSchemeGuid(), idlePowerSchemeGuid);
+        }
+
         var idlePowerScheme =
             power
             .PowerSchemes
@@ -144,6 +149,9 @@ public sealed class IdleMonitorService(
 
     private static Guid GetMainPowerSchemeGuid() =>
         RegistryService.GetMainMonitoring(AppInfo.CompanyName, AppInfo.ProductName);
+
+    private static bool GetKeepBrightness() =>
+        RegistryService.GetKeepBrightness(AppInfo.CompanyName, AppInfo.ProductName);
 
     private static void SetMainPowerScheme(Guid guid) =>
         RegistryService.SetMainPowerScheme(AppInfo.CompanyName, AppInfo.ProductName, guid);

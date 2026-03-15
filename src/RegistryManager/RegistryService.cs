@@ -39,48 +39,11 @@ public static class RegistryService
         }
     }
 
-    public static bool IsShowHibernateOption
-    {
-        get
-        {
-            var result = GetSettings<int>(RegShowHibernateOption);
-            if (result.IsError)
-            {
-                return false;
-            }
+    public static bool IsShowHibernateOption => GetSettings(RegShowHibernateOption);
 
-            return result.Data == 1;
-        }
-    }
+    public static bool IsShowSleepOption => GetSettings(RegShowSleepOption);
 
-    public static bool IsShowSleepOption
-    {
-        get
-        {
-            var result = GetSettings<int>(RegShowSleepOption);
-            if (result.IsError)
-            {
-                return true;
-            }
-
-            return result.Data == 1;
-        }
-    }
-
-    public static bool IsShowLockOption
-    {
-        get
-        {
-            var result = GetSettings<int>(RegShowLockOption);
-            if (result.IsError)
-            {
-                return true;
-            }
-
-            return result.Data == 1;
-        }
-    }
-
+    public static bool IsShowLockOption => GetSettings(RegShowLockOption);
 
     public static void SetStartup(bool isStart)
     {
@@ -145,6 +108,13 @@ public static class RegistryService
         return result.IsError
             ? -1
             : result.Data;
+    }
+
+    public static bool GetKeepBrightness(string company, string product)
+    {
+        var result = GetSettings<int>(RegKeepBrightness(company, product));
+
+        return result is { IsError: false, Data: 1 };
     }
 
     public static bool IsFirstStart(string company, string product)
@@ -279,6 +249,24 @@ public static class RegistryService
         DeleteSetting(regRestartCount);
     }
 
+    public static void SetKeepBrightness(string company, string product, object value)
+    {
+        var regKeepBrightness = RegKeepBrightness(company, product);
+        regKeepBrightness.Value = value;
+        SaveSetting(regKeepBrightness);
+    }
+
+    private static bool GetSettings(RegistryParam registryParam)
+    {
+        var result = GetSettings<int>(registryParam);
+        if (result.IsError)
+        {
+            return false;
+        }
+
+        return result.Data == 1;
+    }
+
     private static void SetRegistryValue(ResourceManager resourceManager, RegistryParam registryParam, object value)
     {
         registryParam.Value = value;
@@ -383,6 +371,15 @@ public static class RegistryService
             Path = GetAppPath(company, product),
             Section = IDLE_MONITOR,
             Name = "PollingIdleTimeInMilliseconds"
+        };
+
+    private static RegistryParam RegKeepBrightness(string company, string product) =>
+        new()
+        {
+            RegistryHive = RegistryHive.CurrentUser,
+            Path = GetAppPath(company, product),
+            Section = IDLE_MONITOR,
+            Name = "KeepBrightness"
         };
 
     private static string GetAppPath(string company, string product) =>

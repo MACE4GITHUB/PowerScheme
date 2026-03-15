@@ -390,6 +390,20 @@ public class PowerSchemeService : IPowerSchemeService
         return string.Empty;
     }
 
+    public void CopyBrightness(Guid sourcePowerScheme, Guid destinationPowerScheme)
+    {
+        const SettingSubgroup VIDEO_SUBGROUP = SettingSubgroup.VIDEO_SUBGROUP;
+        const Setting VIDEO_NORMAL_LEVEL = Setting.VIDEONORMALLEVEL;
+
+        var dCSettings = PowerManager.GetPlanSetting(sourcePowerScheme, VIDEO_SUBGROUP, VIDEO_NORMAL_LEVEL, PowerMode.DC);
+        var aCSettings = PowerManager.GetPlanSetting(sourcePowerScheme, VIDEO_SUBGROUP, VIDEO_NORMAL_LEVEL, PowerMode.AC);
+
+        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(Convert.ToInt32(dCSettings) , Convert.ToInt32(aCSettings));
+        var powerSchemeVideoNormalLevel = new PowerSchemeVideoNormalLevel(destinationPowerScheme, powerSchemeDcAcValues);
+
+        powerSchemeVideoNormalLevel.ApplyValues();
+    }
+
     private static void CreateTypicalPowerScheme(
         Guid source,
         Guid destination,
@@ -431,4 +445,6 @@ public class PowerSchemeService : IPowerSchemeService
             .Where(p => p.Value.Guid == guid)
             .Select(p => p.Value).FirstOrDefault()
         ?? new PowerScheme(guid, false, ImageItem.Unknown);
+
+
 }

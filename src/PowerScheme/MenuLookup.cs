@@ -36,7 +36,8 @@ internal static class MenuLookup
         { MenuItm.DeleteTypicalSchemes, new ViewMenu(Language.Current.DeleteTypicalSchemes, ImageItem.Delete) },
         { MenuItm.Quit, new ViewMenu(Language.Current.Quit, ImageItem.Empty) },
         { MenuItm.Version, new ViewMenu(Language.Current.Version, ImageItem.Empty) },
-        { MenuItm.PowerSchemes, new ViewMenu(Language.Current.PowerSchemes, ImageItem.Empty) }
+        { MenuItm.PowerSchemes, new ViewMenu(Language.Current.PowerSchemes, ImageItem.Empty) },
+        { MenuItm.KeepBrightness, new ViewMenu(Language.Current.KeepBrightness, ImageItem.Empty, description: Language.Current.KeepBrightnessDescription) },
     };
 
     internal enum MenuItm
@@ -54,6 +55,7 @@ internal static class MenuLookup
         LidShutdown,
         IdleMonitoring,
         IdleDoNothing,
+        KeepBrightness,
         Settings,
         RestoreDefaultPowerSchemes,
         ControlPanelSchemeWindows,
