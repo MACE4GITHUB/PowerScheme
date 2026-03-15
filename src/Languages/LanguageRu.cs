@@ -166,4 +166,10 @@ public sealed class LanguageRu : Language
 
     public override string PowerSchemes
         => "Схемы электропитания";
+
+    public override string KeepBrightness
+        => "Не менять яркость";
+
+    public override string KeepBrightnessDescription
+        => "Если включено, яркость при простое такая же как при активности";
 }

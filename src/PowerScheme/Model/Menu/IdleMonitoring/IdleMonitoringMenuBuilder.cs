@@ -21,6 +21,7 @@ internal class IdleMonitoringMenuBuilder(
     internal ToolStripMenuItem Build()
     {
         AddIdleMonitoringItems();
+        AddKeepingBrightness();
 
         return Root;
     }
@@ -98,5 +99,33 @@ internal class IdleMonitoringMenuBuilder(
         doNothingItem.BindCommand(command);
 
         dropDownItems.Add(doNothingItem);
+    }
+
+    private void AddKeepingBrightness()
+    {
+        if (!power.ExistsMobilePlatformRole)
+        {
+            return;
+        }
+
+        var lidPowerSchemeId = RegistryService.GetIdleMonitoring(AppInfo.CompanyName, AppInfo.ProductName);
+
+        if (lidPowerSchemeId == Guid.Empty)
+        {
+            return;
+        }
+
+        var dropDownItems = Root.DropDownItems;
+
+        dropDownItems.Add(new ToolStripSeparator());
+
+        var keepBrightness = MenuItemFactory.Create(MenuItm.KeepBrightness);
+        keepBrightness.Tag = RegistryService.GetKeepBrightness(AppInfo.CompanyName, AppInfo.ProductName);
+        keepBrightness.GetCheckedOption();
+
+        var command = new KeepBrightnessCommand();
+        keepBrightness.BindCommand(command);
+
+        dropDownItems.Add(keepBrightness);
     }
 }

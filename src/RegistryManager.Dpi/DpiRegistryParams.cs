@@ -9,7 +9,7 @@ namespace RegistryManager.Dpi;
 public static class DpiRegistryParams
 {
     private const string SCALE_FACTORS = @"SYSTEM\CurrentControlSet\Control\GraphicsDrivers\ScaleFactors";
-    private const string Dpi_Value = "DpiValue";
+    private const string DPI_VALUE = "DpiValue";
 
     public static RegistryParam GetScaleFactors =>
         new()
@@ -23,7 +23,7 @@ public static class DpiRegistryParams
             RegistryHive = RegistryHive.LocalMachine,
             Path = SCALE_FACTORS,
             Section = x,
-            Name = Dpi_Value
+            Name = DPI_VALUE
         })];
 
     private static ICollection<string> GetMonitorIds() =>

@@ -71,4 +71,6 @@ public abstract class Language
     public abstract string RunAsAdministrator { get; }
     public abstract string SwitchPowerSchemeWhenIdle { get; }
     public abstract string PowerSchemes { get; }
+    public abstract string KeepBrightness { get; }
+    public abstract string KeepBrightnessDescription { get; }
 }

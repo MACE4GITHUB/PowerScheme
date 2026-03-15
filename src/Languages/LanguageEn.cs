@@ -160,4 +160,10 @@ public sealed class LanguageEn : Language
 
     public override string PowerSchemes
         => "Power Schemes";
+
+    public override string KeepBrightness
+        => "Keep the brightness";
+
+    public override string KeepBrightnessDescription
+        => "If enabled, the brightness when idle is the same as when active";
 }

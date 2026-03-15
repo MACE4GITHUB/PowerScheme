@@ -30,8 +30,9 @@ public sealed class DpiWatchers : IDisposable
         if (_scaleFactorsRegistryWatcher.IsMonitoring)
         {
             _scaleFactorsRegistryWatcher.Stop();
-            _scaleFactorsRegistryWatcher.Changed -= ScaleFactorsRegistryWatcher_Changed;
         }
+
+        _scaleFactorsRegistryWatcher.Changed -= ScaleFactorsRegistryWatcher_Changed;
 
         MonitorRegistryWatchersStop();
     }
@@ -68,10 +69,7 @@ public sealed class DpiWatchers : IDisposable
 
     public void Dispose()
     {
-        if (_monitorRegistryWatchers.Count > 0)
-        {
-            MonitorRegistryWatchersStop();
-        }
+        Stop();
     }
 
     private void ScaleFactorsRegistryWatcher_Changed(object sender, RegistryChangedEventArgs e)
@@ -82,8 +80,8 @@ public sealed class DpiWatchers : IDisposable
 
     private void MonitorRegistryWatchers_Changed(object sender, RegistryChangedEventArgs e)
     {
-        if (e.Current.Value is Result<int> currentValue && currentValue.IsSuccess &&
-            e.Previous.Value is Result<int> previousValue && previousValue.IsSuccess &&
+        if (e.Current.Value is Result<int> { IsSuccess: true } currentValue &&
+            e.Previous.Value is Result<int> { IsSuccess: true } previousValue &&
             currentValue.Data != previousValue.Data)
         {
             Changed?.Invoke(sender, e);

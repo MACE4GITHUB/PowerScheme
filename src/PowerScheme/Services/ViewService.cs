@@ -58,30 +58,6 @@ internal sealed class ViewService : ApplicationContext, IViewService
         _idleMonitorService.Start();
     }
 
-    private static void PowerSchemesOnChanged(object sender, RegistryChangedEventArgs e)
-    {
-        if (e is not { RegChangeNotifyFilter: RegChangeNotifyFilter.Key, ChangeType: ChangeType.Deleted })
-        {
-            return;
-        }
-
-        var idlePowerSchemeGuid = RegistryService.GetIdleMonitoring(AppInfo.CompanyName, AppInfo.ProductName);
-
-        if (e.SubKeys == null || e.SubKeys.Length == 0)
-        {
-            return;
-        }
-
-        List<Guid> subKeys = [..e.SubKeys
-            .Select(x => Guid.TryParse(x, out var guid) ? guid : Guid.Empty)
-            .Where(x=> x != Guid.Empty)];
-
-        if (subKeys.Contains(idlePowerSchemeGuid))
-        {
-            RegistryService.SetIdlePowerScheme(AppInfo.CompanyName, AppInfo.ProductName, Guid.Empty);
-        }
-    }
-
     public void Stop()
     {
         _updateTimer.Stop();
@@ -108,6 +84,30 @@ internal sealed class ViewService : ApplicationContext, IViewService
 
         System.Diagnostics.Process.Start(Default.ApplicationFileName);
         Application.Exit();
+    }
+
+    private static void PowerSchemesOnChanged(object sender, RegistryChangedEventArgs e)
+    {
+        if (e is not { RegChangeNotifyFilter: RegChangeNotifyFilter.Key, ChangeType: ChangeType.Deleted })
+        {
+            return;
+        }
+
+        var idlePowerSchemeGuid = RegistryService.GetIdleMonitoring(AppInfo.CompanyName, AppInfo.ProductName);
+
+        if (e.SubKeys == null || e.SubKeys.Length == 0)
+        {
+            return;
+        }
+
+        List<Guid> subKeys = [..e.SubKeys
+            .Select(x => Guid.TryParse(x, out var guid) ? guid : Guid.Empty)
+            .Where(x=> x != Guid.Empty)];
+
+        if (subKeys.Contains(idlePowerSchemeGuid))
+        {
+            RegistryService.SetIdlePowerScheme(AppInfo.CompanyName, AppInfo.ProductName, Guid.Empty);
+        }
     }
 
     private void ActivePowerSchemeOnChanged(object? sender, RegistryChangedEventArgs e)

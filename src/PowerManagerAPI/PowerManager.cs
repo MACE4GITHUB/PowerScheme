@@ -228,7 +228,7 @@ public static class PowerManager
     /// </summary>
     /// <param name="plan">Guid of the power plan</param>
     /// <param name="subgroup">The subgroup to look in</param>
-    /// <param name="setting">The settign to look up</param>
+    /// <param name="setting">The settings to look up</param>
     /// <param name="powerMode">Power mode. AC or DC, but not both.</param>
     /// <returns>The active index value for the specified setting</returns>
     public static uint GetPlanSetting(Guid plan, SettingSubgroup subgroup, Setting setting, PowerMode powerMode)

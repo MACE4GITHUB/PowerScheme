@@ -25,6 +25,8 @@ internal class PowerSchemeSettings(SettingScheme settingScheme)
 
     public PowerSchemeMultimediaQuality MultimediaQuality(StateValues values) => new(PowerSchemeGuid, values.State);
 
+    public PowerSchemeVideoNormalLevel VideoNormalLevel(StateValues values) => new(PowerSchemeGuid, values.State);
+
     public void ApplyDefaultValues()
     {
         var powerSchemeDefaultSettings = new PowerSchemeDefaultSettings(settingScheme);
@@ -70,7 +72,8 @@ internal class PowerSchemeDefaultSettings
             {PowerSchemeSetting.Sleep, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.Sleep][0], defaultSetting[PowerSchemeSetting.Sleep][1]))},
             {PowerSchemeSetting.WiFi, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.WiFi][0], defaultSetting[PowerSchemeSetting.WiFi][1]))},
             {PowerSchemeSetting.MultimediaPlay, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.MultimediaPlay][0], defaultSetting[PowerSchemeSetting.MultimediaPlay][1]))},
-            {PowerSchemeSetting.MultimediaQuality, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.MultimediaQuality][0], defaultSetting[PowerSchemeSetting.MultimediaQuality][1]))}
+            {PowerSchemeSetting.MultimediaQuality, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.MultimediaQuality][0], defaultSetting[PowerSchemeSetting.MultimediaQuality][1]))},
+            {PowerSchemeSetting.VideoNormalLevel, new StateValues( new PowerSchemeDcAcValues(defaultSetting[PowerSchemeSetting.VideoNormalLevel][0], defaultSetting[PowerSchemeSetting.VideoNormalLevel][1]))},
         };
     }
 
@@ -84,7 +87,8 @@ internal class PowerSchemeDefaultSettings
             {PowerSchemeSetting.Sleep, [900,10800] },
             {PowerSchemeSetting.WiFi, [2,2] },
             {PowerSchemeSetting.MultimediaPlay, [1,1] },
-            {PowerSchemeSetting.MultimediaQuality, [1,1] }
+            {PowerSchemeSetting.MultimediaQuality, [1,1] },
+            {PowerSchemeSetting.VideoNormalLevel, [70,70] }
         };
 
     private static Dictionary<PowerSchemeSetting, int[]> SettingsMedia
@@ -95,7 +99,8 @@ internal class PowerSchemeDefaultSettings
             {PowerSchemeSetting.Sleep, [1800,10800] },
             {PowerSchemeSetting.WiFi, [2,3] },
             {PowerSchemeSetting.MultimediaPlay, [2,1] },
-            {PowerSchemeSetting.MultimediaQuality, [1,1] }
+            {PowerSchemeSetting.MultimediaQuality, [1,1] },
+            {PowerSchemeSetting.VideoNormalLevel, [70,70] }
         };
 
     private static Dictionary<PowerSchemeSetting, int[]> SettingsSimple
@@ -106,7 +111,8 @@ internal class PowerSchemeDefaultSettings
             {PowerSchemeSetting.Sleep, [1800,10800] },
             {PowerSchemeSetting.WiFi, [3,3] },
             {PowerSchemeSetting.MultimediaPlay, [2,2] },
-            {PowerSchemeSetting.MultimediaQuality, [0,0] }
+            {PowerSchemeSetting.MultimediaQuality, [0,0] },
+            {PowerSchemeSetting.VideoNormalLevel, [70,70] }
         };
 
     private static Dictionary<PowerSchemeSetting, int[]> SettingsExtreme
@@ -117,7 +123,8 @@ internal class PowerSchemeDefaultSettings
             {PowerSchemeSetting.Sleep, [900,10800] },
             {PowerSchemeSetting.WiFi, [0,0] },
             {PowerSchemeSetting.MultimediaPlay, [0,0] },
-            {PowerSchemeSetting.MultimediaQuality, [1,1] }
+            {PowerSchemeSetting.MultimediaQuality, [1,1] },
+            {PowerSchemeSetting.VideoNormalLevel, [70,70] }
         };
 }
 
@@ -144,5 +151,6 @@ public enum PowerSchemeSetting
     TurnOffDisplay,
     WiFi,
     MultimediaPlay,
-    MultimediaQuality
+    MultimediaQuality,
+    VideoNormalLevel
 }

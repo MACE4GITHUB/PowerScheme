@@ -59,7 +59,8 @@ public enum Setting
     VIDEOIDLE,
     WIFISAVER,
     MULTPLAY,
-    MULTQUALITY
+    MULTQUALITY,
+    VIDEONORMALLEVEL
 }
 
 public enum PowerPlatformRole
@@ -794,6 +795,7 @@ public static class SettingLookup
         { Setting.VIDEOIDLE,        new Guid("3c0bc021-c8a8-4e07-a973-6b14cbcb2b7e") },
         { Setting.WIFISAVER,        new Guid("12bbebe6-58d6-4636-95bb-3217ef867c1a") },
         { Setting.MULTPLAY,         new Guid("34c7b99f-9a6d-4b3c-8dc7-b6693b78cef4") },
-        { Setting.MULTQUALITY,      new Guid("10778347-1370-4ee0-8bbd-33bdacaade49") }
+        { Setting.MULTQUALITY,      new Guid("10778347-1370-4ee0-8bbd-33bdacaade49") },
+        { Setting.VIDEONORMALLEVEL, new Guid("aded5e82-b909-4619-9949-f5d71dac0bcb") },
     };
 }

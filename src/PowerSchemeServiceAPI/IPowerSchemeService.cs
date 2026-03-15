@@ -49,4 +49,6 @@ public interface IPowerSchemeService
     void ActionPowerScheme(StatePowerScheme statePowerScheme);
 
     event EventHandler<PowerSchemeEventArgs> ActivePowerSchemeChanged;
+
+    void CopyBrightness(Guid sourcePowerScheme, Guid destinationPowerScheme);
 }
