@@ -12,6 +12,7 @@ public interface IPowerSchemeService
     IEnumerable<IPowerScheme> TypicalPowerSchemesWithDeleted { get; }
     IEnumerable<IPowerScheme> TypicalPowerSchemesWithoutDeleted { get; }
     IEnumerable<IPowerScheme> UserPowerSchemes { get; }
+    IEnumerable<IPowerScheme> CustomPowerSchemes { get; }
     IEnumerable<IPowerScheme> PowerSchemes { get; }
 
     Watchers Watchers { get; }
@@ -47,6 +48,8 @@ public interface IPowerSchemeService
     StatePowerScheme? StatePowerSchemeToggle(StatePowerScheme statePowerScheme);
 
     void ActionPowerScheme(StatePowerScheme statePowerScheme);
+
+    void DeletePowerScheme(StatePowerScheme statePowerScheme);
 
     event EventHandler<PowerSchemeEventArgs> ActivePowerSchemeChanged;
 

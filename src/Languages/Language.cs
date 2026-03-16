@@ -73,4 +73,5 @@ public abstract class Language
     public abstract string PowerSchemes { get; }
     public abstract string KeepBrightness { get; }
     public abstract string KeepBrightnessDescription { get; }
+    public abstract string DeleteCustomScheme { get; }
 }
