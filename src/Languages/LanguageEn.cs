@@ -166,4 +166,7 @@ public sealed class LanguageEn : Language
 
     public override string KeepBrightnessDescription
         => "If enabled, the brightness when idle is the same as when active";
+
+    public override string DeleteCustomScheme
+        => "Delete the custom scheme";
 }

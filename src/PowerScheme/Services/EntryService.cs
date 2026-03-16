@@ -33,7 +33,7 @@ internal sealed class EntryService : IDisposable
         IPowerSchemeService power,
         IMainMessageBox messageBox)
     {
-        _power = power ?? throw new ArgumentNullException(nameof(power)); ;
+        _power = power ?? throw new ArgumentNullException(nameof(power));
         _args = Environment.GetCommandLineArgs();
         _messageBox = messageBox;
     }

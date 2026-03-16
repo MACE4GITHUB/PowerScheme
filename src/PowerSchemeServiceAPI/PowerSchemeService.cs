@@ -71,6 +71,9 @@ public class PowerSchemeService : IPowerSchemeService
     public IEnumerable<IPowerScheme> UserPowerSchemes
         => RegistryService.UserPowerSchemeIds.Select(NewPowerScheme);
 
+    public IEnumerable<IPowerScheme> CustomPowerSchemes
+        => UserPowerSchemes.Except(TypicalPowerSchemesWithDeleted);
+
     public IEnumerable<IPowerScheme> PowerSchemes
         => PowerProfPowerSchemes.Union(UserPowerSchemes);
 
@@ -353,6 +356,13 @@ public class PowerSchemeService : IPowerSchemeService
         {
             ApplyAction(value, CreateExtremePowerScheme, DeleteExtremePowerScheme);
         }
+    }
+
+    public void DeletePowerScheme(StatePowerScheme statePowerScheme)
+    {
+        var guid = statePowerScheme.PowerScheme.Guid;
+
+        DeleteTypicalScheme(guid);
     }
 
     public string TextActionToggle(StatePowerScheme statePowerScheme)

@@ -172,4 +172,7 @@ public sealed class LanguageRu : Language
 
     public override string KeepBrightnessDescription
         => "Если включено, яркость при простое такая же как при активности";
+
+    public override string DeleteCustomScheme
+        => "Удалить схему";
 }
