@@ -134,6 +134,9 @@ public sealed class LanguageRu : Language
            $"\n\n {SimpleName} - схема на основе Экономия энергии. \n Частота переменная, преимущественно низкая. \n Для просмотра интернет." +
            $"\n\n При нажатии \"Нет\" типовые схемы можно будет создать позже из меню \"Настройки\".";
 
+    public override string Default
+        => "По умолчанию";
+
     public override string None
         => "Ничего";
 
@@ -175,4 +178,31 @@ public sealed class LanguageRu : Language
 
     public override string DeleteCustomScheme
         => "Удалить схему";
+
+    public override string IdleOptions
+        => "Параметры простоя";
+
+    public override string IdleThreshold
+        => "Время простоя";
+
+    public override string PollingActiveTime
+        => "Время опроса при активности";
+
+    public override string PollingIdleTime
+        => "Время опроса при простое";
+
+    public override string Minutes
+        => "м";
+
+    public override string Seconds
+        => "с";
+
+    public override string TheUserIdleTimeAfterWhichThePowerPlanWillChange
+        => "Время бездействия пользователя после которого сменится план электропитания";
+
+    public override string MonitoringFrequencyWhenTheUserIsActive
+        => "Частота мониторинга при активности пользователя";
+
+    public override string MonitoringFrequencyDuringUserInactivity
+        => "Частота мониторинга при бездействии пользователя";
 }

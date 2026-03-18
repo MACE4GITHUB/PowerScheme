@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using PowerScheme.Addins.IdleMonitoring;
 using PowerScheme.Model;
 using PowerSchemeServiceAPI;
@@ -41,6 +42,13 @@ public sealed class IdleMonitorService(
         idleMonitor.OnActive -= OnActive;
         power.ActivePowerSchemeChanged -= ActivePowerSchemeChanged;
         idleMonitor.Stop();
+    }
+
+    public void Restart()
+    {
+        Stop();
+        Thread.Sleep(1000);
+        Start();
     }
 
     private static void ActivePowerSchemeChanged(object sender, PowerSchemeEventArgs e)
