@@ -128,6 +128,9 @@ public sealed class LanguageEn : Language
     public override string FirstStartDescription
         => $"Create typical power schemes {StableName}, {MediaName}, {SimpleName}?";
 
+    public override string Default
+        => "Default";
+
     public override string None
         => "None";
 
@@ -169,4 +172,31 @@ public sealed class LanguageEn : Language
 
     public override string DeleteCustomScheme
         => "Delete the custom scheme";
+
+    public override string IdleOptions
+        => "Idle Options";
+
+    public override string IdleThreshold
+        => "Idle Threshold";
+
+    public override string PollingActiveTime
+        => "Polling Active Time";
+
+    public override string PollingIdleTime
+        => "Polling Idle Time";
+
+    public override string Minutes
+        => "m";
+
+    public override string Seconds
+        => "s";
+
+    public override string TheUserIdleTimeAfterWhichThePowerPlanWillChange
+        => "The user idle time after which the power plan will change";
+
+    public override string MonitoringFrequencyWhenTheUserIsActive
+        => "Monitoring frequency when the user is active";
+
+    public override string MonitoringFrequencyDuringUserInactivity
+        => "Monitoring frequency during user inactivity";
 }

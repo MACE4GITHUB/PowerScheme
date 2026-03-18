@@ -38,6 +38,7 @@ internal static class MenuLookup
         { MenuItm.Version, new ViewMenu(Language.Current.Version, ImageItem.Empty) },
         { MenuItm.PowerSchemes, new ViewMenu(Language.Current.PowerSchemes, ImageItem.Empty) },
         { MenuItm.KeepBrightness, new ViewMenu(Language.Current.KeepBrightness, ImageItem.Empty, description: Language.Current.KeepBrightnessDescription) },
+        { MenuItm.ShowIdleOptions, new ViewMenu(Language.Current.IdleOptions, ImageItem.Empty) },
     };
 
     internal enum MenuItm
@@ -69,7 +70,8 @@ internal static class MenuLookup
         Extreme,
         High,
         Balance,
-        Low
+        Low,
+        ShowIdleOptions
     }
 
     internal enum MenuItmKind

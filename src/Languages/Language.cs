@@ -60,6 +60,7 @@ public abstract class Language
     public abstract string ApplicationLatter { get; }
     public abstract string FirstStartCaption { get; }
     public abstract string FirstStartDescription { get; }
+    public abstract string Default { get; }
     public abstract string None { get; }
     public abstract string Ok { get; }
     public abstract string Cancel { get; }
@@ -74,4 +75,13 @@ public abstract class Language
     public abstract string KeepBrightness { get; }
     public abstract string KeepBrightnessDescription { get; }
     public abstract string DeleteCustomScheme { get; }
+    public abstract string IdleOptions { get; }
+    public abstract string IdleThreshold { get; }
+    public abstract string PollingActiveTime { get; }
+    public abstract string PollingIdleTime { get; }
+    public abstract string Minutes { get; }
+    public abstract string Seconds { get; }
+    public abstract string TheUserIdleTimeAfterWhichThePowerPlanWillChange { get; }
+    public abstract string MonitoringFrequencyWhenTheUserIsActive { get; }
+    public abstract string MonitoringFrequencyDuringUserInactivity { get; }
 }

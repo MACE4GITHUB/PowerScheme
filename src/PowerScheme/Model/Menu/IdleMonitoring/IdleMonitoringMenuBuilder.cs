@@ -22,6 +22,7 @@ internal class IdleMonitoringMenuBuilder(
     {
         AddIdleMonitoringItems();
         AddKeepingBrightness();
+        AddIdleForm();
 
         return Root;
     }
@@ -127,5 +128,19 @@ internal class IdleMonitoringMenuBuilder(
         keepBrightness.BindCommand(command);
 
         dropDownItems.Add(keepBrightness);
+    }
+
+    private void AddIdleForm()
+    {
+        var dropDownItems = Root.DropDownItems;
+
+        dropDownItems.Add(new ToolStripSeparator());
+
+        var showIdleOptions = MenuItemFactory.Create(MenuItm.ShowIdleOptions);
+
+        var command = new ShowIdleFormCommand();
+        showIdleOptions.BindCommand(command);
+
+        dropDownItems.Add(showIdleOptions);
     }
 }
