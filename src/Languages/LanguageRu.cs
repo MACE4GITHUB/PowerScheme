@@ -205,4 +205,19 @@ public sealed class LanguageRu : Language
 
     public override string MonitoringFrequencyDuringUserInactivity
         => "Частота мониторинга при бездействии пользователя";
+
+    public override string Themes
+        => "Темы";
+
+    public override string Dark
+        => "Темная";
+
+    public override string Light
+        => "Светлая";
+
+    public override string Blue
+        => "Синяя";
+
+    public override string Green
+        => "Зеленая";
 }

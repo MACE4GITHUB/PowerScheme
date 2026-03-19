@@ -199,4 +199,19 @@ public sealed class LanguageEn : Language
 
     public override string MonitoringFrequencyDuringUserInactivity
         => "Monitoring frequency during user inactivity";
+
+    public override string Themes
+        => "Themes";
+
+    public override string Dark
+        => "Dark";
+
+    public override string Light
+        => "Light";
+
+    public override string Blue
+        => "Blue";
+
+    public override string Green
+        => "Green";
 }

@@ -43,11 +43,15 @@
 		<None Include="Resources\Empty.png" />
 		<None Include="Resources\Add.png" />
 		<None Include="Resources\Balance.png" />
+		<None Include="Resources\Blue.png" />
 		<None Include="Resources\Check.png" />
+		<None Include="Resources\Dark.png" />
 		<None Include="Resources\Delete.png" />
 		<None Include="Resources\Extreme.png" />
+		<None Include="Resources\Green.png" />
 		<None Include="Resources\Hibernate.png" />
 		<None Include="Resources\High.png" />
+		<None Include="Resources\Light.png" />
 		<None Include="Resources\Low.png" />
 		<None Include="Resources\Media.png" />
 		<None Include="Resources\Nothing.png" />
@@ -64,6 +68,7 @@
 		<None Include="Resources\Stable.png" />
 		<Content Include="Resources\Start.ico" />
 		<None Include="Resources\Stop.png" />
+		<None Include="Resources\Themes.png" />
 		<None Include="Resources\Ultimate.png" />
 		<None Include="Resources\Unknown.png" />
 		<None Include="Resources\Update.png" />
