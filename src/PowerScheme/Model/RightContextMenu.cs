@@ -10,6 +10,7 @@ using PowerScheme.Model.Menu.Sleep;
 using PowerScheme.Model.Menu.Version;
 using PowerScheme.Model.Menu.WindowsStartup;
 using PowerScheme.Services;
+using PowerScheme.Themes;
 using PowerSchemeServiceAPI;
 
 namespace PowerScheme.Model;
@@ -74,6 +75,8 @@ internal sealed class RightContextMenu(
         {
             Items.ReplaceMenu(GetLidMenu);
         }
+
+        ThemeService.ApplyToolStripTheme(this);
     }
 
     #region MenuBuilders

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows.Forms;
 using Languages;
+using PowerScheme.Themes;
 using PowerScheme.Utility;
 using PowerSchemeServiceAPI;
 using PowerSchemeServiceAPI.Model;
@@ -33,6 +34,7 @@ internal class SettingsMenuBuilder :
 
         AddControlPanelScheme(root);
         AddRestoreDefault(root);
+        AddThemes(root);
         root.DropDownItems.Add(new ToolStripSeparator());
 
         var withoutDeletedCount = _power.TypicalPowerSchemesWithoutDeleted.Count();
@@ -75,6 +77,34 @@ internal class SettingsMenuBuilder :
 
         var command = new RestoreDefaultPowerSchemesCommand(_power);
         item.BindCommand(command);
+
+        root.DropDownItems.Add(item);
+    }
+
+    private void AddThemes(ToolStripMenuItem root)
+    {
+        var item = MenuItemFactory.Create(MenuItm.Themes);
+
+        var itemDark = MenuItemFactory.Create(MenuItm.Dark);
+        itemDark.Tag = ThemeKind.Dark;
+        itemDark.BindCommand(new ChangeThemeCommand());
+
+        var itemLight = MenuItemFactory.Create(MenuItm.Light);
+        itemLight.Tag = ThemeKind.Light;
+        itemLight.BindCommand(new ChangeThemeCommand());
+
+        var itemBlue = MenuItemFactory.Create(MenuItm.Blue);
+        itemBlue.Tag = ThemeKind.Blue;
+        itemBlue.BindCommand(new ChangeThemeCommand());
+
+        var itemGreen = MenuItemFactory.Create(MenuItm.Green);
+        itemGreen.Tag = ThemeKind.Green;
+        itemGreen.BindCommand(new ChangeThemeCommand());
+
+        item.DropDownItems.Add(itemDark);
+        item.DropDownItems.Add(itemLight);
+        item.DropDownItems.Add(itemBlue);
+        item.DropDownItems.Add(itemGreen);
 
         root.DropDownItems.Add(item);
     }

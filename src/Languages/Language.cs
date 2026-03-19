@@ -84,4 +84,9 @@ public abstract class Language
     public abstract string TheUserIdleTimeAfterWhichThePowerPlanWillChange { get; }
     public abstract string MonitoringFrequencyWhenTheUserIsActive { get; }
     public abstract string MonitoringFrequencyDuringUserInactivity { get; }
+    public abstract string Themes { get; }
+    public abstract string Dark { get; }
+    public abstract string Light { get; }
+    public abstract string Blue { get; }
+    public abstract string Green { get; }
 }

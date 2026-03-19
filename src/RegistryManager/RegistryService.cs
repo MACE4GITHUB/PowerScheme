@@ -117,6 +117,15 @@ public static class RegistryService
         return result is { IsError: false, Data: 1 };
     }
 
+    public static int GetTheme(string company, string product)
+    {
+        var result = GetSettings<int>(RegTheme(company, product));
+
+        return result.IsError
+            ? 0
+            : result.Data;
+    }
+
     public static bool IsFirstStart(string company, string product)
     {
         var result = GetSettings<int>(RegAppSettings(company, product));
@@ -256,6 +265,13 @@ public static class RegistryService
         SaveSetting(regKeepBrightness);
     }
 
+    public static void SetTheme(string company, string product, object value)
+    {
+        var regTheme = RegTheme(company, product);
+        regTheme.Value = value;
+        SaveSetting(regTheme);
+    }
+
     private static bool GetSettings(RegistryParam registryParam)
     {
         var result = GetSettings<int>(registryParam);
@@ -380,6 +396,15 @@ public static class RegistryService
             Path = GetAppPath(company, product),
             Section = IDLE_MONITOR,
             Name = "KeepBrightness"
+        };
+
+    private static RegistryParam RegTheme(string company, string product) =>
+        new()
+        {
+            RegistryHive = RegistryHive.CurrentUser,
+            Path = @"SOFTWARE\" + company,
+            Section = product,
+            Name = "ThemeId"
         };
 
     private static string GetAppPath(string company, string product) =>

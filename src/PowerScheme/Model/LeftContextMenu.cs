@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using PowerScheme.Model.Menu;
 using PowerScheme.Model.Menu.PowerSchemes;
+using PowerScheme.Themes;
 using PowerSchemeServiceAPI;
 
 namespace PowerScheme.Model;
@@ -41,6 +42,8 @@ internal sealed class LeftContextMenu(
             var item = powerSchemeMenu.DropDownItems[0];
             Items.Add(item);
         }
+
+        ThemeService.ApplyToolStripTheme(this);
 
         _isBuilt = true;
     }

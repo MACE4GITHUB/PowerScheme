@@ -50,22 +50,22 @@
             // idleThresholdTrackBar
             // 
             this.idleThresholdTrackBar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.idleThresholdTrackBar.Location = new System.Drawing.Point(228, 45);
+            this.idleThresholdTrackBar.Location = new System.Drawing.Point(307, 45);
             this.idleThresholdTrackBar.Margin = new System.Windows.Forms.Padding(3, 10, 10, 3);
             this.idleThresholdTrackBar.Maximum = 200;
             this.idleThresholdTrackBar.Minimum = 1;
             this.idleThresholdTrackBar.Name = "idleThresholdTrackBar";
-            this.idleThresholdTrackBar.Size = new System.Drawing.Size(122, 45);
+            this.idleThresholdTrackBar.Size = new System.Drawing.Size(113, 45);
             this.idleThresholdTrackBar.TabIndex = 0;
             this.idleThresholdTrackBar.TickFrequency = 15;
             this.idleThresholdTrackBar.Value = 1;
             // 
             // tableLayoutPanel
             // 
-            this.tableLayoutPanel.BackColor = System.Drawing.Color.DarkSlateBlue;
+            this.tableLayoutPanel.BackColor = System.Drawing.Color.Black;
             this.tableLayoutPanel.ColumnCount = 3;
-            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70F));
-            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 65F));
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35F));
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel.Controls.Add(this.defaultButton, 0, 4);
             this.tableLayoutPanel.Controls.Add(this.pollingIdleTimeValueLabel, 1, 3);
@@ -89,8 +89,7 @@
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel.Size = new System.Drawing.Size(360, 256);
+            this.tableLayoutPanel.Size = new System.Drawing.Size(430, 265);
             this.tableLayoutPanel.TabIndex = 3;
             // 
             // defaultButton
@@ -102,11 +101,11 @@
             this.defaultButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.MediumSlateBlue;
             this.defaultButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.defaultButton.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.defaultButton.Location = new System.Drawing.Point(15, 219);
-            this.defaultButton.Margin = new System.Windows.Forms.Padding(15, 10, 3, 10);
+            this.defaultButton.Location = new System.Drawing.Point(10, 219);
+            this.defaultButton.Margin = new System.Windows.Forms.Padding(10, 10, 10, 20);
             this.defaultButton.Name = "defaultButton";
-            this.defaultButton.Padding = new System.Windows.Forms.Padding(15, 0, 15, 0);
-            this.defaultButton.Size = new System.Drawing.Size(140, 27);
+            this.defaultButton.Padding = new System.Windows.Forms.Padding(10, 0, 10, 0);
+            this.defaultButton.Size = new System.Drawing.Size(178, 26);
             this.defaultButton.TabIndex = 10;
             this.defaultButton.Text = "Default";
             this.defaultButton.UseVisualStyleBackColor = false;
@@ -116,10 +115,10 @@
             this.pollingIdleTimeValueLabel.AutoSize = true;
             this.pollingIdleTimeValueLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pollingIdleTimeValueLabel.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.pollingIdleTimeValueLabel.Location = new System.Drawing.Point(168, 161);
+            this.pollingIdleTimeValueLabel.Location = new System.Drawing.Point(208, 161);
             this.pollingIdleTimeValueLabel.Margin = new System.Windows.Forms.Padding(10, 10, 3, 10);
             this.pollingIdleTimeValueLabel.Name = "pollingIdleTimeValueLabel";
-            this.pollingIdleTimeValueLabel.Size = new System.Drawing.Size(54, 38);
+            this.pollingIdleTimeValueLabel.Size = new System.Drawing.Size(93, 38);
             this.pollingIdleTimeValueLabel.TabIndex = 9;
             this.pollingIdleTimeValueLabel.Text = "value3";
             this.pollingIdleTimeValueLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -132,19 +131,19 @@
             this.pollingIdleTimeLabel.Location = new System.Drawing.Point(20, 161);
             this.pollingIdleTimeLabel.Margin = new System.Windows.Forms.Padding(20, 10, 3, 10);
             this.pollingIdleTimeLabel.Name = "pollingIdleTimeLabel";
-            this.pollingIdleTimeLabel.Size = new System.Drawing.Size(135, 38);
+            this.pollingIdleTimeLabel.Size = new System.Drawing.Size(175, 38);
             this.pollingIdleTimeLabel.TabIndex = 8;
             this.pollingIdleTimeLabel.Text = "PollingIdleTime";
             // 
             // pollingIdleTimeTrackBar
             // 
             this.pollingIdleTimeTrackBar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pollingIdleTimeTrackBar.Location = new System.Drawing.Point(228, 161);
+            this.pollingIdleTimeTrackBar.Location = new System.Drawing.Point(307, 161);
             this.pollingIdleTimeTrackBar.Margin = new System.Windows.Forms.Padding(3, 10, 10, 3);
             this.pollingIdleTimeTrackBar.Maximum = 5000;
             this.pollingIdleTimeTrackBar.Minimum = 1000;
             this.pollingIdleTimeTrackBar.Name = "pollingIdleTimeTrackBar";
-            this.pollingIdleTimeTrackBar.Size = new System.Drawing.Size(122, 45);
+            this.pollingIdleTimeTrackBar.Size = new System.Drawing.Size(113, 45);
             this.pollingIdleTimeTrackBar.TabIndex = 7;
             this.pollingIdleTimeTrackBar.TickFrequency = 500;
             this.pollingIdleTimeTrackBar.Value = 1500;
@@ -152,12 +151,12 @@
             // pollingActiveTimeTrackBar
             // 
             this.pollingActiveTimeTrackBar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pollingActiveTimeTrackBar.Location = new System.Drawing.Point(228, 103);
+            this.pollingActiveTimeTrackBar.Location = new System.Drawing.Point(307, 103);
             this.pollingActiveTimeTrackBar.Margin = new System.Windows.Forms.Padding(3, 10, 10, 3);
             this.pollingActiveTimeTrackBar.Maximum = 5000;
             this.pollingActiveTimeTrackBar.Minimum = 1000;
             this.pollingActiveTimeTrackBar.Name = "pollingActiveTimeTrackBar";
-            this.pollingActiveTimeTrackBar.Size = new System.Drawing.Size(122, 45);
+            this.pollingActiveTimeTrackBar.Size = new System.Drawing.Size(113, 45);
             this.pollingActiveTimeTrackBar.TabIndex = 6;
             this.pollingActiveTimeTrackBar.TickFrequency = 500;
             this.pollingActiveTimeTrackBar.Value = 1500;
@@ -167,10 +166,10 @@
             this.pollingActiveTimeValueLabel.AutoSize = true;
             this.pollingActiveTimeValueLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pollingActiveTimeValueLabel.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.pollingActiveTimeValueLabel.Location = new System.Drawing.Point(168, 103);
+            this.pollingActiveTimeValueLabel.Location = new System.Drawing.Point(208, 103);
             this.pollingActiveTimeValueLabel.Margin = new System.Windows.Forms.Padding(10, 10, 3, 10);
             this.pollingActiveTimeValueLabel.Name = "pollingActiveTimeValueLabel";
-            this.pollingActiveTimeValueLabel.Size = new System.Drawing.Size(54, 38);
+            this.pollingActiveTimeValueLabel.Size = new System.Drawing.Size(93, 38);
             this.pollingActiveTimeValueLabel.TabIndex = 5;
             this.pollingActiveTimeValueLabel.Text = "value2";
             this.pollingActiveTimeValueLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -183,7 +182,7 @@
             this.pollingActiveTimeLabel.Location = new System.Drawing.Point(20, 103);
             this.pollingActiveTimeLabel.Margin = new System.Windows.Forms.Padding(20, 10, 3, 10);
             this.pollingActiveTimeLabel.Name = "pollingActiveTimeLabel";
-            this.pollingActiveTimeLabel.Size = new System.Drawing.Size(135, 38);
+            this.pollingActiveTimeLabel.Size = new System.Drawing.Size(175, 38);
             this.pollingActiveTimeLabel.TabIndex = 4;
             this.pollingActiveTimeLabel.Text = "PollingActiveTime";
             // 
@@ -192,10 +191,10 @@
             this.idleThresholdValueLabel.AutoSize = true;
             this.idleThresholdValueLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.idleThresholdValueLabel.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.idleThresholdValueLabel.Location = new System.Drawing.Point(168, 45);
+            this.idleThresholdValueLabel.Location = new System.Drawing.Point(208, 45);
             this.idleThresholdValueLabel.Margin = new System.Windows.Forms.Padding(10, 10, 3, 10);
             this.idleThresholdValueLabel.Name = "idleThresholdValueLabel";
-            this.idleThresholdValueLabel.Size = new System.Drawing.Size(54, 38);
+            this.idleThresholdValueLabel.Size = new System.Drawing.Size(93, 38);
             this.idleThresholdValueLabel.TabIndex = 3;
             this.idleThresholdValueLabel.Text = "value1";
             this.idleThresholdValueLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -205,12 +204,11 @@
             this.captionLabel.AutoSize = true;
             this.tableLayoutPanel.SetColumnSpan(this.captionLabel, 2);
             this.captionLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.captionLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.captionLabel.ForeColor = System.Drawing.SystemColors.HighlightText;
             this.captionLabel.Location = new System.Drawing.Point(10, 10);
             this.captionLabel.Margin = new System.Windows.Forms.Padding(10, 10, 3, 10);
             this.captionLabel.Name = "captionLabel";
-            this.captionLabel.Size = new System.Drawing.Size(212, 15);
+            this.captionLabel.Size = new System.Drawing.Size(291, 15);
             this.captionLabel.TabIndex = 0;
             this.captionLabel.Text = "IdleOptions";
             // 
@@ -224,11 +222,11 @@
             this.okButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.MediumSlateBlue;
             this.okButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.okButton.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.okButton.Location = new System.Drawing.Point(228, 219);
-            this.okButton.Margin = new System.Windows.Forms.Padding(3, 10, 15, 10);
+            this.okButton.Location = new System.Drawing.Point(314, 219);
+            this.okButton.Margin = new System.Windows.Forms.Padding(10, 10, 10, 20);
             this.okButton.Name = "okButton";
-            this.okButton.Padding = new System.Windows.Forms.Padding(15, 0, 15, 0);
-            this.okButton.Size = new System.Drawing.Size(117, 27);
+            this.okButton.Padding = new System.Windows.Forms.Padding(10, 0, 10, 0);
+            this.okButton.Size = new System.Drawing.Size(106, 26);
             this.okButton.TabIndex = 1;
             this.okButton.Text = "OK";
             this.okButton.UseVisualStyleBackColor = false;
@@ -241,7 +239,7 @@
             this.idleThresholdLabel.Location = new System.Drawing.Point(20, 45);
             this.idleThresholdLabel.Margin = new System.Windows.Forms.Padding(20, 10, 3, 10);
             this.idleThresholdLabel.Name = "idleThresholdLabel";
-            this.idleThresholdLabel.Size = new System.Drawing.Size(135, 38);
+            this.idleThresholdLabel.Size = new System.Drawing.Size(175, 38);
             this.idleThresholdLabel.TabIndex = 2;
             this.idleThresholdLabel.Text = "IdleThreshold";
             // 
@@ -249,7 +247,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(360, 256);
+            this.ClientSize = new System.Drawing.Size(430, 265);
             this.ControlBox = false;
             this.Controls.Add(this.tableLayoutPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;

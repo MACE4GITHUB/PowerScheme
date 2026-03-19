@@ -25,5 +25,10 @@ public enum ImageItem
     Hibernate,
     Shutdown,
     Shield,
-    Update
+    Update,
+    Themes,
+    Dark,
+    Light,
+    Blue,
+    Green
 }

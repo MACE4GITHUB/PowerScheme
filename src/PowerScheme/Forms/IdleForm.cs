@@ -5,6 +5,7 @@ using PowerScheme.Configuration;
 using PowerScheme.Model;
 using PowerScheme.Model.Options;
 using PowerScheme.Services;
+using PowerScheme.Themes;
 using RegistryManager;
 
 namespace PowerScheme.Forms
@@ -85,6 +86,8 @@ namespace PowerScheme.Forms
 
         private void OnActivated(object sender, EventArgs e)
         {
+            ThemeService.ApplyControlTheme(tableLayoutPanel);
+
             var idleThresholdInMilliseconds = RegistryService.GetIdleThresholdInMilliseconds(AppInfo.CompanyName, AppInfo.ProductName);
             var pollingActiveTimeInMilliseconds = RegistryService.GetPollingActiveTimeInMilliseconds(AppInfo.CompanyName, AppInfo.ProductName);
             var pollingIdleTimeInMilliseconds = RegistryService.GetPollingIdleTimeInMilliseconds(AppInfo.CompanyName, AppInfo.ProductName);
