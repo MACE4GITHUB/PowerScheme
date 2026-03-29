@@ -17,11 +17,6 @@ internal static class WindowManager
         if (!_forms.ContainsKey(type) || _forms[type].IsDisposed)
         {
             var form = new T();
-            //form.FormBorderStyle = FormBorderStyle.None;
-            //form.BackColor = Color.FromArgb(53, 54, 132);
-            form.BackColor = Color.DarkOrange;
-            form.TransparencyKey = Color.DarkOrange;
-            form.Opacity = 10;
 
             if (radius > 0)
                 WindowStyling.ApplyRoundedCorners(form, radius);
