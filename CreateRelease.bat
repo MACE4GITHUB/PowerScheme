@@ -13,7 +13,7 @@ set APP_DIR=.\src\PowerScheme\%BIN_DIR%
 set REGWRITER_DIR=.\src\RegWriter\%BIN_DIR%
 set RUNAS_DIR=.\src\RunAs\%BIN_DIR%
 set UPDATER_DIR=.\src\Updater\%BIN_DIR%
-set MSBUILD="C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
+set MSBUILD="C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe"
 REM ===============================================
 
 call :PrintHeader "Build RegWriter project"
@@ -107,7 +107,7 @@ exit /b
 
 REM Function Build Project
 :BuildProject
-"C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" %~1 ^
+%MSBUILD% %~1 ^
  /t:Rebuild ^
  /p:Configuration=%CONFIG% ^
  /v:m
