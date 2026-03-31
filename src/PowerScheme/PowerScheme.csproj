@@ -75,4 +75,13 @@
 		<None Include="Resources\Updater.exe" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Update="Forms\IdleForm.cs">
+	    <SubType>Form</SubType>
+	  </Compile>
+	  <Compile Update="Forms\BaseForm.cs">
+	    <SubType>Form</SubType>
+	  </Compile>
+	</ItemGroup>
+
 </Project>

@@ -1,5 +1,6 @@
 ﻿using PowerScheme.Forms;
 using PowerScheme.Model.Command;
+using static PowerScheme.Forms.WindowManager;
 
 namespace PowerScheme.Model.Menu.IdleMonitoring;
 
@@ -8,6 +9,6 @@ internal class ShowIdleFormCommand :
 {
     public void Execute()
     {
-        WindowManager.ShowForm<IdleForm>(true, 12);
+        ShowForm<IdleForm>(true, 12);
     }
 }

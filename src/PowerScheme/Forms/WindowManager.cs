@@ -7,7 +7,7 @@ namespace PowerScheme.Forms;
 
 internal static class WindowManager
 {
-    private static readonly Dictionary<Type, Form> _forms = new();
+    private static readonly Dictionary<Type, Form> _forms = [];
 
     public static T ShowForm<T>(bool popup = false, int radius = 0)
         where T : Form, new()

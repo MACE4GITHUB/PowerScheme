@@ -1,5 +1,7 @@
 ﻿using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using PowerScheme.Controls;
 using PowerScheme.Model;
 using RegistryManager;
 
@@ -25,41 +27,51 @@ internal static class ThemeService
         control.ForeColor = styleTheme.ForeColor;
         control.Font = styleTheme.Font;
 
-        SetLabelsColor(control, styleTheme.ForeColor);
-        SetButtonsColor(control, styleTheme);
+        SetControlsTheme(control, styleTheme);
     }
 
-    private static void SetLabelsColor(Control parent, Color color)
+    public static GraphicsPath RoundedRect(Rectangle r, int radius)
+    {
+        var d = radius * 2;
+        var path = new GraphicsPath();
+
+        path.AddArc(r.X, r.Y, d, d, 180, 90);
+        path.AddArc(r.Right - d, r.Y, d, d, 270, 90);
+        path.AddArc(r.Right - d, r.Bottom - d, d, d, 0, 90);
+        path.AddArc(r.X, r.Bottom - d, d, d, 90, 90);
+        path.CloseFigure();
+
+        return path;
+    }
+
+    private static void SetControlsTheme(Control parent, IStyleTheme styleTheme)
     {
         foreach (Control c in parent.Controls)
         {
-            if (c is Label lbl)
+            switch (c)
             {
-                lbl.ForeColor = color;
+                case Label ctl:
+                    ctl.Font = styleTheme.Font;
+                    ctl.ForeColor = styleTheme.ForeColor;
+                    break;
+                case BaseButton ctl:
+                    ctl.Font = styleTheme.Font;
+                    ctl.CornerRadius = styleTheme.ButtonCornerRadius;
+                    ctl.BorderThickness = styleTheme.ButtonBorderThickness;
+                    ctl.BackColor = styleTheme.ButtonBackColor;
+                    ctl.ForeColor = styleTheme.ButtonForeColor;
+                    ctl.FlatAppearance.BorderColor = styleTheme.ButtonBorderColor;
+                    ctl.FlatAppearance.MouseOverBackColor = styleTheme.ButtonMouseOverBackColor;
+                    ctl.FlatAppearance.MouseDownBackColor = styleTheme.ButtonMouseDownBackColor;
+                    break;
+                case Panel ctl:
+                    ctl.BackColor = styleTheme.BackColor;
+                    break;
             }
 
             if (c.HasChildren)
             {
-                SetLabelsColor(c, color);
-            }
-        }
-    }
-
-    private static void SetButtonsColor(Control parent, IStyleTheme styleTheme)
-    {
-        foreach (Control c in parent.Controls)
-        {
-            if (c is Button btn)
-            {
-                btn.BackColor = styleTheme.ButtonBackColor;
-                btn.ForeColor = styleTheme.ButtonForeColor;
-                btn.FlatAppearance.MouseOverBackColor = styleTheme.ButtonMouseOverBackColor;
-                btn.FlatAppearance.MouseDownBackColor = styleTheme.ButtonMouseDownBackColor;
-            }
-
-            if (c.HasChildren)
-            {
-                SetButtonsColor(c, styleTheme);
+                SetControlsTheme(c, styleTheme);
             }
         }
     }

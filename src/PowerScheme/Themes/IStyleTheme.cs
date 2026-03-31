@@ -19,7 +19,10 @@ internal interface IStyleTheme
 
     Font Font { get; }
 
+    int ButtonCornerRadius { get; }
+    int ButtonBorderThickness { get; }
     Color ButtonBackColor { get; }
+    Color ButtonBorderColor { get; }
     Color ButtonForeColor { get; }
     Color ButtonMouseOverBackColor { get; }
     Color ButtonMouseDownBackColor { get; }

@@ -16,7 +16,7 @@ internal class ToolStripMenuRenderer(ProfessionalColorTable colorTable) :
 
         var rect = new Rectangle(Point.Empty, e.ToolStrip.Size);
 
-        using var path = RoundedRect(rect, RADIUS);
+        using var path = ThemeService.RoundedRect(rect, RADIUS);
         using var brush = new SolidBrush(((IStyleTheme)ColorTable).BackColor);
 
         g.SetClip(path);
@@ -35,7 +35,7 @@ internal class ToolStripMenuRenderer(ProfessionalColorTable colorTable) :
 
         var rect = new Rectangle(0, 0, e.ToolStrip.Width - 1, e.ToolStrip.Height - 1);
 
-        using var path = RoundedRect(rect, RADIUS);
+        using var path = ThemeService.RoundedRect(rect, RADIUS);
         using var pen = new Pen(((IStyleTheme)ColorTable).BorderColor, 2);
         g.DrawPath(pen, path);
     }
@@ -65,13 +65,13 @@ internal class ToolStripMenuRenderer(ProfessionalColorTable colorTable) :
 
         if (e.Item.Selected && !e.Item.Pressed)
         {
-            using var path = RoundedRect(rect, RADIUS);
+            using var path = ThemeService.RoundedRect(rect, RADIUS);
             using var brush = new SolidBrush(((IStyleTheme)ColorTable).SelectedColor);
             g.FillPath(brush, path);
         }
         else if (e.Item.Pressed)
         {
-            using var path = RoundedRect(rect, RADIUS);
+            using var path = ThemeService.RoundedRect(rect, RADIUS);
             using var brush = new SolidBrush(((IStyleTheme)ColorTable).PressedColor);
             g.FillPath(brush, path);
         }
@@ -95,20 +95,5 @@ internal class ToolStripMenuRenderer(ProfessionalColorTable colorTable) :
 
         using var brush = new SolidBrush(((IStyleTheme)ColorTable).ArrowColor);
         e.Graphics.FillPolygon(brush, arrowPoints);
-    }
-
-
-    private static GraphicsPath RoundedRect(Rectangle bounds, int radius)
-    {
-        var d = radius * 2;
-        var path = new GraphicsPath();
-
-        path.AddArc(bounds.X, bounds.Y, d, d, 180, 90);
-        path.AddArc(bounds.Right - d, bounds.Y, d, d, 270, 90);
-        path.AddArc(bounds.Right - d, bounds.Bottom - d, d, d, 0, 90);
-        path.AddArc(bounds.X, bounds.Bottom - d, d, d, 90, 90);
-        path.CloseFigure();
-
-        return path;
     }
 }
