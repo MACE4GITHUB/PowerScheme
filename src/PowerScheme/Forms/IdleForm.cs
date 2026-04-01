@@ -10,9 +10,11 @@ public partial class IdleForm : Form
     public IdleForm()
     {
         InitializeComponent();
+        KeyPreview = true;
 
         Activated += OnActivated;
         Deactivate += OnDeactivate;
+        KeyDown += OnKeyDown;
 
         titleLabel.Text = thresholdControl.Title;
     }
@@ -26,5 +28,13 @@ public partial class IdleForm : Form
     private void OnDeactivate(object sender, EventArgs e)
     {
         WindowManager.HideForm<IdleForm>();
+    }
+
+    private void OnKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.Escape)
+        {
+            WindowManager.HideForm<IdleForm>();
+        }
     }
 }
