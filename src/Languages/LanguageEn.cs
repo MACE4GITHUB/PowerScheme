@@ -74,6 +74,9 @@ public sealed class LanguageEn : Language
     public override string DeleteExtremeScheme
         => "Delete extreme scheme";
 
+    public override string AllPowerSchemes
+        => "All Power Schemes";
+
     public override string MediaName
         => "Media";
 
@@ -128,6 +131,9 @@ public sealed class LanguageEn : Language
     public override string FirstStartDescription
         => $"Create typical power schemes {StableName}, {MediaName}, {SimpleName}?";
 
+    public override string Apply
+        => "Apply";
+
     public override string Default
         => "Default";
 
@@ -173,6 +179,18 @@ public sealed class LanguageEn : Language
     public override string DeleteCustomScheme
         => "Delete the custom scheme";
 
+    public override string IdleDisplayOptions
+        => "Display Idle Options";
+
+    public override string TurnOffDisplay
+        => "Turn off the display";
+
+    public override string TurnOffLockedDisplay
+        => "Turn off the display when locked";
+
+    public override string SyncAcDc
+        => "Sync AC and DC";
+
     public override string IdleOptions
         => "Idle Options";
 
@@ -184,6 +202,9 @@ public sealed class LanguageEn : Language
 
     public override string PollingIdleTime
         => "Polling Idle Time";
+
+    public override string Hours
+        => "h";
 
     public override string Minutes
         => "m";

@@ -26,6 +26,7 @@ public class BlueColorTable : ProfessionalColorTable, IStyleTheme
     public Color ButtonBorderColor => ButtonBackColor;
     public Color ButtonBackColor => Color.FromArgb(80, 82, 182);
     public Color ButtonForeColor => Color.White;
+    public Color ButtonAttentionForeColor => Color.FromArgb(255, 42, 60);
     public Color ButtonMouseOverBackColor => Color.FromArgb(99, 101, 190);
     public Color ButtonMouseDownBackColor => Color.FromArgb(114, 116, 197);
 

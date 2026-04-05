@@ -26,6 +26,7 @@ public class DarkColorTable : ProfessionalColorTable, IStyleTheme
     public Color ButtonBorderColor => Color.FromArgb(69, 69, 69);
     public Color ButtonBackColor => Color.FromArgb(55, 55, 55);
     public Color ButtonForeColor => Color.White;
+    public Color ButtonAttentionForeColor => Color.FromArgb(242, 36, 112);
     public Color ButtonMouseOverBackColor => Color.FromArgb(59, 59, 59);
     public Color ButtonMouseDownBackColor => Color.FromArgb(50, 50, 50);
 

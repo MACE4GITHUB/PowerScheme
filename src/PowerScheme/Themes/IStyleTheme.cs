@@ -24,6 +24,7 @@ internal interface IStyleTheme
     Color ButtonBackColor { get; }
     Color ButtonBorderColor { get; }
     Color ButtonForeColor { get; }
+    Color ButtonAttentionForeColor { get; }
     Color ButtonMouseOverBackColor { get; }
     Color ButtonMouseDownBackColor { get; }
 }

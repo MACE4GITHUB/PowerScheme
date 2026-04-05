@@ -194,6 +194,62 @@ public class PowerSchemeService : IPowerSchemeService
         SetActivePowerScheme(activeScheme, true);
     }
 
+    public void SetAllPowerSchemesIdleDisplay(int value)
+    {
+        var listGuid = PowerSchemes.Select(p => p.Guid);
+        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
+
+        foreach (var guid in listGuid)
+        {
+            var setting = new PowerSchemeTurnOffDisplay(guid, powerSchemeDcAcValues);
+            setting.ApplyValues();
+        }
+    }
+
+    public void SetIdleDisplay(Guid guid, int value)
+    {
+        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
+        var setting = new PowerSchemeTurnOffDisplay(guid, powerSchemeDcAcValues);
+
+        setting.ApplyValues();
+    }
+
+    public PowerSchemeDcAcValues GetIdleDisplay(Guid guid)
+    {
+        var dc =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.VIDEO_SUBGROUP, Setting.VIDEOIDLE, PowerMode.DC);
+        var ac =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.VIDEO_SUBGROUP, Setting.VIDEOIDLE, PowerMode.AC);
+
+        return new PowerSchemeDcAcValues(dc, ac);
+    }
+
+    public void SetAllPowerSchemesIdleLockDisplay(int value)
+    {
+        var listGuid = PowerSchemes.Select(p => p.Guid);
+        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
+
+        foreach (var guid in listGuid)
+        {
+            var setting = new PowerSchemeTurnOffLockDisplay(guid, powerSchemeDcAcValues);
+            setting.ApplyValues();
+        }
+    }
+
+    public void SetIdleLockDisplay(Guid guid, int value)
+    {
+        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
+        var setting = new PowerSchemeTurnOffLockDisplay(guid, powerSchemeDcAcValues);
+
+        setting.ApplyValues();
+    }
+
+    public PowerSchemeDcAcValues GetIdleLockDisplay(Guid guid)
+    {
+        var dc =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.VIDEO_SUBGROUP, Setting.VIDEOCONLOCK, PowerMode.DC);
+        var ac =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.VIDEO_SUBGROUP, Setting.VIDEOCONLOCK, PowerMode.AC);
+
+        return new PowerSchemeDcAcValues(dc, ac);
+    }
+
     public void CreateTypicalSchemes()
     {
         Watchers.RaiseActionWithoutWatchers(CreateTypicalSchemesIn);
@@ -408,7 +464,7 @@ public class PowerSchemeService : IPowerSchemeService
         var dCSettings = PowerManager.GetPlanSetting(sourcePowerScheme, VIDEO_SUBGROUP, VIDEO_NORMAL_LEVEL, PowerMode.DC);
         var aCSettings = PowerManager.GetPlanSetting(sourcePowerScheme, VIDEO_SUBGROUP, VIDEO_NORMAL_LEVEL, PowerMode.AC);
 
-        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(Convert.ToInt32(dCSettings) , Convert.ToInt32(aCSettings));
+        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(Convert.ToInt32(dCSettings), Convert.ToInt32(aCSettings));
         var powerSchemeVideoNormalLevel = new PowerSchemeVideoNormalLevel(destinationPowerScheme, powerSchemeDcAcValues);
 
         powerSchemeVideoNormalLevel.ApplyValues();

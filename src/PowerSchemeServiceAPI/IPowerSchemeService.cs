@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using PowerSchemeServiceAPI.EventsArgs;
 using PowerSchemeServiceAPI.Model;
+using PowerSchemeServiceAPI.Settings;
 
 namespace PowerSchemeServiceAPI;
 
@@ -42,6 +43,18 @@ public interface IPowerSchemeService
     void CreateTypicalSchemes();
 
     void SetLid(int value);
+
+    void SetAllPowerSchemesIdleDisplay(int value);
+
+    void SetIdleDisplay(Guid guid, int value);
+
+    PowerSchemeDcAcValues GetIdleDisplay(Guid guid);
+
+    void SetAllPowerSchemesIdleLockDisplay(int value);
+
+    void SetIdleLockDisplay(Guid guid, int value);
+
+    PowerSchemeDcAcValues GetIdleLockDisplay(Guid guid);
 
     string TextActionToggle(StatePowerScheme statePowerScheme);
 
