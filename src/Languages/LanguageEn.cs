@@ -179,6 +179,9 @@ public sealed class LanguageEn : Language
     public override string DeleteCustomScheme
         => "Delete the custom scheme";
 
+    public override string IdleSleepOptions
+        => "Sleep Idle Options";
+
     public override string IdleDisplayOptions
         => "Display Idle Options";
 

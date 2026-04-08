@@ -6,7 +6,7 @@ using PowerSchemeServiceAPI.Settings;
 
 namespace PowerSchemeServiceAPI;
 
-public interface IPowerSchemeService
+public interface IPowerSchemeService: IPowerSchemeDisplayService, IPowerSchemeSleepService
 {
     IPowerScheme ActivePowerScheme { get; }
     IEnumerable<IPowerScheme> PowerProfPowerSchemes { get; }
@@ -44,18 +44,6 @@ public interface IPowerSchemeService
 
     void SetLid(int value);
 
-    void SetAllPowerSchemesIdleDisplay(int value);
-
-    void SetIdleDisplay(Guid guid, int value);
-
-    PowerSchemeDcAcValues GetIdleDisplay(Guid guid);
-
-    void SetAllPowerSchemesIdleLockDisplay(int value);
-
-    void SetIdleLockDisplay(Guid guid, int value);
-
-    PowerSchemeDcAcValues GetIdleLockDisplay(Guid guid);
-
     string TextActionToggle(StatePowerScheme statePowerScheme);
 
     StatePowerScheme? StatePowerSchemeToggle(StatePowerScheme statePowerScheme);
@@ -67,4 +55,34 @@ public interface IPowerSchemeService
     event EventHandler<PowerSchemeEventArgs> ActivePowerSchemeChanged;
 
     void CopyBrightness(Guid sourcePowerScheme, Guid destinationPowerScheme);
+}
+
+public interface IPowerSchemeDisplayService
+{
+    void SetAllPowerSchemesIdleDisplay(int value);
+
+    void SetIdleDisplay(Guid guid, int value);
+
+    PowerSchemeDcAcValues GetIdleDisplay(Guid guid);
+
+    void SetAllPowerSchemesIdleLockDisplay(int value);
+
+    void SetIdleLockDisplay(Guid guid, int value);
+
+    PowerSchemeDcAcValues GetIdleLockDisplay(Guid guid);
+}
+
+public interface IPowerSchemeSleepService
+{
+    void SetAllPowerSchemesIdleSleep(int value);
+
+    void SetIdleSleep(Guid guid, int value);
+
+    PowerSchemeDcAcValues GetIdleSleep(Guid guid);
+
+    void SetAllPowerSchemesIdleHibernate(int value);
+
+    void SetIdleHibernate(Guid guid, int value);
+
+    PowerSchemeDcAcValues GetIdleHibernate(Guid guid);
 }

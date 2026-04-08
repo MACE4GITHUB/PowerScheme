@@ -21,4 +21,12 @@ public static class Constants
     public const int DEFAULT_TURN_OFF_LOCK_DISPLAY_IN_SECONDS = 0;
     public const int MIN_TURN_OFF_LOCK_DISPLAY_IN_SECONDS = 0;
     public const int MAX_TURN_OFF_LOCK_DISPLAY_IN_SECONDS = 18_000; // 5h
+
+    public const int DEFAULT_SLEEP_IN_SECONDS = 0;
+    public const int MIN_SLEEP_IN_SECONDS = 0;
+    public const int MAX_SLEEP_IN_SECONDS = 18_000; // 5h
+
+    public const int DEFAULT_HIBERNATE_IN_SECONDS = 0;
+    public const int MIN_HIBERNATE_IN_SECONDS = 0;
+    public const int MAX_HIBERNATE_IN_SECONDS = 18_000; // 5h
 }

@@ -184,6 +184,9 @@ public sealed class LanguageRu : Language
     public override string DeleteCustomScheme
         => "Удалить схему";
 
+    public override string IdleSleepOptions
+        => "Параметры сна";
+
     public override string IdleDisplayOptions
         => "Параметры простоя экрана";
 

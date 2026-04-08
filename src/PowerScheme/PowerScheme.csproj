@@ -76,8 +76,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Controls\SleepControl.cs">
+	    <SubType>UserControl</SubType>
+	  </Compile>
 	  <Compile Update="Controls\DisplayControl.cs">
 	    <SubType>UserControl</SubType>
+	  </Compile>
+	  <Compile Update="Forms\IdleSleepForm.cs">
+	    <SubType>Form</SubType>
 	  </Compile>
 	  <Compile Update="Forms\IdleDisplayForm.cs">
 	    <SubType>Form</SubType>

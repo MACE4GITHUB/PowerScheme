@@ -77,6 +77,7 @@ public abstract class Language
     public abstract string KeepBrightness { get; }
     public abstract string KeepBrightnessDescription { get; }
     public abstract string DeleteCustomScheme { get; }
+    public abstract string IdleSleepOptions { get; }
     public abstract string IdleDisplayOptions { get; }
     public abstract string TurnOffDisplay { get; }
     public abstract string TurnOffLockedDisplay { get; }

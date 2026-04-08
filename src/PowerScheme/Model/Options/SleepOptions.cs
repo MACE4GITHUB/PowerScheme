@@ -9,19 +9,19 @@ using static PowerScheme.Addins.IdleMonitoring.Constants;
 
 namespace PowerScheme.Model.Options;
 
-internal class DisplayOptions : INotifyPropertyChanged
+internal class SleepOptions : INotifyPropertyChanged
 {
     private readonly IPowerSchemeService _power = DiRoot.GetService<IPowerSchemeService>();
 
     public event PropertyChangedEventHandler? PropertyChanged;
     public event EventHandler? PowerSchemeIdChanged;
 
-    public DisplayOptions(
-        int turnOffDisplayInSc = DEFAULT_TURN_OFF_DISPLAY_IN_SECONDS,
-        int turnOffLockDisplayInSc = DEFAULT_TURN_OFF_LOCK_DISPLAY_IN_SECONDS)
+    public SleepOptions(
+        int sleepInSc = DEFAULT_SLEEP_IN_SECONDS,
+        int hibernateInSc = DEFAULT_HIBERNATE_IN_SECONDS)
     {
-        TurnOffDisplay = turnOffDisplayInSc;
-        TurnOffLockDisplay = turnOffLockDisplayInSc;
+        SleepIdle = sleepInSc;
+        HibernateIdle = hibernateInSc;
 
         PowerSchemeId = ActivePowerSchemeId;
     }
@@ -56,8 +56,8 @@ internal class DisplayOptions : INotifyPropertyChanged
 
             field = value;
 
-            TurnOffDisplay = TurnOffDisplayDcAcValues.AcSettings;
-            TurnOffLockDisplay = TurnOffLockDisplayDcAcValues.AcSettings;
+            SleepIdle = SleepDcAcValues.AcSettings;
+            HibernateIdle = HibernateDcAcValues.AcSettings;
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PowerSchemeId)));
             PowerSchemeIdChanged?.Invoke(this, EventArgs.Empty);
@@ -68,55 +68,55 @@ internal class DisplayOptions : INotifyPropertyChanged
 
     public Guid ActivePowerSchemeId => _power.ActivePowerScheme.Guid;
 
-    public int TurnOffDisplay { get; set; }
+    public int SleepIdle { get; set; }
 
-    public string TurnOffDisplayFormated => OptionsHelper.FormatHoursMinutesSeconds(TimeSpan.FromSeconds(TurnOffDisplay));
+    public string SleepIdleFormated => OptionsHelper.FormatHoursMinutesSeconds(TimeSpan.FromSeconds(SleepIdle));
 
-    public int TurnOffLockDisplay { get; set; }
+    public int HibernateIdle { get; set; }
 
-    public string TurnOffLockedDisplayFormated => OptionsHelper.FormatHoursMinutesSeconds(TimeSpan.FromSeconds(TurnOffLockDisplay));
+    public string HibernateIdleFormated => OptionsHelper.FormatHoursMinutesSeconds(TimeSpan.FromSeconds(HibernateIdle));
 
     public bool AcEqualsDc =>
-        TurnOffDisplayDcAcValues.AcSettings == TurnOffDisplayDcAcValues.DcSettings &&
-        TurnOffLockDisplayDcAcValues.AcSettings == TurnOffLockDisplayDcAcValues.DcSettings;
+        SleepDcAcValues.AcSettings == SleepDcAcValues.DcSettings &&
+        HibernateDcAcValues.AcSettings == HibernateDcAcValues.DcSettings;
 
-    public PowerSchemeDcAcValues TurnOffDisplayDcAcValues =>
+    public PowerSchemeDcAcValues SleepDcAcValues =>
         PowerSchemeId == Guid.Empty
-            ? _power.GetIdleDisplay(ActivePowerSchemeId)
-            : _power.GetIdleDisplay(PowerSchemeId);
+            ? _power.GetIdleSleep(ActivePowerSchemeId)
+            : _power.GetIdleSleep(PowerSchemeId);
 
-    public void ApplyTurnOffDisplayDcAcValues()
+    public void ApplySleepDcAcValues()
     {
         if (PowerSchemeId == Guid.Empty)
         {
-            _power.SetAllPowerSchemesIdleDisplay(TurnOffDisplay);
+            _power.SetAllPowerSchemesIdleSleep(SleepIdle);
 
             return;
         }
 
-        _power.SetIdleDisplay(PowerSchemeId, TurnOffDisplay);
+        _power.SetIdleSleep(PowerSchemeId, SleepIdle);
     }
 
-    public PowerSchemeDcAcValues TurnOffLockDisplayDcAcValues =>
+    public PowerSchemeDcAcValues HibernateDcAcValues =>
         PowerSchemeId == Guid.Empty
-            ? _power.GetIdleLockDisplay(ActivePowerSchemeId)
-            : _power.GetIdleLockDisplay(PowerSchemeId);
+            ? _power.GetIdleHibernate(ActivePowerSchemeId)
+            : _power.GetIdleHibernate(PowerSchemeId);
 
-    public void ApplyTurnOffLockDisplayDcAcValues()
+    public void ApplyHibernateDcAcValues()
     {
         if (PowerSchemeId == Guid.Empty)
         {
-            _power.SetAllPowerSchemesIdleLockDisplay(TurnOffLockDisplay);
+            _power.SetAllPowerSchemesIdleHibernate(HibernateIdle);
 
             return;
         }
 
-        _power.SetIdleLockDisplay(PowerSchemeId, TurnOffLockDisplay);
+        _power.SetIdleHibernate(PowerSchemeId, HibernateIdle);
     }
 
     public void ApplyDcAcValues()
     {
-        ApplyTurnOffDisplayDcAcValues();
-        ApplyTurnOffLockDisplayDcAcValues();
+        ApplySleepDcAcValues();
+        ApplyHibernateDcAcValues();
     }
 }

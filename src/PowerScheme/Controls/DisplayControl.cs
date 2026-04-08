@@ -5,6 +5,7 @@ using Languages;
 using PowerScheme.Forms;
 using PowerScheme.Model.Options;
 using PowerScheme.Themes;
+using static PowerScheme.Addins.IdleMonitoring.Constants;
 
 namespace PowerScheme.Controls;
 
@@ -116,6 +117,10 @@ public partial class DisplayControl : UserControl
         turnOffDisplayValueLabel.DataBindings.Add(nameof(turnOffDisplayValueLabel.Text), _displayOptions, nameof(_displayOptions.TurnOffDisplayFormated));
 
         turnOffDisplayNumericUpDown.KeyUp += TurnOffDisplayNumericUpDownOnKeyUp;
+
+        turnOffDisplayNumericUpDown.Minimum = MIN_TURN_OFF_DISPLAY_IN_SECONDS;
+        turnOffDisplayNumericUpDown.Maximum = MAX_TURN_OFF_DISPLAY_IN_SECONDS;
+
     }
 
     private void InitializeTurnOffLockedDisplay()
@@ -126,6 +131,9 @@ public partial class DisplayControl : UserControl
         turnOffLockedDisplayValueLabel.DataBindings.Add(nameof(turnOffLockedDisplayValueLabel.Text), _displayOptions, nameof(_displayOptions.TurnOffLockedDisplayFormated));
 
         turnOffLockedDisplayNumericUpDown.KeyUp += TurnOffLockedDisplayNumericUpDownOnKeyUp;
+
+        turnOffLockedDisplayNumericUpDown.Minimum = MIN_TURN_OFF_LOCK_DISPLAY_IN_SECONDS;
+        turnOffLockedDisplayNumericUpDown.Maximum = MAX_TURN_OFF_LOCK_DISPLAY_IN_SECONDS;
     }
 
     private void TurnOffDisplayNumericUpDownOnKeyUp(object? sender, KeyEventArgs e) =>

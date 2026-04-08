@@ -250,6 +250,62 @@ public class PowerSchemeService : IPowerSchemeService
         return new PowerSchemeDcAcValues(dc, ac);
     }
 
+    public void SetAllPowerSchemesIdleSleep(int value)
+    {
+        var listGuid = PowerSchemes.Select(p => p.Guid);
+        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
+
+        foreach (var guid in listGuid)
+        {
+            var setting = new PowerSchemeSleep(guid, powerSchemeDcAcValues);
+            setting.ApplyValues();
+        }
+    }
+
+    public void SetIdleSleep(Guid guid, int value)
+    {
+        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
+        var setting = new PowerSchemeSleep(guid, powerSchemeDcAcValues);
+
+        setting.ApplyValues();
+    }
+
+    public PowerSchemeDcAcValues GetIdleSleep(Guid guid)
+    {
+        var dc =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.SLEEP_SUBGROUP, Setting.STANDBYIDLE, PowerMode.DC);
+        var ac =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.SLEEP_SUBGROUP, Setting.STANDBYIDLE, PowerMode.AC);
+
+        return new PowerSchemeDcAcValues(dc, ac);
+    }
+
+    public void SetAllPowerSchemesIdleHibernate(int value)
+    {
+        var listGuid = PowerSchemes.Select(p => p.Guid);
+        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
+
+        foreach (var guid in listGuid)
+        {
+            var setting = new PowerSchemeHibernate(guid, powerSchemeDcAcValues);
+            setting.ApplyValues();
+        }
+    }
+
+    public void SetIdleHibernate(Guid guid, int value)
+    {
+        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
+        var setting = new PowerSchemeHibernate(guid, powerSchemeDcAcValues);
+
+        setting.ApplyValues();
+    }
+
+    public PowerSchemeDcAcValues GetIdleHibernate(Guid guid)
+    {
+        var dc =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.SLEEP_SUBGROUP, Setting.HIBERNATEIDLE, PowerMode.DC);
+        var ac =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.SLEEP_SUBGROUP, Setting.HIBERNATEIDLE, PowerMode.AC);
+
+        return new PowerSchemeDcAcValues(dc, ac);
+    }
+
     public void CreateTypicalSchemes()
     {
         Watchers.RaiseActionWithoutWatchers(CreateTypicalSchemesIn);
