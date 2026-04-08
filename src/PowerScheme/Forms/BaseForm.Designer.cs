@@ -1,6 +1,6 @@
 ﻿namespace PowerScheme.Forms
 {
-    partial class IdleForm
+    partial class BaseForm
     {
         /// <summary>
         /// Required designer variable.
@@ -30,7 +30,6 @@
         {
             this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.titleLabel = new System.Windows.Forms.Label();
-            this.thresholdControl = new PowerScheme.Controls.ThresholdControl();
             this.tableLayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -42,7 +41,6 @@
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel.Controls.Add(this.titleLabel, 0, 0);
-            this.tableLayoutPanel.Controls.Add(this.thresholdControl, 0, 1);
             this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.tableLayoutPanel.Location = new System.Drawing.Point(0, 0);
@@ -52,7 +50,7 @@
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel.Size = new System.Drawing.Size(460, 265);
+            this.tableLayoutPanel.Size = new System.Drawing.Size(430, 265);
             this.tableLayoutPanel.TabIndex = 3;
             // 
             // titleLabel
@@ -63,30 +61,21 @@
             this.titleLabel.Location = new System.Drawing.Point(10, 10);
             this.titleLabel.Margin = new System.Windows.Forms.Padding(10);
             this.titleLabel.Name = "titleLabel";
-            this.titleLabel.Size = new System.Drawing.Size(440, 15);
+            this.titleLabel.Size = new System.Drawing.Size(410, 15);
             this.titleLabel.TabIndex = 0;
             this.titleLabel.Text = "Title";
             // 
-            // thresholdControl
-            // 
-            this.thresholdControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.thresholdControl.Location = new System.Drawing.Point(0, 35);
-            this.thresholdControl.Margin = new System.Windows.Forms.Padding(0);
-            this.thresholdControl.Name = "thresholdControl";
-            this.thresholdControl.Size = new System.Drawing.Size(460, 230);
-            this.thresholdControl.TabIndex = 1;
-            // 
-            // IdleForm
+            // BaseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(460, 265);
+            this.ClientSize = new System.Drawing.Size(430, 265);
             this.ControlBox = false;
             this.Controls.Add(this.tableLayoutPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "IdleForm";
+            this.Name = "BaseForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.tableLayoutPanel.ResumeLayout(false);
@@ -98,6 +87,5 @@
         #endregion
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
         private System.Windows.Forms.Label titleLabel;
-        private Controls.ThresholdControl thresholdControl;
     }
 }

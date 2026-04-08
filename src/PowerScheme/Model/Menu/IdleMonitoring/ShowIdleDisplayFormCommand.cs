@@ -4,11 +4,11 @@ using static PowerScheme.Forms.WindowManager;
 
 namespace PowerScheme.Model.Menu.IdleMonitoring;
 
-internal class ShowIdleFormCommand :
+internal class ShowIdleDisplayFormCommand :
     IMenuCommand
 {
     public void Execute()
     {
-        ShowForm<IdleForm>(true, 12);
+        ShowForm<IdleDisplayForm>(true, 12);
     }
 }

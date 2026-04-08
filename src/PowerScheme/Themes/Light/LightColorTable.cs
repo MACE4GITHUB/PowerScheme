@@ -21,8 +21,12 @@ public class LightColorTable : ProfessionalColorTable, IStyleTheme
 
     public Color ArrowColor => SeparatorForeColor;
 
+    public int ButtonCornerRadius => 5;
+    public int ButtonBorderThickness => 1;
+    public Color ButtonBorderColor => ButtonBackColor;
     public Color ButtonBackColor => Color.FromArgb(139, 147, 154);
     public Color ButtonForeColor => Color.White;
+    public Color ButtonAttentionForeColor => Color.FromArgb(148, 0, 0);
     public Color ButtonMouseOverBackColor => Color.FromArgb(158, 165, 171);
     public Color ButtonMouseDownBackColor => Color.FromArgb(176, 183, 187);
 

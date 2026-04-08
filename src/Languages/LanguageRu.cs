@@ -74,6 +74,9 @@ public sealed class LanguageRu : Language
     public override string DeleteExtremeScheme
         => "Удалить схему экстремальной производительности";
 
+    public override string AllPowerSchemes
+        => "Все схемы электропитания";
+
     public override string MediaName
         => "Медиа";
 
@@ -107,7 +110,6 @@ public sealed class LanguageRu : Language
     public override string WhenICloseTheLid
         => "Действие при закрытии крышки";
 
-
     public override string AlreadyRunning
         => "Приложение уже было запущено.";
 
@@ -133,6 +135,9 @@ public sealed class LanguageRu : Language
            $"\n\n {MediaName} - схема на основе Сбалансированная. \n Частота переменная. \n Для просмотра видео, прослушивания аудио." +
            $"\n\n {SimpleName} - схема на основе Экономия энергии. \n Частота переменная, преимущественно низкая. \n Для просмотра интернет." +
            $"\n\n При нажатии \"Нет\" типовые схемы можно будет создать позже из меню \"Настройки\".";
+
+    public override string Apply
+        => "Применить";
 
     public override string Default
         => "По умолчанию";
@@ -179,6 +184,21 @@ public sealed class LanguageRu : Language
     public override string DeleteCustomScheme
         => "Удалить схему";
 
+    public override string IdleSleepOptions
+        => "Параметры сна";
+
+    public override string IdleDisplayOptions
+        => "Параметры простоя экрана";
+
+    public override string TurnOffDisplay
+        => "Выключение экрана";
+
+    public override string TurnOffLockedDisplay
+        => "Выключение заблокированного экрана";
+
+    public override string SyncAcDc
+        => "Синхронизировать значения для батареи и сети";
+
     public override string IdleOptions
         => "Параметры простоя";
 
@@ -190,6 +210,9 @@ public sealed class LanguageRu : Language
 
     public override string PollingIdleTime
         => "Время опроса при простое";
+
+    public override string Hours
+        => "ч";
 
     public override string Minutes
         => "м";

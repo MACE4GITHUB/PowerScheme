@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Windows.Forms;
-using Languages;
 using PowerScheme.Themes;
 
 namespace PowerScheme.Forms;
 
-public partial class IdleForm : Form
+public partial class IdleSleepForm : Form
 {
-    public IdleForm()
+    public IdleSleepForm()
     {
         InitializeComponent();
         KeyPreview = true;
@@ -16,25 +15,25 @@ public partial class IdleForm : Form
         Deactivate += OnDeactivate;
         KeyDown += OnKeyDown;
 
-        titleLabel.Text = thresholdControl.Title;
+        titleLabel.Text = sleepControl.Title;
     }
 
     private void OnActivated(object sender, EventArgs e)
     {
         ThemeService.ApplyControlTheme(this);
-        thresholdControl.OnShown();
+        sleepControl.OnShown();
     }
 
     private void OnDeactivate(object sender, EventArgs e)
     {
-        WindowManager.HideForm<IdleForm>();
+        WindowManager.HideForm<IdleSleepForm>();
     }
 
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
         if (e.KeyCode == Keys.Escape)
         {
-            WindowManager.HideForm<IdleForm>();
+            WindowManager.HideForm<IdleSleepForm>();
         }
     }
 }

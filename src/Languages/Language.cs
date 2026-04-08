@@ -42,6 +42,7 @@ public abstract class Language
     public abstract string DeleteSimpleScheme { get; }
     public abstract string CreateExtremeScheme { get; }
     public abstract string DeleteExtremeScheme { get; }
+    public abstract string AllPowerSchemes { get; }
     public abstract string MediaName { get; }
     public abstract string MediaDescription { get; }
     public abstract string StableName { get; }
@@ -60,6 +61,7 @@ public abstract class Language
     public abstract string ApplicationLatter { get; }
     public abstract string FirstStartCaption { get; }
     public abstract string FirstStartDescription { get; }
+    public abstract string Apply { get; }
     public abstract string Default { get; }
     public abstract string None { get; }
     public abstract string Ok { get; }
@@ -75,10 +77,16 @@ public abstract class Language
     public abstract string KeepBrightness { get; }
     public abstract string KeepBrightnessDescription { get; }
     public abstract string DeleteCustomScheme { get; }
+    public abstract string IdleSleepOptions { get; }
+    public abstract string IdleDisplayOptions { get; }
+    public abstract string TurnOffDisplay { get; }
+    public abstract string TurnOffLockedDisplay { get; }
+    public abstract string SyncAcDc { get; }
     public abstract string IdleOptions { get; }
     public abstract string IdleThreshold { get; }
     public abstract string PollingActiveTime { get; }
     public abstract string PollingIdleTime { get; }
+    public abstract string Hours { get; }
     public abstract string Minutes { get; }
     public abstract string Seconds { get; }
     public abstract string TheUserIdleTimeAfterWhichThePowerPlanWillChange { get; }

@@ -23,6 +23,8 @@ internal class IdleMonitoringMenuBuilder(
         AddIdleMonitoringItems();
         AddKeepingBrightness();
         AddIdleForm();
+        AddIdleDisplayForm();
+        AddIdleSleepForm();
 
         return Root;
     }
@@ -142,5 +144,29 @@ internal class IdleMonitoringMenuBuilder(
         showIdleOptions.BindCommand(command);
 
         dropDownItems.Add(showIdleOptions);
+    }
+
+    private void AddIdleDisplayForm()
+    {
+        var dropDownItems = Root.DropDownItems;
+
+        var showIdleDisplayOptions = MenuItemFactory.Create(MenuItm.ShowIdleDisplayOptions);
+
+        var command = new ShowIdleDisplayFormCommand();
+        showIdleDisplayOptions.BindCommand(command);
+
+        dropDownItems.Add(showIdleDisplayOptions);
+    }
+
+    private void AddIdleSleepForm()
+    {
+        var dropDownItems = Root.DropDownItems;
+
+        var showIdleSleepOptions = MenuItemFactory.Create(MenuItm.ShowIdleSleepOptions);
+
+        var command = new ShowIdleSleepFormCommand();
+        showIdleSleepOptions.BindCommand(command);
+
+        dropDownItems.Add(showIdleSleepOptions);
     }
 }
