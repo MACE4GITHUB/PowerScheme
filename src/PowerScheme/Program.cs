@@ -2,10 +2,13 @@
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
+using Languages;
 using MessageForm;
 using PowerScheme.Configuration;
+using PowerScheme.Model;
 using PowerScheme.Services;
 using PowerSchemeServiceAPI;
+using RegistryManager;
 
 namespace PowerScheme;
 
@@ -16,6 +19,12 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
+        var savedLanguage = RegistryService.GetLanguage(AppInfo.CompanyName, AppInfo.ProductName);
+        if (savedLanguage is { } languageKind)
+        {
+            Language.SetLanguage((LanguageKind)languageKind);
+        }
+
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
         Application.ThreadException += Application_ThreadException;

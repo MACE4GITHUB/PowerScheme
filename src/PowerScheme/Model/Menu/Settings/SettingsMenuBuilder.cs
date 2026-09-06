@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using Common;
 using Languages;
 using PowerScheme.Themes;
 using PowerScheme.Utility;
@@ -35,6 +37,7 @@ internal class SettingsMenuBuilder :
         AddControlPanelScheme(root);
         AddRestoreDefault(root);
         AddThemes(root);
+        AddLanguages(root);
         root.DropDownItems.Add(new ToolStripSeparator());
 
         var withoutDeletedCount = _power.TypicalPowerSchemesWithoutDeleted.Count();
@@ -108,6 +111,31 @@ internal class SettingsMenuBuilder :
 
         root.DropDownItems.Add(item);
     }
+
+    private static void AddLanguages(ToolStripMenuItem root)
+    {
+        var item = MenuItemFactory.Create(MenuItm.Language);
+
+        var itemEn = MenuItemFactory.Create(MenuItm.LanguageEn);
+        itemEn.Tag = LanguageKind.En;
+        itemEn.Image = GetLanguageCheckImage(Language.Kind == LanguageKind.En);
+        itemEn.BindCommand(new ChangeLanguageCommand());
+
+        var itemRu = MenuItemFactory.Create(MenuItm.LanguageRu);
+        itemRu.Tag = LanguageKind.Ru;
+        itemRu.Image = GetLanguageCheckImage(Language.Kind == LanguageKind.Ru);
+        itemRu.BindCommand(new ChangeLanguageCommand());
+
+        item.DropDownItems.Add(itemEn);
+        item.DropDownItems.Add(itemRu);
+
+        root.DropDownItems.Add(item);
+    }
+
+    private static Bitmap GetLanguageCheckImage(bool isChecked) =>
+        isChecked
+            ? ImageItem.Check.GetImage()
+            : ImageItem.Empty.GetImage();
 
     private void AddTypicalSchemes(ToolStripMenuItem root)
     {

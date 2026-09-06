@@ -272,6 +272,22 @@ public static class RegistryService
         SaveSetting(regTheme);
     }
 
+    public static int? GetLanguage(string company, string product)
+    {
+        var result = GetSettings<int>(RegLanguage(company, product));
+
+        return result.IsError
+            ? null
+            : result.Data;
+    }
+
+    public static void SetLanguage(string company, string product, object value)
+    {
+        var regLanguage = RegLanguage(company, product);
+        regLanguage.Value = value;
+        SaveSetting(regLanguage);
+    }
+
     private static bool GetSettings(RegistryParam registryParam)
     {
         var result = GetSettings<int>(registryParam);
@@ -405,6 +421,15 @@ public static class RegistryService
             Path = @"SOFTWARE\" + company,
             Section = product,
             Name = "ThemeId"
+        };
+
+    private static RegistryParam RegLanguage(string company, string product) =>
+        new()
+        {
+            RegistryHive = RegistryHive.CurrentUser,
+            Path = @"SOFTWARE\" + company,
+            Section = product,
+            Name = "LanguageId"
         };
 
     private static string GetAppPath(string company, string product) =>

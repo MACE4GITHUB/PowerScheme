@@ -238,4 +238,13 @@ public sealed class LanguageEn : Language
 
     public override string Green
         => "Green";
+
+    public override string SelectLanguage
+        => "Language";
+
+    public override string LanguageEnName
+        => "English";
+
+    public override string LanguageRuName
+        => "Русский";
 }
