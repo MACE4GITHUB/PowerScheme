@@ -112,19 +112,19 @@ internal class SettingsMenuBuilder :
         root.DropDownItems.Add(item);
     }
 
-    private static void AddLanguages(ToolStripMenuItem root)
+    private void AddLanguages(ToolStripMenuItem root)
     {
         var item = MenuItemFactory.Create(MenuItm.Language);
 
         var itemEn = MenuItemFactory.Create(MenuItm.LanguageEn);
         itemEn.Tag = LanguageKind.En;
         itemEn.Image = GetLanguageCheckImage(Language.Kind == LanguageKind.En);
-        itemEn.BindCommand(new ChangeLanguageCommand());
+        itemEn.BindCommand(new ChangeLanguageCommand(_power));
 
         var itemRu = MenuItemFactory.Create(MenuItm.LanguageRu);
         itemRu.Tag = LanguageKind.Ru;
         itemRu.Image = GetLanguageCheckImage(Language.Kind == LanguageKind.Ru);
-        itemRu.BindCommand(new ChangeLanguageCommand());
+        itemRu.BindCommand(new ChangeLanguageCommand(_power));
 
         item.DropDownItems.Add(itemEn);
         item.DropDownItems.Add(itemRu);

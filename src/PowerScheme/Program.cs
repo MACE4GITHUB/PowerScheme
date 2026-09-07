@@ -41,6 +41,8 @@ internal static class Program
             OnceAppMutex = entry.Mutex;
         }
 
+        DiRoot.GetService<IPowerSchemeService>().RenameTypicalSchemes();
+
         Application.Run((ApplicationContext)DiRoot.GetService<IViewService>());
 
         OnceAppMutex?.Dispose();
