@@ -8,7 +8,11 @@ namespace PowerScheme;
 
 internal static class MenuLookup
 {
-    internal static readonly Dictionary<MenuItm, ViewMenu> MenuItems = new()
+    internal static Dictionary<MenuItm, ViewMenu> MenuItems { get; private set; } = CreateMenuItems();
+
+    internal static void RebuildMenuItems() => MenuItems = CreateMenuItems();
+
+    private static Dictionary<MenuItm, ViewMenu> CreateMenuItems() => new()
     {
         { MenuItm.High, new ViewMenu(SettingSchemes[SettingScheme.High].Name, ImageItem.High, SettingSchemes[SettingScheme.High].Guid, SettingSchemes[SettingScheme.High].Description, MenuItmKind.PowerScheme) },
         { MenuItm.Balance, new ViewMenu(SettingSchemes[SettingScheme.Balance].Name, ImageItem.Balance, SettingSchemes[SettingScheme.Balance].Guid, SettingSchemes[SettingScheme.Balance].Description, MenuItmKind.PowerScheme) },
@@ -46,6 +50,9 @@ internal static class MenuLookup
         { MenuItm.Light, new ViewMenu(Language.Current.Light, ImageItem.Light) },
         { MenuItm.Blue, new ViewMenu(Language.Current.Blue, ImageItem.Blue) },
         { MenuItm.Green, new ViewMenu(Language.Current.Green, ImageItem.Green) },
+        { MenuItm.Language, new ViewMenu(Language.Current.SelectLanguage, ImageItem.Empty) },
+        { MenuItm.LanguageEn, new ViewMenu(Language.Current.LanguageEnName, ImageItem.Empty) },
+        { MenuItm.LanguageRu, new ViewMenu(Language.Current.LanguageRuName, ImageItem.Empty) },
     };
 
     internal enum MenuItm
@@ -85,7 +92,10 @@ internal static class MenuLookup
         Dark,
         Light,
         Blue,
-        Green
+        Green,
+        Language,
+        LanguageEn,
+        LanguageRu
     }
 
     internal enum MenuItmKind

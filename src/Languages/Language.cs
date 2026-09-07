@@ -7,12 +7,29 @@ public abstract class Language
 {
     private static readonly List<string> _ruLanguages = ["ru", "ru-ru", "be", "be-by"];
 
-    public static Language Current { get; } = GetLanguage();
+    public static Language Current { get; private set; } = GetLanguage();
+
+    public static LanguageKind Kind { get; private set; } = GetDefaultKind();
+
+    public static void SetLanguage(LanguageKind kind)
+    {
+        Kind = kind;
+        Current = kind switch
+        {
+            LanguageKind.Ru => new LanguageRu(),
+            _ => new LanguageEn()
+        };
+    }
 
     public static Language GetLanguage() =>
         IsRuLocale(CultureInfo.CurrentCulture.Name)
             ? new LanguageRu()
             : new LanguageEn();
+
+    private static LanguageKind GetDefaultKind() =>
+        IsRuLocale(CultureInfo.CurrentCulture.Name)
+            ? LanguageKind.Ru
+            : LanguageKind.En;
 
     public static bool IsRuLocale(string locale) =>
         !string.IsNullOrWhiteSpace(locale) &&
@@ -51,6 +68,12 @@ public abstract class Language
     public abstract string SimpleDescription { get; }
     public abstract string ExtremeName { get; }
     public abstract string ExtremeDescription { get; }
+    public abstract string HighName { get; }
+    public abstract string HighDescription { get; }
+    public abstract string BalanceName { get; }
+    public abstract string BalanceDescription { get; }
+    public abstract string LowName { get; }
+    public abstract string LowDescription { get; }
     public abstract string ShutDown { get; }
     public abstract string DoNothing { get; }
     public abstract string WhenICloseTheLid { get; }
@@ -97,4 +120,7 @@ public abstract class Language
     public abstract string Light { get; }
     public abstract string Blue { get; }
     public abstract string Green { get; }
+    public abstract string SelectLanguage { get; }
+    public abstract string LanguageEnName { get; }
+    public abstract string LanguageRuName { get; }
 }

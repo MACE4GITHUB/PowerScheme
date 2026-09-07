@@ -101,6 +101,24 @@ public sealed class LanguageRu : Language
     public override string ExtremeDescription
         => "Максимальная производительность";
 
+    public override string HighName
+        => "Высокая производительность";
+
+    public override string HighDescription
+        => "Максимальная производительность, может увеличить энергопотребление";
+
+    public override string BalanceName
+        => "Сбалансированная";
+
+    public override string BalanceDescription
+        => "Автоматически изменяет производительность и энергопотребление в зависимости от потребностей";
+
+    public override string LowName
+        => "Экономия энергии";
+
+    public override string LowDescription
+        => "Снижает производительность для экономии энергии";
+
     public override string ShutDown
         => "Выключить компьютер";
 
@@ -243,4 +261,13 @@ public sealed class LanguageRu : Language
 
     public override string Green
         => "Зеленая";
+
+    public override string SelectLanguage
+        => "Язык";
+
+    public override string LanguageEnName
+        => "English";
+
+    public override string LanguageRuName
+        => "Русский";
 }

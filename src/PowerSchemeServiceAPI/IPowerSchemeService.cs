@@ -42,6 +42,12 @@ public interface IPowerSchemeService: IPowerSchemeDisplayService, IPowerSchemeSl
 
     void CreateTypicalSchemes();
 
+    /// <summary>
+    /// Renames the typical power schemes (Stable, Media, Simple, Extreme)
+    /// to the names and descriptions of the current language.
+    /// </summary>
+    void RenameTypicalSchemes();
+
     void SetLid(int value);
 
     string TextActionToggle(StatePowerScheme statePowerScheme);

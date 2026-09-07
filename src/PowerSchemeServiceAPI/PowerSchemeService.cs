@@ -322,6 +322,54 @@ public class PowerSchemeService : IPowerSchemeService
         }
     }
 
+    public void RenameTypicalSchemes()
+    {
+        Watchers.RaiseActionWithoutWatchers(RenameTypicalSchemesIn);
+
+        return;
+
+        void RenameTypicalSchemesIn()
+        {
+            RenameStablePowerScheme();
+            RenameMediaPowerScheme();
+            RenameSimplePowerScheme();
+            RenameExtremePowerScheme();
+        }
+    }
+
+    private static void RenameStablePowerScheme()
+        => RenameTypicalPowerScheme(SettingSchemes[SettingScheme.Stable].Guid,
+            Language.Current.StableName, Language.Current.StableDescription);
+
+    private static void RenameMediaPowerScheme()
+        => RenameTypicalPowerScheme(SettingSchemes[SettingScheme.Media].Guid,
+            Language.Current.MediaName, Language.Current.MediaDescription);
+
+    private static void RenameSimplePowerScheme()
+        => RenameTypicalPowerScheme(SettingSchemes[SettingScheme.Simple].Guid,
+            Language.Current.SimpleName, Language.Current.SimpleDescription);
+
+    private static void RenameExtremePowerScheme()
+        => RenameTypicalPowerScheme(SettingSchemes[SettingScheme.Extreme].Guid,
+            Language.Current.ExtremeName, Language.Current.ExtremeDescription);
+
+    private static void RenameTypicalPowerScheme(Guid guid, string name, string? description = null)
+    {
+        if (!ExistsTypicalPowerScheme(guid))
+        {
+            return;
+        }
+
+        PowerManager.SetPlanName(guid, name);
+
+        if (description == null)
+        {
+            return;
+        }
+
+        PowerManager.SetPlanDescription(guid, description);
+    }
+
     private static void CreateStablePowerScheme()
     {
         CreateTypicalPowerScheme(SettingSchemes[SettingScheme.High].Guid, SettingSchemes[SettingScheme.Stable].Guid,

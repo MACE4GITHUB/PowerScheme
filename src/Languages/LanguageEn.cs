@@ -101,6 +101,24 @@ public sealed class LanguageEn : Language
     public override string ExtremeDescription
         => "Ultimate CPU Speed";
 
+    public override string HighName
+        => "High performance";
+
+    public override string HighDescription
+        => "Maximizes performance and may increase power consumption";
+
+    public override string BalanceName
+        => "Balanced";
+
+    public override string BalanceDescription
+        => "Automatically balances performance and energy consumption";
+
+    public override string LowName
+        => "Power saver";
+
+    public override string LowDescription
+        => "Reduces performance to save energy";
+
     public override string ShutDown
         => "Shut down";
 
@@ -238,4 +256,13 @@ public sealed class LanguageEn : Language
 
     public override string Green
         => "Green";
+
+    public override string SelectLanguage
+        => "Language";
+
+    public override string LanguageEnName
+        => "English";
+
+    public override string LanguageRuName
+        => "Русский";
 }
