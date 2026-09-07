@@ -68,6 +68,12 @@ public abstract class Language
     public abstract string SimpleDescription { get; }
     public abstract string ExtremeName { get; }
     public abstract string ExtremeDescription { get; }
+    public abstract string HighName { get; }
+    public abstract string HighDescription { get; }
+    public abstract string BalanceName { get; }
+    public abstract string BalanceDescription { get; }
+    public abstract string LowName { get; }
+    public abstract string LowDescription { get; }
     public abstract string ShutDown { get; }
     public abstract string DoNothing { get; }
     public abstract string WhenICloseTheLid { get; }

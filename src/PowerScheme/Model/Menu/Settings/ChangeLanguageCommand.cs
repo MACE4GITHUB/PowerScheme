@@ -1,7 +1,9 @@
 using System;
 using System.Windows.Forms;
 using Languages;
+using PowerScheme.Configuration;
 using PowerScheme.Model.Command;
+using PowerScheme.Services;
 using PowerSchemeServiceAPI;
 using RegistryManager;
 
@@ -19,6 +21,8 @@ public class ChangeLanguageCommand(
             Language.SetLanguage(tag);
             power.RenameTypicalSchemes();
             MenuLookup.RebuildMenuItems();
+
+            DiRoot.GetService<IViewService>().UpdateIcon();
         }
     }
 }

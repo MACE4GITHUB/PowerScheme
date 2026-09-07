@@ -115,7 +115,7 @@ internal sealed class ViewService : ApplicationContext, IViewService
         UpdateIcon();
     }
 
-    private void UpdateIcon()
+    public void UpdateIcon()
     {
         var activePowerScheme = _viewModel.Power.ActivePowerScheme;
         var image = activePowerScheme.Picture;
