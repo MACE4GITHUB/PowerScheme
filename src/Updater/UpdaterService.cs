@@ -27,7 +27,7 @@ internal sealed class UpdaterService(
             KillOldVersion(arguments);
 
             logger.LogInfo("Downloading latest version...");
-            await DownloadLatestAsync(releaseInfo.AssetUrl, arguments.DownloadFilePath);
+            await DownloadLatestAsync(releaseInfo.GetAssetDownloadUrl(arguments.ApiUrl), arguments.DownloadFilePath);
 
             ReplaceOldVersion(arguments);
 
@@ -77,6 +77,7 @@ internal sealed class UpdaterService(
     {
         using var client = new HttpClient();
         client.DefaultRequestHeaders.UserAgent.ParseAdd("request");
+        client.DefaultRequestHeaders.Accept.ParseAdd("application/octet-stream");
         var data = await client.GetByteArrayAsync(url);
         File.WriteAllBytes(downloadFilePath.Value, data); // overwrite if exists
     }
