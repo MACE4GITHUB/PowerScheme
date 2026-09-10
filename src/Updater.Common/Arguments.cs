@@ -166,9 +166,9 @@ public sealed class ApiUrl : BasePrimitive
         }
 
         if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) ||
-            uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
+            uri.Scheme != Uri.UriSchemeHttps)
         {
-            throw new ArgumentException("Invalid URL format. Must be absolute and start with http or https.");
+            throw new ArgumentException("Invalid URL format. Must be absolute and start with https.");
         }
     }
 }
