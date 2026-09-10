@@ -94,6 +94,11 @@ public sealed class ReleaseInfo
             throw new ArgumentException($"Asset with extension {fileExtension} not found.");
         }
 
+        if (!IsAllowedDownloadUrl(assetUrl, apiUrl.Value))
+        {
+            throw new ArgumentException($"Download URL is not allowed: {assetUrl}");
+        }
+
         return new GitHubReleaseInfo
         {
             Version = new Version(tag),
@@ -151,6 +156,50 @@ public sealed class ReleaseInfo
         }
 
         return null;
+    }
+
+    private static bool IsAllowedDownloadUrl(string url, string apiUrl)
+    {
+        // Only HTTPS links to GitHub domains are trusted as update sources.
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+            uri.Scheme != Uri.UriSchemeHttps)
+        {
+            return false;
+        }
+
+        if (IsGitHubHost(uri.Host) && TryGetRepositoryPrefix(apiUrl, out var repositoryPrefix))
+        {
+            // For github.com the path must point to the release download of this repository.
+            return uri.AbsolutePath.StartsWith(repositoryPrefix, StringComparison.OrdinalIgnoreCase);
+        }
+
+        return IsGitHubContentHost(uri.Host);
+    }
+
+    private static bool IsGitHubHost(string host) =>
+        host.Equals("github.com", StringComparison.OrdinalIgnoreCase) ||
+        host.Equals("www.github.com", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsGitHubContentHost(string host) =>
+        host.Equals("objects.githubusercontent.com", StringComparison.OrdinalIgnoreCase) ||
+        host.Equals("release-assets.githubusercontent.com", StringComparison.OrdinalIgnoreCase);
+
+    private static bool TryGetRepositoryPrefix(string apiUrl, out string prefix)
+    {
+        // api.github.com/repos/{owner}/{repo}/releases/latest
+        if (Uri.TryCreate(apiUrl, UriKind.Absolute, out var uri))
+        {
+            var segments = uri.AbsolutePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (segments.Length >= 4 &&
+                segments[0].Equals("repos", StringComparison.OrdinalIgnoreCase))
+            {
+                prefix = $"/{segments[1]}/{segments[2]}/";
+                return true;
+            }
+        }
+
+        prefix = string.Empty;
+        return false;
     }
 
     private static Version GetLocalFileVersion(LocalFilePath localFilePath)
