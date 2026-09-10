@@ -47,6 +47,16 @@ ILRepack.exe ^
  %UPDATER_DIR%\Updater.exe ^
  %UPDATER_DIR%\Updater.Common.dll ^
  %UPDATER_DIR%\Logger.dll ^
+ %UPDATER_DIR%\Microsoft.Bcl.AsyncInterfaces.dll ^
+ %UPDATER_DIR%\System.Buffers.dll ^
+ %UPDATER_DIR%\System.IO.Pipelines.dll ^
+ %UPDATER_DIR%\System.Memory.dll ^
+ %UPDATER_DIR%\System.Numerics.Vectors.dll ^
+ %UPDATER_DIR%\System.Runtime.CompilerServices.Unsafe.dll ^
+ %UPDATER_DIR%\System.Text.Encodings.Web.dll ^
+ %UPDATER_DIR%\System.Text.Json.dll ^
+ %UPDATER_DIR%\System.Threading.Tasks.Extensions.dll ^
+ %UPDATER_DIR%\System.ValueTuple.dll ^
  /skipconfig ^
  /ndebug ^
  /parallel
@@ -76,8 +86,15 @@ ILRepack.exe ^
  %APP_DIR%\RegistryManager.Extensions.dll ^
  %APP_DIR%\RegistryManager.Savers.dll ^
  %APP_DIR%\RunAs.Common.dll ^
+ %APP_DIR%\System.Buffers.dll ^
+ %APP_DIR%\System.IO.Pipelines.dll ^
+ %APP_DIR%\System.Memory.dll ^
+ %APP_DIR%\System.Numerics.Vectors.dll ^
  %APP_DIR%\System.Runtime.CompilerServices.Unsafe.dll ^
+ %APP_DIR%\System.Text.Encodings.Web.dll ^
+ %APP_DIR%\System.Text.Json.dll ^
  %APP_DIR%\System.Threading.Tasks.Extensions.dll ^
+ %APP_DIR%\System.ValueTuple.dll ^
  %APP_DIR%\Updater.Common.dll ^
  /skipconfig ^
  /ndebug ^

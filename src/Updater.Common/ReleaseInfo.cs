@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net.Http;
-using System.Text.RegularExpressions;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Updater.Common;
@@ -65,41 +65,34 @@ public sealed class ReleaseInfo
         client.DefaultRequestHeaders.UserAgent.ParseAdd("request"); // GitHub requires User-Agent
         var json = await client.GetStringAsync(apiUrl.Value);
 
-        var tagMatch = Regex.Match(json, @"""tag_name"":\s*""([^""]+)""");
-        if (!tagMatch.Success)
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+
+        if (!TryGetStringProperty(root, "tag_name", out var tag))
         {
             throw new ArgumentException("tag_name not found");
         }
 
-        var tag = tagMatch.Groups[1].Value;
-        if (tag.StartsWith("v"))
+        if (tag!.StartsWith("v"))
         {
             tag = tag.Substring(1);
         }
 
-        var draftMatch = Regex.Match(json, @"""draft"":\s*(true|false)");
-        if (!draftMatch.Success)
+        if (!TryGetBooleanProperty(root, "draft", out var draft))
         {
             throw new ArgumentException("draft not found");
         }
 
-        var draft = bool.Parse(draftMatch.Groups[1].Value);
-
-        var prereleaseMatch = Regex.Match(json, @"""prerelease"":\s*(true|false)");
-        if (!prereleaseMatch.Success)
+        if (!TryGetBooleanProperty(root, "prerelease", out var prerelease))
         {
             throw new ArgumentException("prerelease not found");
         }
 
-        var prerelease = bool.Parse(prereleaseMatch.Groups[1].Value);
-
-        var assetMatch = Regex.Match(json, $@"""name"":\s*""([^""]+{Regex.Escape(fileExtension.Value)})""[\s\S]*?""browser_download_url"":\s*""([^""]+)""");
-        if (!assetMatch.Success)
+        var assetUrl = FindAssetUrl(root, fileExtension);
+        if (assetUrl == null)
         {
             throw new ArgumentException($"Asset with extension {fileExtension} not found.");
         }
-
-        var assetUrl = assetMatch.Groups[2].Value;
 
         return new GitHubReleaseInfo
         {
@@ -108,6 +101,56 @@ public sealed class ReleaseInfo
             Draft = draft,
             Prerelease = prerelease
         };
+    }
+
+    private static bool TryGetStringProperty(JsonElement element, string propertyName, out string? value)
+    {
+        if (element.TryGetProperty(propertyName, out var property) &&
+            property.ValueKind == JsonValueKind.String)
+        {
+            value = property.GetString();
+            return value != null;
+        }
+
+        value = null;
+        return false;
+    }
+
+    private static bool TryGetBooleanProperty(JsonElement element, string propertyName, out bool value)
+    {
+        if (element.TryGetProperty(propertyName, out var property) &&
+            property.ValueKind is JsonValueKind.True or JsonValueKind.False)
+        {
+            value = property.GetBoolean();
+            return true;
+        }
+
+        value = false;
+        return false;
+    }
+
+    private static string? FindAssetUrl(JsonElement root, FileExtension fileExtension)
+    {
+        if (!root.TryGetProperty("assets", out var assets) ||
+            assets.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        foreach (var asset in assets.EnumerateArray())
+        {
+            if (asset.ValueKind != JsonValueKind.Object ||
+                !TryGetStringProperty(asset, "name", out var name) ||
+                !name!.EndsWith(fileExtension.Value, StringComparison.OrdinalIgnoreCase) ||
+                !TryGetStringProperty(asset, "browser_download_url", out var url))
+            {
+                continue;
+            }
+
+            return url;
+        }
+
+        return null;
     }
 
     private static Version GetLocalFileVersion(LocalFilePath localFilePath)
