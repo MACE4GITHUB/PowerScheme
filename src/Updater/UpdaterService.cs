@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Logger;
 using Updater.Common;
@@ -90,10 +91,32 @@ internal sealed class UpdaterService(
     {
         if (File.Exists(localFilePath.Value))
         {
-            File.Delete(localFilePath.Value);
+            if (!ReplaceFile(localFilePath.Value, downloadFilePath.Value, null!,
+                    ReplaceFileFlags.None, IntPtr.Zero, IntPtr.Zero))
+            {
+                throw new IOException($"Failed to replace file: {localFilePath.Value}");
+            }
         }
+        else
+        {
+            File.Move(downloadFilePath.Value, localFilePath.Value);
+        }
+    }
 
-        File.Move(downloadFilePath.Value, localFilePath.Value);
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool ReplaceFile(
+        string lpReplacedFileName,
+        string lpReplacementFileName,
+        string lpBackupFileName,
+        ReplaceFileFlags dwReplaceFlags,
+        IntPtr lpExclude,
+        IntPtr lpReserved);
+
+    [Flags]
+    private enum ReplaceFileFlags : uint
+    {
+        None = 0x00000000
     }
 
     private void LaunchAfterUpdate(Arguments arguments)
