@@ -19,6 +19,7 @@ public sealed class Arguments
         KillOldVersion = HasKey(args, "--quit") && IsExecutable();
         ReplaceOldVersion = HasKey(args, "--replace") || KillOldVersion;
         LaunchAfterUpdate = HasKey(args, "--launchAfterUpdate") && KillOldVersion;
+        ProcessId = GetIntValue(args, "--pid", 0);
     }
 
     public static Arguments Create(string[] args)
@@ -53,6 +54,8 @@ public sealed class Arguments
 
     public Suffix Suffix { get; }
 
+    public int ProcessId { get; }
+
     private static string GetKeyedValue(
         string[] args,
         string key,
@@ -71,6 +74,12 @@ public sealed class Arguments
         }
 
         return value;
+    }
+
+    private static int GetIntValue(string[] args, string key, int defaultValue)
+    {
+        var value = GetKeyedValue(args, key);
+        return int.TryParse(value, out var result) ? result : defaultValue;
     }
 
     private static bool HasKey(string[] args, string key) =>

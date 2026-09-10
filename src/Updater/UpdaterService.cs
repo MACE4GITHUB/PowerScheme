@@ -44,25 +44,32 @@ internal sealed class UpdaterService(
         if (arguments.KillOldVersion)
         {
             logger.LogInfo("Checking if old version is running...");
-            KillRunningInstances(Path.GetFileNameWithoutExtension(arguments.LocalFilePath.Value));
+            KillProcessById(arguments.ProcessId);
         }
     }
 
-    private void KillRunningInstances(string processName)
+    private void KillProcessById(int processId)
     {
-        var processes = Process.GetProcessesByName(processName);
-        foreach (var proc in processes)
+        if (processId <= 0)
         {
-            try
-            {
-                logger.LogInfo($"Terminating process {proc.ProcessName} (PID {proc.Id})...");
-                proc.Kill();
-                proc.WaitForExit();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError($"Failed to terminate {proc.ProcessName}: {ex.Message}");
-            }
+            logger.LogInfo("No valid process ID provided, skipping.");
+            return;
+        }
+
+        try
+        {
+            var proc = Process.GetProcessById(processId);
+            logger.LogInfo($"Terminating process {proc.ProcessName} (PID {proc.Id})...");
+            proc.Kill();
+            proc.WaitForExit();
+        }
+        catch (ArgumentException)
+        {
+            logger.LogInfo($"Process with PID {processId} not found (already stopped).");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Failed to terminate process PID {processId}: {ex.Message}");
         }
     }
 

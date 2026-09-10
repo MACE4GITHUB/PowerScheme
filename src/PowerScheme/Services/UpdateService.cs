@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using Common.Paths;
 using PowerScheme.Properties;
 using RunAs.Common.Services;
@@ -16,7 +17,8 @@ public sealed class UpdateService : ExecutorService, IUpdateService
                            "--suffix:\"_new\"",
                            "--quit",
                            "--replace",
-                           "--launchAfterUpdate"
+                           "--launchAfterUpdate",
+                           $"--pid:{Process.GetCurrentProcess().Id}"
                            ];
 
     public UpdateService() :
