@@ -80,6 +80,11 @@ internal sealed class UpdaterService(
         client.DefaultRequestHeaders.Accept.ParseAdd("application/octet-stream");
         var data = await client.GetByteArrayAsync(url);
         File.WriteAllBytes(downloadFilePath.Value, data); // overwrite if exists
+
+        if (!new SignatureVerifier().Verify(downloadFilePath.Value))
+        {
+            throw new InvalidOperationException("Downloaded file failed signature verification.");
+        }
     }
 
     private void ReplaceOldVersion(Arguments arguments)

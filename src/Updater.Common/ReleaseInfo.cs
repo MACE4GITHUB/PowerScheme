@@ -91,11 +91,8 @@ public sealed class ReleaseInfo
             throw new ArgumentException("prerelease not found");
         }
 
-        var asset = FindAsset(root, fileExtension);
-        if (asset == null)
-        {
+        var asset = FindAsset(root, fileExtension) ??
             throw new ArgumentException($"Asset with extension {fileExtension} not found.");
-        }
 
         if (!IsAllowedDownloadUrl(asset.Url, apiUrl.Value))
         {
@@ -167,7 +164,7 @@ public sealed class ReleaseInfo
     public string GetAssetDownloadUrl(ApiUrl apiUrl)
     {
         var uri = new Uri(apiUrl.Value);
-        var segments = uri.AbsolutePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+        var segments = uri.AbsolutePath.Split(['/'], StringSplitOptions.RemoveEmptyEntries);
 
         if (segments.Length < 4 ||
             !segments[0].Equals("repos", StringComparison.OrdinalIgnoreCase))
@@ -212,7 +209,7 @@ public sealed class ReleaseInfo
         // api.github.com/repos/{owner}/{repo}/releases/latest
         if (Uri.TryCreate(apiUrl, UriKind.Absolute, out var uri))
         {
-            var segments = uri.AbsolutePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var segments = uri.AbsolutePath.Split(['/'], StringSplitOptions.RemoveEmptyEntries);
             if (segments.Length >= 4 &&
                 segments[0].Equals("repos", StringComparison.OrdinalIgnoreCase))
             {
