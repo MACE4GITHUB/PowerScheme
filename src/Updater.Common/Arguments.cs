@@ -10,15 +10,14 @@ public sealed class Arguments
     {
         ApiUrl = new ApiUrl(GetKeyedValue(args, "--api"));
         LocalFilePath = new LocalFilePath(GetKeyedValue(args, "--path"));
-        Suffix = new Suffix(GetKeyedValue(args, "--suffix", "_new"));
+        SetupName = new SetupName(GetKeyedValue(args, "--setup", "PowerSchemeSetup.exe"));
         FileExtension = new FileExtension(Path.GetExtension(LocalFilePath.Value));
         LocalDirectoryPath = new LocalDirectoryPath(Path.GetDirectoryName(LocalFilePath.Value));
-        FileNameWithoutExtension = new FileNameWithoutExtension(Path.GetFileNameWithoutExtension(LocalFilePath.Value));
-        DownloadFilePath = new DownloadFilePath(Path.Combine(LocalDirectoryPath.Value, $"{FileNameWithoutExtension}{Suffix}{FileExtension}"));
+        DownloadFilePath = new DownloadFilePath(Path.Combine(LocalDirectoryPath.Value, SetupName.Value));
 
         KillOldVersion = HasKey(args, "--quit") && IsExecutable();
-        ReplaceOldVersion = HasKey(args, "--replace") || KillOldVersion;
         LaunchAfterUpdate = HasKey(args, "--launchAfterUpdate") && KillOldVersion;
+        ProcessId = GetIntValue(args, "--pid", 0);
     }
 
     public static Arguments Create(string[] args)
@@ -27,7 +26,7 @@ public sealed class Arguments
             !args.Any(x => x.StartsWith("--api")) ||
             !args.Any(x => x.StartsWith("--path")))
         {
-            throw new ArgumentException("Usage: Updater --api:\"apiUrl\" --path:\"path-to-app.exe\" [--suffix:\"_new\"] [--quit] [--replace] [--launchAfterUpdate]");
+            throw new ArgumentException("Usage: Updater --api:\"apiUrl\" --path:\"path-to-app.exe\" [--setup:\"PowerSchemeSetup.exe\"] [--quit] [--launchAfterUpdate]");
         }
 
         return new Arguments(args);
@@ -35,13 +34,13 @@ public sealed class Arguments
 
     public bool LaunchAfterUpdate { get; }
 
-    public bool ReplaceOldVersion { get; }
-
     public bool KillOldVersion { get; }
 
     public ApiUrl ApiUrl { get; }
 
     public LocalFilePath LocalFilePath { get; }
+
+    public SetupName SetupName { get; }
 
     public DownloadFilePath DownloadFilePath { get; }
 
@@ -49,9 +48,7 @@ public sealed class Arguments
 
     public LocalDirectoryPath LocalDirectoryPath { get; }
 
-    public FileNameWithoutExtension FileNameWithoutExtension { get; }
-
-    public Suffix Suffix { get; }
+    public int ProcessId { get; }
 
     private static string GetKeyedValue(
         string[] args,
@@ -73,6 +70,12 @@ public sealed class Arguments
         return value;
     }
 
+    private static int GetIntValue(string[] args, string key, int defaultValue)
+    {
+        var value = GetKeyedValue(args, key);
+        return int.TryParse(value, out var result) ? result : defaultValue;
+    }
+
     private static bool HasKey(string[] args, string key) =>
         Array.Exists(args, arg => arg.Equals(key, StringComparison.OrdinalIgnoreCase));
 
@@ -91,13 +94,13 @@ public sealed class DownloadFilePath : BasePrimitive
     }
 }
 
-public sealed class FileNameWithoutExtension : BasePrimitive
+public sealed class SetupName : BasePrimitive
 {
-    public FileNameWithoutExtension(string value) : base(value)
+    public SetupName(string value) : base(value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new ArgumentException("File name without extension cannot be null or empty.");
+            throw new ArgumentException("Setup file name cannot be null or empty.");
         }
     }
 }
@@ -129,17 +132,6 @@ public sealed class FileExtension : BasePrimitive
     }
 }
 
-public sealed class Suffix : BasePrimitive
-{
-    public Suffix(string value) : base(value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new ArgumentException("Suffix cannot be null or empty.");
-        }
-    }
-}
-
 public sealed class LocalFilePath : BasePrimitive
 {
     public LocalFilePath(string value) : base(value)
@@ -166,9 +158,9 @@ public sealed class ApiUrl : BasePrimitive
         }
 
         if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) ||
-            uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
+            uri.Scheme != Uri.UriSchemeHttps)
         {
-            throw new ArgumentException("Invalid URL format. Must be absolute and start with http or https.");
+            throw new ArgumentException("Invalid URL format. Must be absolute and start with https.");
         }
     }
 }

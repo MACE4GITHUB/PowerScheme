@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Logger;
 using Updater.Common;
@@ -9,6 +10,8 @@ internal static class GitHubUpdater
 {
     public static async Task Main(string[] args)
     {
+        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
+
         IWriter writer = new ConsoleWriter();
         ILogger logger = new Log(writer);
         try

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -25,10 +25,10 @@ internal sealed class UpdaterService(
         {
             KillOldVersion(arguments);
 
-            logger.LogInfo("Downloading latest version...");
-            await DownloadLatestAsync(releaseInfo.AssetUrl, arguments.DownloadFilePath);
+            logger.LogInfo("Downloading installer...");
+            await DownloadLatestAsync(releaseInfo.GetAssetDownloadUrl(arguments.ApiUrl), arguments.DownloadFilePath);
 
-            ReplaceOldVersion(arguments);
+            RunInstaller(arguments);
 
             LaunchAfterUpdate(arguments);
         }
@@ -43,25 +43,32 @@ internal sealed class UpdaterService(
         if (arguments.KillOldVersion)
         {
             logger.LogInfo("Checking if old version is running...");
-            KillRunningInstances(Path.GetFileNameWithoutExtension(arguments.LocalFilePath.Value));
+            KillProcessById(arguments.ProcessId);
         }
     }
 
-    private void KillRunningInstances(string processName)
+    private void KillProcessById(int processId)
     {
-        var processes = Process.GetProcessesByName(processName);
-        foreach (var proc in processes)
+        if (processId <= 0)
         {
-            try
-            {
-                logger.LogInfo($"Terminating process {proc.ProcessName} (PID {proc.Id})...");
-                proc.Kill();
-                proc.WaitForExit();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError($"Failed to terminate {proc.ProcessName}: {ex.Message}");
-            }
+            logger.LogInfo("No valid process ID provided, skipping.");
+            return;
+        }
+
+        try
+        {
+            var proc = Process.GetProcessById(processId);
+            logger.LogInfo($"Terminating process {proc.ProcessName} (PID {proc.Id})...");
+            proc.Kill();
+            proc.WaitForExit();
+        }
+        catch (ArgumentException)
+        {
+            logger.LogInfo($"Process with PID {processId} not found (already stopped).");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Failed to terminate process PID {processId}: {ex.Message}");
         }
     }
 
@@ -69,38 +76,46 @@ internal sealed class UpdaterService(
     {
         using var client = new HttpClient();
         client.DefaultRequestHeaders.UserAgent.ParseAdd("request");
+        client.DefaultRequestHeaders.Accept.ParseAdd("application/octet-stream");
         var data = await client.GetByteArrayAsync(url);
         File.WriteAllBytes(downloadFilePath.Value, data); // overwrite if exists
-    }
 
-    private void ReplaceOldVersion(Arguments arguments)
-    {
-        if (arguments.ReplaceOldVersion)
+        if (!new SignatureVerifier().Verify(downloadFilePath.Value))
         {
-            logger.LogInfo("Replacing old version with latest...");
-            ReplaceFile(arguments.LocalFilePath, arguments.DownloadFilePath);
-        }
-        else
-        {
-            logger.LogInfo($"Latest version saved as '{arguments.Suffix}' file.");
+            throw new InvalidOperationException("Downloaded file failed signature verification.");
         }
     }
 
-    private static void ReplaceFile(LocalFilePath localFilePath, DownloadFilePath downloadFilePath)
+    private void RunInstaller(Arguments arguments)
     {
-        if (File.Exists(localFilePath.Value))
+        logger.LogInfo("Running silent installer (VERYSILENT)...");
+        var startInfo = new ProcessStartInfo
         {
-            File.Delete(localFilePath.Value);
+            FileName = arguments.DownloadFilePath.Value,
+            UseShellExecute = true,
+            WindowStyle = ProcessWindowStyle.Hidden,
+            Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART"
+        };
+        try
+        {
+            using var process = Process.Start(startInfo);
+            process?.WaitForExit();
+            if (process is not null && process.ExitCode != 0)
+            {
+                logger.LogError($"Installer exited with code {process.ExitCode}.");
+            }
         }
-
-        File.Move(downloadFilePath.Value, localFilePath.Value);
+        catch (Exception ex)
+        {
+            logger.LogError($"Failed to run installer: {ex.Message}");
+        }
     }
 
     private void LaunchAfterUpdate(Arguments arguments)
     {
         if (arguments.LaunchAfterUpdate)
         {
-            logger.LogInfo("Launching latest version...");
+            logger.LogInfo("Launching application...");
             try
             {
                 Process.Start(arguments.LocalFilePath.Value);
