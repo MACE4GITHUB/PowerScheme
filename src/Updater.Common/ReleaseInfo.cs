@@ -28,7 +28,7 @@ public sealed class ReleaseInfo
         GitHubReleaseInfo gitHubReleaseInfo;
         try
         {
-            gitHubReleaseInfo = await GetGitHubReleaseInfoAsync(arguments.ApiUrl, arguments.FileExtension);
+            gitHubReleaseInfo = await GetGitHubReleaseInfoAsync(arguments.ApiUrl, arguments.SetupName.Value);
         }
         catch
         {
@@ -62,7 +62,7 @@ public sealed class ReleaseInfo
             Download URL: {AssetUrl}
             """;
 
-    private static async Task<GitHubReleaseInfo> GetGitHubReleaseInfoAsync(ApiUrl apiUrl, FileExtension fileExtension)
+    private static async Task<GitHubReleaseInfo> GetGitHubReleaseInfoAsync(ApiUrl apiUrl, string assetName)
     {
         using var client = new HttpClient();
         client.DefaultRequestHeaders.UserAgent.ParseAdd("request"); // GitHub requires User-Agent
@@ -91,8 +91,8 @@ public sealed class ReleaseInfo
             throw new ArgumentException("prerelease not found");
         }
 
-        var asset = FindAsset(root, fileExtension) ??
-            throw new ArgumentException($"Asset with extension {fileExtension} not found.");
+        var asset = FindAsset(root, assetName) ??
+            throw new ArgumentException($"Asset '{assetName}' not found.");
 
         if (!IsAllowedDownloadUrl(asset.Url, apiUrl.Value))
         {
@@ -135,7 +135,7 @@ public sealed class ReleaseInfo
         return false;
     }
 
-    private static ReleaseAsset? FindAsset(JsonElement root, FileExtension fileExtension)
+    private static ReleaseAsset? FindAsset(JsonElement root, string assetName)
     {
         if (!root.TryGetProperty("assets", out var assets) ||
             assets.ValueKind != JsonValueKind.Array)
@@ -147,7 +147,7 @@ public sealed class ReleaseInfo
         {
             if (asset.ValueKind != JsonValueKind.Object ||
                 !TryGetStringProperty(asset, "name", out var name) ||
-                !name!.EndsWith(fileExtension.Value, StringComparison.OrdinalIgnoreCase) ||
+                !name!.EndsWith(assetName, StringComparison.OrdinalIgnoreCase) ||
                 !asset.TryGetProperty("id", out var idElement) ||
                 idElement.ValueKind != JsonValueKind.Number ||
                 !TryGetStringProperty(asset, "browser_download_url", out var url))

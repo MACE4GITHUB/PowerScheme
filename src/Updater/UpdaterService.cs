@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Logger;
 using Updater.Common;
@@ -26,10 +25,10 @@ internal sealed class UpdaterService(
         {
             KillOldVersion(arguments);
 
-            logger.LogInfo("Downloading latest version...");
+            logger.LogInfo("Downloading installer...");
             await DownloadLatestAsync(releaseInfo.GetAssetDownloadUrl(arguments.ApiUrl), arguments.DownloadFilePath);
 
-            ReplaceOldVersion(arguments);
+            RunInstaller(arguments);
 
             LaunchAfterUpdate(arguments);
         }
@@ -87,56 +86,36 @@ internal sealed class UpdaterService(
         }
     }
 
-    private void ReplaceOldVersion(Arguments arguments)
+    private void RunInstaller(Arguments arguments)
     {
-        if (arguments.ReplaceOldVersion)
+        logger.LogInfo("Running silent installer (VERYSILENT)...");
+        var startInfo = new ProcessStartInfo
         {
-            logger.LogInfo("Replacing old version with latest...");
-            ReplaceFile(arguments.LocalFilePath, arguments.DownloadFilePath);
-        }
-        else
+            FileName = arguments.DownloadFilePath.Value,
+            UseShellExecute = true,
+            WindowStyle = ProcessWindowStyle.Hidden,
+            Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART"
+        };
+        try
         {
-            logger.LogInfo($"Latest version saved as '{arguments.Suffix}' file.");
-        }
-    }
-
-    private static void ReplaceFile(LocalFilePath localFilePath, DownloadFilePath downloadFilePath)
-    {
-        if (File.Exists(localFilePath.Value))
-        {
-            if (!ReplaceFile(localFilePath.Value, downloadFilePath.Value, null!,
-                    ReplaceFileFlags.None, IntPtr.Zero, IntPtr.Zero))
+            using var process = Process.Start(startInfo);
+            process?.WaitForExit();
+            if (process is not null && process.ExitCode != 0)
             {
-                throw new IOException($"Failed to replace file: {localFilePath.Value}");
+                logger.LogError($"Installer exited with code {process.ExitCode}.");
             }
         }
-        else
+        catch (Exception ex)
         {
-            File.Move(downloadFilePath.Value, localFilePath.Value);
+            logger.LogError($"Failed to run installer: {ex.Message}");
         }
-    }
-
-    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool ReplaceFile(
-        string lpReplacedFileName,
-        string lpReplacementFileName,
-        string lpBackupFileName,
-        ReplaceFileFlags dwReplaceFlags,
-        IntPtr lpExclude,
-        IntPtr lpReserved);
-
-    [Flags]
-    private enum ReplaceFileFlags : uint
-    {
-        None = 0x00000000
     }
 
     private void LaunchAfterUpdate(Arguments arguments)
     {
         if (arguments.LaunchAfterUpdate)
         {
-            logger.LogInfo("Launching latest version...");
+            logger.LogInfo("Launching application...");
             try
             {
                 Process.Start(arguments.LocalFilePath.Value);

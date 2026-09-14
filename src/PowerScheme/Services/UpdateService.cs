@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Common.Paths;
 using PowerScheme.Properties;
@@ -14,9 +14,8 @@ public sealed class UpdateService : ExecutorService, IUpdateService
     private static readonly string[] _arguments = [
                            "--api:\"https://api.github.com/repos/MACE4GITHUB/PowerScheme/releases/latest\"",
                            $"--path:\"{Default.ApplicationFileName}\"",
-                           "--suffix:\"_new\"",
+                           "--setup:\"PowerSchemeSetup.exe\"",
                            "--quit",
-                           "--replace",
                            "--launchAfterUpdate",
                            $"--pid:{Process.GetCurrentProcess().Id}"
                            ];
