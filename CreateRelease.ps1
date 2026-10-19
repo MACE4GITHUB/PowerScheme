@@ -108,26 +108,13 @@ $RunAsDlls = @(
 )
 $UpdaterDlls = @(
     'Updater.Common.dll',
-    'Logger.dll',
-    'Microsoft.Bcl.AsyncInterfaces.dll',
-    'System.Buffers.dll',
-    'System.IO.Pipelines.dll',
-    'System.Memory.dll',
-    'System.Numerics.Vectors.dll',
-    'System.Runtime.CompilerServices.Unsafe.dll',
-    'System.Text.Encodings.Web.dll',
-    'System.Text.Json.dll',
-    'System.Threading.Tasks.Extensions.dll',
-    'System.ValueTuple.dll'
+    'Logger.dll'
 )
 $AppDlls = @(
     'Common.dll',
     'Common.Paths.dll',
     'Languages.dll',
     'MessageForm.dll',
-    'Microsoft.Bcl.AsyncInterfaces.dll',
-    'Microsoft.Extensions.DependencyInjection.dll',
-    'Microsoft.Extensions.DependencyInjection.Abstractions.dll',
     'PowerManagerAPI.dll',
     'PowerSchemeServiceAPI.dll',
     'PowerScheme.Addins.IdleMonitoring.dll',
@@ -139,15 +126,6 @@ $AppDlls = @(
     'RegistryManager.Extensions.dll',
     'RegistryManager.Savers.dll',
     'RunAs.Common.dll',
-    'System.Buffers.dll',
-    'System.IO.Pipelines.dll',
-    'System.Memory.dll',
-    'System.Numerics.Vectors.dll',
-    'System.Runtime.CompilerServices.Unsafe.dll',
-    'System.Text.Encodings.Web.dll',
-    'System.Text.Json.dll',
-    'System.Threading.Tasks.Extensions.dll',
-    'System.ValueTuple.dll',
     'Updater.Common.dll'
 )
 
@@ -183,6 +161,28 @@ function Merge-Exe {
     $inputs += $Dlls | ForEach-Object { Join-Path $srcDir $_ }
     $args = @("/out:$Output") + $inputs + @('/skipconfig', '/ndebug', '/parallel')
     Invoke-Native $ILRepack $args
+}
+
+function Compress-Resource {
+    param([string]$Path)
+    # The helper exes are embedded as GZip streams (see ExecutorService) to keep
+    # the application resources small; the source exe is no longer needed.
+    $target = "$Path.gz"
+    $source = [IO.File]::ReadAllBytes($Path)
+    $file = [IO.File]::Create($target)
+    try {
+        $gzip = New-Object IO.Compression.GZipStream($file, [IO.Compression.CompressionLevel]::Optimal)
+        try {
+            $gzip.Write($source, 0, $source.Length)
+        }
+        finally {
+            $gzip.Dispose()
+        }
+    }
+    finally {
+        $file.Dispose()
+    }
+    Remove-Item -LiteralPath $Path -Force
 }
 
 function Find-ISCC {
@@ -245,6 +245,10 @@ try {
 
     Build-Project (Join-Path $RepoRoot 'src\Updater\Updater.csproj')
     Merge-Exe 'Updater' 'Updater.exe' $UpdaterDlls (Join-Path $Resources 'Updater.exe')
+
+    foreach ($helper in 'RegWriter.exe', 'RunAs.exe', 'Updater.exe') {
+        Compress-Resource (Join-Path $Resources $helper)
+    }
 
     # --- 3. Main application (single-file) ---
     Build-Project (Join-Path $RepoRoot 'src\PowerScheme\PowerScheme.csproj')

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Resources;
 using RunAs.Common.Utils;
 
@@ -74,6 +75,19 @@ public class ExecutorService(
     }
 
     private byte[] Executor
-        => (byte[])(ResourceManager?.GetObject(Name)
-                    ?? throw new ArgumentException("The application resource executable file was not found."));
+    {
+        get
+        {
+            var compressed = (byte[])(ResourceManager?.GetObject(Name)
+                             ?? throw new ArgumentException("The application resource executable file was not found."));
+
+            using var input = new MemoryStream(compressed);
+            using var gzip = new GZipStream(input, CompressionMode.Decompress);
+            using var output = new MemoryStream();
+
+            gzip.CopyTo(output);
+
+            return output.ToArray();
+        }
+    }
 }

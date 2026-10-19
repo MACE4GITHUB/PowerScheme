@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Updater.Common;
@@ -68,8 +67,12 @@ public sealed class ReleaseInfo
         client.DefaultRequestHeaders.UserAgent.ParseAdd("request"); // GitHub requires User-Agent
         var json = await client.GetStringAsync(apiUrl.Value);
 
-        using var document = JsonDocument.Parse(json);
-        var root = document.RootElement;
+        return ParseGitHubReleaseInfo(json, apiUrl, assetName);
+    }
+
+    internal static GitHubReleaseInfo ParseGitHubReleaseInfo(string json, ApiUrl apiUrl, string assetName)
+    {
+        var root = JsonParser.Parse(json);
 
         if (!TryGetStringProperty(root, "tag_name", out var tag))
         {
@@ -109,25 +112,27 @@ public sealed class ReleaseInfo
         };
     }
 
-    private static bool TryGetStringProperty(JsonElement element, string propertyName, out string? value)
+    private static bool TryGetStringProperty(JsonNode element, string propertyName, out string? value)
     {
-        if (element.TryGetProperty(propertyName, out var property) &&
-            property.ValueKind == JsonValueKind.String)
+        if (element is JsonObject jsonObject &&
+            jsonObject.TryGetValue(propertyName, out var property) &&
+            property is JsonString stringProperty)
         {
-            value = property.GetString();
-            return value != null;
+            value = stringProperty.Value;
+            return true;
         }
 
         value = null;
         return false;
     }
 
-    private static bool TryGetBooleanProperty(JsonElement element, string propertyName, out bool value)
+    private static bool TryGetBooleanProperty(JsonNode element, string propertyName, out bool value)
     {
-        if (element.TryGetProperty(propertyName, out var property) &&
-            property.ValueKind is JsonValueKind.True or JsonValueKind.False)
+        if (element is JsonObject jsonObject &&
+            jsonObject.TryGetValue(propertyName, out var property) &&
+            property is JsonBoolean booleanProperty)
         {
-            value = property.GetBoolean();
+            value = booleanProperty.Value;
             return true;
         }
 
@@ -135,27 +140,29 @@ public sealed class ReleaseInfo
         return false;
     }
 
-    private static ReleaseAsset? FindAsset(JsonElement root, string assetName)
+    private static ReleaseAsset? FindAsset(JsonNode root, string assetName)
     {
-        if (!root.TryGetProperty("assets", out var assets) ||
-            assets.ValueKind != JsonValueKind.Array)
+        if (root is not JsonObject rootObject ||
+            !rootObject.TryGetValue("assets", out var assetsProperty) ||
+            assetsProperty is not JsonArray assets)
         {
             return null;
         }
 
-        foreach (var asset in assets.EnumerateArray())
+        foreach (var asset in assets.Items)
         {
-            if (asset.ValueKind != JsonValueKind.Object ||
-                !TryGetStringProperty(asset, "name", out var name) ||
+            if (asset is not JsonObject assetObject ||
+                !TryGetStringProperty(assetObject, "name", out var name) ||
                 !name!.EndsWith(assetName, StringComparison.OrdinalIgnoreCase) ||
-                !asset.TryGetProperty("id", out var idElement) ||
-                idElement.ValueKind != JsonValueKind.Number ||
-                !TryGetStringProperty(asset, "browser_download_url", out var url))
+                !assetObject.TryGetValue("id", out var idProperty) ||
+                idProperty is not JsonNumber id ||
+                id.Integer is not long assetId ||
+                !TryGetStringProperty(assetObject, "browser_download_url", out var url))
             {
                 continue;
             }
 
-            return new ReleaseAsset(idElement.GetInt64(), url!);
+            return new ReleaseAsset(assetId, url!);
         }
 
         return null;
@@ -229,7 +236,7 @@ public sealed class ReleaseInfo
         return new Version(info.FileVersion ?? "0.0.0.0");
     }
 
-    private sealed class GitHubReleaseInfo
+    internal sealed class GitHubReleaseInfo
     {
         public Version Version { get; set; } = new Version();
         public string AssetUrl { get; set; } = string.Empty;
