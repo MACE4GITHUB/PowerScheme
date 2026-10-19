@@ -5,6 +5,7 @@
 
 *.txt
 *.exe
+*.exe.gz
 *.bat
 !CreateRelease.bat
 
