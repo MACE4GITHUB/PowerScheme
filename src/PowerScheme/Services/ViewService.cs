@@ -17,6 +17,9 @@ namespace PowerScheme.Services;
 internal sealed class ViewService : ApplicationContext, IViewService
 {
     private const string SHOW_CONTEXT_MENU = "ShowContextMenu";
+    private static readonly MethodInfo _showContextMenu = typeof(NotifyIcon)
+        .GetMethod(SHOW_CONTEXT_MENU, BindingFlags.Instance | BindingFlags.NonPublic)
+        ?? throw new MissingMethodException(typeof(NotifyIcon).FullName, SHOW_CONTEXT_MENU);
     private readonly IViewModel _viewModel;
     private readonly UpdateTimer _updateTimer;
     private readonly DpiWatchers _dpiWatchers;
@@ -125,24 +128,36 @@ internal sealed class ViewService : ApplicationContext, IViewService
         _viewModel.NotifyIcon.Text = activePowerScheme.Name;
     }
 
-    private void NotifyIcon_MouseClick(object? sender, MouseEventArgs e)
+    private void NotifyIcon_MouseClick(object? sender, MouseEventArgs e) =>
+        ShowContextMenu(_viewModel, e.Button, static icon => _showContextMenu.Invoke(icon, null));
+
+    internal static void ShowContextMenu(
+        IViewModel viewModel,
+        MouseButtons button,
+        Action<NotifyIcon> showMenu)
     {
-        if (e.Button == MouseButtons.Right)
+        if (button is not (MouseButtons.Left or MouseButtons.Right))
         {
-            _viewModel.ContextRightMenu.UpdateMenu();
-            _viewModel.NotifyIcon.ContextMenuStrip = _viewModel.ContextRightMenu;
-        }
-        else
-        {
-            _viewModel.ContextLeftMenu.UpdateMenu();
-            _viewModel.NotifyIcon.ContextMenuStrip = _viewModel.ContextLeftMenu;
+            return;
         }
 
-        var mi = typeof(NotifyIcon)
-            .GetMethod(SHOW_CONTEXT_MENU, BindingFlags.Instance | BindingFlags.NonPublic);
-        mi?.Invoke(_viewModel.NotifyIcon, null);
+        var menu = button == MouseButtons.Right
+            ? viewModel.ContextRightMenu
+            : viewModel.ContextLeftMenu;
 
-        _viewModel.NotifyIcon.ContextMenuStrip = null;
+        menu.UpdateMenu();
+
+        var notifyIcon = viewModel.NotifyIcon;
+        notifyIcon.ContextMenuStrip = menu;
+
+        try
+        {
+            showMenu(notifyIcon);
+        }
+        finally
+        {
+            notifyIcon.ContextMenuStrip = null;
+        }
     }
 
     protected override void Dispose(bool disposing)

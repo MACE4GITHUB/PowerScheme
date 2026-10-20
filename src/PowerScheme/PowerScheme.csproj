@@ -26,6 +26,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="PowerScheme.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\Languages\Languages.csproj" />
 		<ProjectReference Include="..\MessageForm\MessageForm.csproj" />
