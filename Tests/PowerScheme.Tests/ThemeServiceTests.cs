@@ -12,6 +12,41 @@ namespace PowerScheme.Tests;
 public sealed class ThemeServiceTests
 {
     [TestMethod]
+    [DataRow(120, 70)]
+    [DataRow(240, 160)]
+    [DataRow(90, 28)]
+    public void MenuCorners_BackgroundAndBorderAreSymmetricAtDifferentSizes(int width, int height)
+    {
+        var renderer = new ToolStripMenuRenderer(ThemeKind.Dark.GetTheme());
+        using var menu = new ContextMenuStrip { AutoSize = false, Size = new Size(width, height) };
+        using var bitmap = new Bitmap(menu.Width, menu.Height);
+        using (var graphics = Graphics.FromImage(bitmap))
+        {
+            graphics.Clear(Color.Transparent);
+            renderer.DrawToolStripBackground(new ToolStripRenderEventArgs(graphics, menu));
+            Assert.IsNotNull(menu.Region);
+            graphics.SetClip(menu.Region, System.Drawing.Drawing2D.CombineMode.Intersect);
+            renderer.DrawToolStripBorder(new ToolStripRenderEventArgs(graphics, menu));
+        }
+
+        Assert.AreEqual(0, bitmap.GetPixel(0, 0).A);
+        Assert.AreEqual(255, bitmap.GetPixel(7, 7).A);
+        for (var row = 0; row < 8; row++)
+        {
+            for (var column = 0; column < 8; column++)
+            {
+            var topLeft = bitmap.GetPixel(column, row).A;
+            Assert.AreEqual(topLeft, bitmap.GetPixel(bitmap.Width - 1 - column, row).A,
+                    $"Top corners differ at ({column}, {row}) for {width}x{height}.");
+                Assert.AreEqual(topLeft, bitmap.GetPixel(column, bitmap.Height - 1 - row).A,
+                    $"Left corners differ at ({column}, {row}) for {width}x{height}.");
+                Assert.AreEqual(topLeft, bitmap.GetPixel(bitmap.Width - 1 - column, bitmap.Height - 1 - row).A,
+                    $"Opposite corners differ at ({column}, {row}) for {width}x{height}.");
+            }
+        }
+    }
+
+    [TestMethod]
     public void ApplyToolStripTheme_UsesCustomRendererForNestedLanguageMenu()
     {
         using var menu = new ContextMenuStrip();

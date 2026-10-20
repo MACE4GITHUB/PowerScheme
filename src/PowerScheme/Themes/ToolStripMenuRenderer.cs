@@ -20,16 +20,18 @@ internal class ToolStripMenuRenderer(ProfessionalColorTable colorTable) :
     protected override void OnRenderToolStripBackground(ToolStripRenderEventArgs e)
     {
         var g = e.Graphics;
-        g.SmoothingMode = SmoothingMode.AntiAlias;
-
-        var rect = new Rectangle(Point.Empty, e.ToolStrip.Size);
-
-        using var path = ThemeService.RoundedRect(rect, RADIUS);
+        using var path = CreateMenuOutline(e.ToolStrip);
         using var brush = new SolidBrush(((IStyleTheme)ColorTable).BackColor);
-
-        g.SetClip(path);
-        g.FillPath(brush, path);
-        g.ResetClip();
+        var state = g.Save();
+        try
+        {
+            g.SetClip(path, CombineMode.Intersect);
+            g.FillRectangle(brush, e.ToolStrip.ClientRectangle);
+        }
+        finally
+        {
+            g.Restore(state);
+        }
 
         e.ToolStrip.Region = new Region(path);
         e.ToolStrip.ForeColor = ((IStyleTheme)ColorTable).ForeColor;
@@ -39,14 +41,22 @@ internal class ToolStripMenuRenderer(ProfessionalColorTable colorTable) :
     protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e)
     {
         var g = e.Graphics;
-        g.SmoothingMode = SmoothingMode.AntiAlias;
-
-        var rect = new Rectangle(0, 0, e.ToolStrip.Width - 1, e.ToolStrip.Height - 1);
-
-        using var path = ThemeService.RoundedRect(rect, RADIUS);
-        using var pen = new Pen(((IStyleTheme)ColorTable).BorderColor, 2);
-        g.DrawPath(pen, path);
+        using var path = CreateMenuOutline(e.ToolStrip);
+        using var pen = new Pen(((IStyleTheme)ColorTable).BorderColor, 2) { Alignment = PenAlignment.Inset };
+        var state = g.Save();
+        try
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.DrawPath(pen, path);
+        }
+        finally
+        {
+            g.Restore(state);
+        }
     }
+
+    private static GraphicsPath CreateMenuOutline(ToolStrip menu) =>
+        ThemeService.RoundedRect(new RectangleF(-0.5f, -0.5f, menu.Width, menu.Height), RADIUS);
 
     protected override void OnRenderSeparator(ToolStripSeparatorRenderEventArgs e)
     {

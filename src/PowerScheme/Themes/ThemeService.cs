@@ -30,7 +30,10 @@ internal static class ThemeService
         SetControlsTheme(control, style);
     }
 
-    public static GraphicsPath RoundedRect(Rectangle r, int radius)
+    public static GraphicsPath RoundedRect(Rectangle r, int radius) =>
+        RoundedRect((RectangleF)r, radius);
+
+    internal static GraphicsPath RoundedRect(RectangleF r, float radius)
     {
         var d = radius * 2;
         var path = new GraphicsPath();
