@@ -194,116 +194,74 @@ public class PowerSchemeService : IPowerSchemeService
         SetActivePowerScheme(activeScheme, true);
     }
 
-    public void SetAllPowerSchemesIdleDisplay(int value)
+    public void SetAllPowerSchemesIdleDisplay(int value) =>
+        ApplyPowerSettings(PowerSchemes.Select(p => p.Guid), value,
+            static (guid, values) => new PowerSchemeTurnOffDisplay(guid, values));
+
+    public void SetIdleDisplay(Guid guid, int value) =>
+        ApplyPowerSettings([guid], value,
+            static (id, values) => new PowerSchemeTurnOffDisplay(id, values));
+
+    public PowerSchemeDcAcValues GetIdleDisplay(Guid guid) =>
+        ReadPowerSetting(guid, SettingSubgroup.VIDEO_SUBGROUP, Setting.VIDEOIDLE);
+
+    public void SetAllPowerSchemesIdleLockDisplay(int value) =>
+        ApplyPowerSettings(PowerSchemes.Select(p => p.Guid), value,
+            static (guid, values) => new PowerSchemeTurnOffLockDisplay(guid, values));
+
+    public void SetIdleLockDisplay(Guid guid, int value) =>
+        ApplyPowerSettings([guid], value,
+            static (id, values) => new PowerSchemeTurnOffLockDisplay(id, values));
+
+    public PowerSchemeDcAcValues GetIdleLockDisplay(Guid guid) =>
+        ReadPowerSetting(guid, SettingSubgroup.VIDEO_SUBGROUP, Setting.VIDEOCONLOCK);
+
+    public void SetAllPowerSchemesIdleSleep(int value) =>
+        ApplyPowerSettings(PowerSchemes.Select(p => p.Guid), value,
+            static (guid, values) => new PowerSchemeSleep(guid, values));
+
+    public void SetIdleSleep(Guid guid, int value) =>
+        ApplyPowerSettings([guid], value,
+            static (id, values) => new PowerSchemeSleep(id, values));
+
+    public PowerSchemeDcAcValues GetIdleSleep(Guid guid) =>
+        ReadPowerSetting(guid, SettingSubgroup.SLEEP_SUBGROUP, Setting.STANDBYIDLE);
+
+    public void SetAllPowerSchemesIdleHibernate(int value) =>
+        ApplyPowerSettings(PowerSchemes.Select(p => p.Guid), value,
+            static (guid, values) => new PowerSchemeHibernate(guid, values));
+
+    public void SetIdleHibernate(Guid guid, int value) =>
+        ApplyPowerSettings([guid], value,
+            static (id, values) => new PowerSchemeHibernate(id, values));
+
+    public PowerSchemeDcAcValues GetIdleHibernate(Guid guid) =>
+        ReadPowerSetting(guid, SettingSubgroup.SLEEP_SUBGROUP, Setting.HIBERNATEIDLE);
+
+    internal static PowerSchemeDcAcValues ReadPowerSetting(
+        Guid guid,
+        SettingSubgroup subgroup,
+        Setting setting,
+        Func<Guid, SettingSubgroup, Setting, PowerMode, uint>? read = null)
     {
-        var listGuid = PowerSchemes.Select(p => p.Guid);
-        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
-
-        foreach (var guid in listGuid)
-        {
-            var setting = new PowerSchemeTurnOffDisplay(guid, powerSchemeDcAcValues);
-            setting.ApplyValues();
-        }
-    }
-
-    public void SetIdleDisplay(Guid guid, int value)
-    {
-        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
-        var setting = new PowerSchemeTurnOffDisplay(guid, powerSchemeDcAcValues);
-
-        setting.ApplyValues();
-    }
-
-    public PowerSchemeDcAcValues GetIdleDisplay(Guid guid)
-    {
-        var dc =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.VIDEO_SUBGROUP, Setting.VIDEOIDLE, PowerMode.DC);
-        var ac =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.VIDEO_SUBGROUP, Setting.VIDEOIDLE, PowerMode.AC);
+        read ??= PowerManager.GetPlanSetting;
+        var dc = (int)read(guid, subgroup, setting, PowerMode.DC);
+        var ac = (int)read(guid, subgroup, setting, PowerMode.AC);
 
         return new PowerSchemeDcAcValues(dc, ac);
     }
 
-    public void SetAllPowerSchemesIdleLockDisplay(int value)
+    internal static void ApplyPowerSettings(
+        IEnumerable<Guid> schemeIds,
+        int value,
+        Func<Guid, PowerSchemeDcAcValues, IApplicable> createSetting)
     {
-        var listGuid = PowerSchemes.Select(p => p.Guid);
-        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
+        var values = new PowerSchemeDcAcValues(value, value);
 
-        foreach (var guid in listGuid)
+        foreach (var guid in schemeIds)
         {
-            var setting = new PowerSchemeTurnOffLockDisplay(guid, powerSchemeDcAcValues);
-            setting.ApplyValues();
+            createSetting(guid, values).ApplyValues();
         }
-    }
-
-    public void SetIdleLockDisplay(Guid guid, int value)
-    {
-        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
-        var setting = new PowerSchemeTurnOffLockDisplay(guid, powerSchemeDcAcValues);
-
-        setting.ApplyValues();
-    }
-
-    public PowerSchemeDcAcValues GetIdleLockDisplay(Guid guid)
-    {
-        var dc =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.VIDEO_SUBGROUP, Setting.VIDEOCONLOCK, PowerMode.DC);
-        var ac =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.VIDEO_SUBGROUP, Setting.VIDEOCONLOCK, PowerMode.AC);
-
-        return new PowerSchemeDcAcValues(dc, ac);
-    }
-
-    public void SetAllPowerSchemesIdleSleep(int value)
-    {
-        var listGuid = PowerSchemes.Select(p => p.Guid);
-        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
-
-        foreach (var guid in listGuid)
-        {
-            var setting = new PowerSchemeSleep(guid, powerSchemeDcAcValues);
-            setting.ApplyValues();
-        }
-    }
-
-    public void SetIdleSleep(Guid guid, int value)
-    {
-        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
-        var setting = new PowerSchemeSleep(guid, powerSchemeDcAcValues);
-
-        setting.ApplyValues();
-    }
-
-    public PowerSchemeDcAcValues GetIdleSleep(Guid guid)
-    {
-        var dc =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.SLEEP_SUBGROUP, Setting.STANDBYIDLE, PowerMode.DC);
-        var ac =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.SLEEP_SUBGROUP, Setting.STANDBYIDLE, PowerMode.AC);
-
-        return new PowerSchemeDcAcValues(dc, ac);
-    }
-
-    public void SetAllPowerSchemesIdleHibernate(int value)
-    {
-        var listGuid = PowerSchemes.Select(p => p.Guid);
-        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
-
-        foreach (var guid in listGuid)
-        {
-            var setting = new PowerSchemeHibernate(guid, powerSchemeDcAcValues);
-            setting.ApplyValues();
-        }
-    }
-
-    public void SetIdleHibernate(Guid guid, int value)
-    {
-        var powerSchemeDcAcValues = new PowerSchemeDcAcValues(value, value);
-        var setting = new PowerSchemeHibernate(guid, powerSchemeDcAcValues);
-
-        setting.ApplyValues();
-    }
-
-    public PowerSchemeDcAcValues GetIdleHibernate(Guid guid)
-    {
-        var dc =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.SLEEP_SUBGROUP, Setting.HIBERNATEIDLE, PowerMode.DC);
-        var ac =  (int)PowerManager.GetPlanSetting(guid, SettingSubgroup.SLEEP_SUBGROUP, Setting.HIBERNATEIDLE, PowerMode.AC);
-
-        return new PowerSchemeDcAcValues(dc, ac);
     }
 
     public void CreateTypicalSchemes()

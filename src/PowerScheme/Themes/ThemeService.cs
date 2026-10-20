@@ -18,13 +18,16 @@ internal static class ThemeService
     public static void ApplyToolStripTheme(ToolStrip toolStrip) =>
         toolStrip.Renderer = new ToolStripMenuRenderer(Theme);
 
-    public static void ApplyControlTheme(Control control)
-    {
-        control.BackColor = StyleTheme.BackColor;
-        control.ForeColor = StyleTheme.ForeColor;
-        control.Font = StyleTheme.Font;
+    public static void ApplyControlTheme(Control control) =>
+        ApplyControlTheme(control, StyleTheme);
 
-        SetControlsTheme(control);
+    internal static void ApplyControlTheme(Control control, IStyleTheme style)
+    {
+        control.BackColor = style.BackColor;
+        control.ForeColor = style.ForeColor;
+        control.Font = style.Font;
+
+        SetControlsTheme(control, style);
     }
 
     public static GraphicsPath RoundedRect(Rectangle r, int radius)
@@ -41,84 +44,60 @@ internal static class ThemeService
         return path;
     }
 
-    private static void SetControlsTheme(Control parent)
+    private static void SetControlsTheme(Control parent, IStyleTheme style)
     {
         foreach (Control c in parent.Controls)
         {
             switch (c)
             {
                 case Label ctl:
-                    SetLabelTheme(ctl);
+                    SetLabelTheme(ctl, style);
                     break;
                 case BaseButton ctl:
-                    SetButtonTheme(ctl);
+                    SetButtonTheme(ctl, style);
                     break;
-                case Panel ctl:
-                    SetPanelTheme(ctl);
-                    break;
-                case NumericUpDown ctl:
-                    SetNumericUpDownTheme(ctl);
-                    break;
-                case ComboBox ctl:
-                    SetComboBoxTheme(ctl);
+                case Panel:
+                case NumericUpDown:
+                case ComboBox:
+                    SetControlTheme(c, style);
                     break;
             }
 
             if (c.HasChildren)
             {
-                SetControlsTheme(c);
+                SetControlsTheme(c, style);
             }
         }
     }
 
-    private static void SetComboBoxTheme(ComboBox ctl)
+    private static void SetControlTheme(Control ctl, IStyleTheme style)
     {
-        ctl.Font = StyleTheme.Font;
-        ctl.BackColor = StyleTheme.BackColor;
-        ctl.ForeColor = StyleTheme.ForeColor;
+        ctl.Font = style.Font;
+        ctl.BackColor = style.BackColor;
+        ctl.ForeColor = style.ForeColor;
     }
 
-    private static void SetNumericUpDownTheme(NumericUpDown ctl)
+    public static void SetButtonTheme(BaseButton ctl) =>
+        SetButtonTheme(ctl, StyleTheme);
+
+    public static void SetAttentionButtonTheme(BaseButton ctl) =>
+        SetButtonTheme(ctl, StyleTheme, true);
+
+    internal static void SetButtonTheme(BaseButton ctl, IStyleTheme style, bool attention = false)
     {
-        ctl.Font = StyleTheme.Font;
-        ctl.BackColor = StyleTheme.BackColor;
-        ctl.ForeColor = StyleTheme.ForeColor;
+        ctl.Font = style.Font;
+        ctl.CornerRadius = style.ButtonCornerRadius;
+        ctl.BorderThickness = style.ButtonBorderThickness;
+        ctl.BackColor = style.ButtonBackColor;
+        ctl.ForeColor = attention ? style.ButtonAttentionForeColor : style.ButtonForeColor;
+        ctl.FlatAppearance.BorderColor = style.ButtonBorderColor;
+        ctl.FlatAppearance.MouseOverBackColor = style.ButtonMouseOverBackColor;
+        ctl.FlatAppearance.MouseDownBackColor = style.ButtonMouseDownBackColor;
     }
 
-    private static void SetPanelTheme(Panel ctl)
+    private static void SetLabelTheme(Label ctl, IStyleTheme style)
     {
-        ctl.Font = StyleTheme.Font;
-        ctl.BackColor = StyleTheme.BackColor;
-        ctl.ForeColor = StyleTheme.ForeColor;
-    }
-
-    public static void SetButtonTheme(BaseButton ctl)
-    {
-        ctl.Font = StyleTheme.Font;
-        ctl.CornerRadius = StyleTheme.ButtonCornerRadius;
-        ctl.BorderThickness = StyleTheme.ButtonBorderThickness;
-        ctl.BackColor = StyleTheme.ButtonBackColor;
-        ctl.ForeColor = StyleTheme.ButtonForeColor;
-        ctl.FlatAppearance.BorderColor = StyleTheme.ButtonBorderColor;
-        ctl.FlatAppearance.MouseOverBackColor = StyleTheme.ButtonMouseOverBackColor;
-        ctl.FlatAppearance.MouseDownBackColor = StyleTheme.ButtonMouseDownBackColor;
-    }
-
-    public static void SetAttentionButtonTheme(BaseButton ctl)
-    {
-        ctl.Font = StyleTheme.Font;
-        ctl.CornerRadius = StyleTheme.ButtonCornerRadius;
-        ctl.BorderThickness = StyleTheme.ButtonBorderThickness;
-        ctl.BackColor = StyleTheme.ButtonBackColor;
-        ctl.ForeColor = StyleTheme.ButtonAttentionForeColor;
-        ctl.FlatAppearance.BorderColor = StyleTheme.ButtonBorderColor;
-        ctl.FlatAppearance.MouseOverBackColor = StyleTheme.ButtonMouseOverBackColor;
-        ctl.FlatAppearance.MouseDownBackColor = StyleTheme.ButtonMouseDownBackColor;
-    }
-
-    private static void SetLabelTheme(Label ctl)
-    {
-        ctl.Font = StyleTheme.Font;
-        ctl.ForeColor = StyleTheme.ForeColor;
+        ctl.Font = style.Font;
+        ctl.ForeColor = style.ForeColor;
     }
 }

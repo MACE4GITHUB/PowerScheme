@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using Languages;
 using PowerScheme.Configuration;
 using PowerSchemeServiceAPI;
 using PowerSchemeServiceAPI.Settings;
@@ -9,64 +6,26 @@ using static PowerScheme.Addins.IdleMonitoring.Constants;
 
 namespace PowerScheme.Model.Options;
 
-internal class SleepOptions : INotifyPropertyChanged
+internal class SleepOptions : PowerSchemeOptions
 {
-    private readonly IPowerSchemeService _power = DiRoot.GetService<IPowerSchemeService>();
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    public event EventHandler? PowerSchemeIdChanged;
-
     public SleepOptions(
         int sleepInSc = DEFAULT_SLEEP_IN_SECONDS,
         int hibernateInSc = DEFAULT_HIBERNATE_IN_SECONDS)
+        : this(DiRoot.GetService<IPowerSchemeService>(), sleepInSc, hibernateInSc)
+    {
+    }
+
+    internal SleepOptions(
+        IPowerSchemeService power,
+        int sleepInSc = DEFAULT_SLEEP_IN_SECONDS,
+        int hibernateInSc = DEFAULT_HIBERNATE_IN_SECONDS)
+        : base(power)
     {
         SleepIdle = sleepInSc;
         HibernateIdle = hibernateInSc;
 
         PowerSchemeId = ActivePowerSchemeId;
     }
-
-    public Dictionary<Guid, string> PowerSchemes
-    {
-        get
-        {
-            var powerSchemes = new Dictionary<Guid, string>
-            {
-                { Guid.Empty, Language.Current.AllPowerSchemes }
-            };
-
-            foreach (var powerScheme in _power.PowerSchemes)
-            {
-                powerSchemes.Add(powerScheme.Guid, powerScheme.Name);
-            }
-
-            return powerSchemes;
-        }
-    }
-
-    public Guid PowerSchemeId
-    {
-        get => field;
-        set
-        {
-            if (field == value)
-            {
-                return;
-            }
-
-            field = value;
-
-            SleepIdle = SleepDcAcValues.AcSettings;
-            HibernateIdle = HibernateDcAcValues.AcSettings;
-
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PowerSchemeId)));
-            PowerSchemeIdChanged?.Invoke(this, EventArgs.Empty);
-        }
-    }
-
-    public Guid DefaultPowerSchemeId => Guid.Empty;
-
-    public Guid ActivePowerSchemeId => _power.ActivePowerScheme.Guid;
 
     public int SleepIdle { get; set; }
 
@@ -81,42 +40,26 @@ internal class SleepOptions : INotifyPropertyChanged
         HibernateDcAcValues.AcSettings == HibernateDcAcValues.DcSettings;
 
     public PowerSchemeDcAcValues SleepDcAcValues =>
-        PowerSchemeId == Guid.Empty
-            ? _power.GetIdleSleep(ActivePowerSchemeId)
-            : _power.GetIdleSleep(PowerSchemeId);
+        Power.GetIdleSleep(EffectivePowerSchemeId);
 
-    public void ApplySleepDcAcValues()
-    {
-        if (PowerSchemeId == Guid.Empty)
-        {
-            _power.SetAllPowerSchemesIdleSleep(SleepIdle);
-
-            return;
-        }
-
-        _power.SetIdleSleep(PowerSchemeId, SleepIdle);
-    }
+    public void ApplySleepDcAcValues() =>
+        ApplyValue(SleepIdle, Power.SetIdleSleep, Power.SetAllPowerSchemesIdleSleep);
 
     public PowerSchemeDcAcValues HibernateDcAcValues =>
-        PowerSchemeId == Guid.Empty
-            ? _power.GetIdleHibernate(ActivePowerSchemeId)
-            : _power.GetIdleHibernate(PowerSchemeId);
+        Power.GetIdleHibernate(EffectivePowerSchemeId);
 
-    public void ApplyHibernateDcAcValues()
-    {
-        if (PowerSchemeId == Guid.Empty)
-        {
-            _power.SetAllPowerSchemesIdleHibernate(HibernateIdle);
-
-            return;
-        }
-
-        _power.SetIdleHibernate(PowerSchemeId, HibernateIdle);
-    }
+    public void ApplyHibernateDcAcValues() =>
+        ApplyValue(HibernateIdle, Power.SetIdleHibernate, Power.SetAllPowerSchemesIdleHibernate);
 
     public void ApplyDcAcValues()
     {
         ApplySleepDcAcValues();
         ApplyHibernateDcAcValues();
+    }
+
+    protected override void LoadSelectedValues()
+    {
+        SleepIdle = SleepDcAcValues.AcSettings;
+        HibernateIdle = HibernateDcAcValues.AcSettings;
     }
 }

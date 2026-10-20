@@ -203,54 +203,26 @@ public static class RegistryService
     public static void SetSleepOption(ResourceManager resourceManager, object value) =>
         SetRegistryValue(resourceManager, RegShowSleepOption, value);
 
-    public static void SetIdlePowerScheme(string company, string product, object value)
-    {
-        var regAppSettings = RegIdlePowerScheme(company, product);
-        regAppSettings.Value = value;
-        SaveSetting(regAppSettings);
-    }
+    public static void SetIdlePowerScheme(string company, string product, object value) =>
+        SetRegistryValue(RegIdlePowerScheme(company, product), value);
 
-    public static void SetMainPowerScheme(string company, string product, object value)
-    {
-        var regAppSettings = RegMainPowerScheme(company, product);
-        regAppSettings.Value = value;
-        SaveSetting(regAppSettings);
-    }
+    public static void SetMainPowerScheme(string company, string product, object value) =>
+        SetRegistryValue(RegMainPowerScheme(company, product), value);
 
-    public static void SetIdleThresholdInMilliseconds(string company, string product, object value)
-    {
-        var regAppSettings = RegIdleThresholdInMilliseconds(company, product);
-        regAppSettings.Value = value;
-        SaveSetting(regAppSettings);
-    }
+    public static void SetIdleThresholdInMilliseconds(string company, string product, object value) =>
+        SetRegistryValue(RegIdleThresholdInMilliseconds(company, product), value);
 
-    public static void SetPollingActiveTimeInMilliseconds(string company, string product, object value)
-    {
-        var regAppSettings = RegPollingActiveTimeInMilliseconds(company, product);
-        regAppSettings.Value = value;
-        SaveSetting(regAppSettings);
-    }
+    public static void SetPollingActiveTimeInMilliseconds(string company, string product, object value) =>
+        SetRegistryValue(RegPollingActiveTimeInMilliseconds(company, product), value);
 
-    public static void SetPollingIdleTimeInMilliseconds(string company, string product, object value)
-    {
-        var regAppSettings = RegPollingIdleTimeInMilliseconds(company, product);
-        regAppSettings.Value = value;
-        SaveSetting(regAppSettings);
-    }
+    public static void SetPollingIdleTimeInMilliseconds(string company, string product, object value) =>
+        SetRegistryValue(RegPollingIdleTimeInMilliseconds(company, product), value);
 
-    public static void SetAppSettings(string company, string product, object value)
-    {
-        var regAppSettings = RegAppSettings(company, product);
-        regAppSettings.Value = value;
-        SaveSetting(regAppSettings);
-    }
+    public static void SetAppSettings(string company, string product, object value) =>
+        SetRegistryValue(RegAppSettings(company, product), value);
 
-    public static void SetRestartCount(string company, string product, object value)
-    {
-        var regRestartCount = RegRestartCount(company, product);
-        regRestartCount.Value = value;
-        SaveSetting(regRestartCount);
-    }
+    public static void SetRestartCount(string company, string product, object value) =>
+        SetRegistryValue(RegRestartCount(company, product), value);
 
     public static void DeleteRestartCount(string company, string product)
     {
@@ -258,19 +230,11 @@ public static class RegistryService
         DeleteSetting(regRestartCount);
     }
 
-    public static void SetKeepBrightness(string company, string product, object value)
-    {
-        var regKeepBrightness = RegKeepBrightness(company, product);
-        regKeepBrightness.Value = value;
-        SaveSetting(regKeepBrightness);
-    }
+    public static void SetKeepBrightness(string company, string product, object value) =>
+        SetRegistryValue(RegKeepBrightness(company, product), value);
 
-    public static void SetTheme(string company, string product, object value)
-    {
-        var regTheme = RegTheme(company, product);
-        regTheme.Value = value;
-        SaveSetting(regTheme);
-    }
+    public static void SetTheme(string company, string product, object value) =>
+        SetRegistryValue(RegTheme(company, product), value);
 
     public static int? GetLanguage(string company, string product)
     {
@@ -281,11 +245,14 @@ public static class RegistryService
             : result.Data;
     }
 
-    public static void SetLanguage(string company, string product, object value)
+    public static void SetLanguage(string company, string product, object value) =>
+        SetRegistryValue(RegLanguage(company, product), value);
+
+    internal static void SetRegistryValue(RegistryParam registryParam, object value, Action<RegistryParam>? save = null)
     {
-        var regLanguage = RegLanguage(company, product);
-        regLanguage.Value = value;
-        SaveSetting(regLanguage);
+        registryParam.Value = value;
+        save ??= SaveSetting;
+        save(registryParam);
     }
 
     private static bool GetSettings(RegistryParam registryParam)

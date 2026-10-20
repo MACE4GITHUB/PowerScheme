@@ -1,15 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PowerScheme.Addins.IdleMonitoring;
 using PowerScheme.Services;
 using PowerScheme.Services.Settings;
-using PowerSchemeServiceAPI;
-using PowerSchemeServiceAPI.EventsArgs;
-using PowerSchemeServiceAPI.Model;
-using PowerSchemeServiceAPI.Settings;
+using PowerScheme.Tests.TestDoubles;
 
 namespace PowerScheme.Tests;
 
@@ -346,81 +341,4 @@ public sealed class IdleMonitorServiceTests
         public void RaiseActive() => OnActive?.Invoke(this, EventArgs.Empty);
     }
 
-    private sealed class TestScheme(Guid guid, bool isNative = true, bool isMaxPerformance = false) : IPowerScheme
-    {
-        public Guid Guid { get; } = guid;
-        public bool IsNative { get; } = isNative;
-        public bool IsMaxPerformance { get; } = isMaxPerformance;
-        public bool IsVisible => true;
-        public bool IsActive => throw new NotSupportedException();
-        public string Name => throw new NotSupportedException();
-        public string? Description => throw new NotSupportedException();
-        public ImageItem Picture => throw new NotSupportedException();
-    }
-
-    private sealed class TestPowerService(IPowerScheme initialScheme) : IPowerSchemeService
-    {
-        public event EventHandler<PowerSchemeEventArgs> ActivePowerSchemeChanged = delegate { };
-        public IPowerScheme ActivePowerScheme { get; private set; } = initialScheme;
-        public IEnumerable<IPowerScheme> Schemes { get; set; } = [];
-        public IEnumerable<IPowerScheme> NativeSchemes { get; set; } = [];
-        public IEnumerable<IPowerScheme> PowerSchemes => Schemes;
-        public IEnumerable<IPowerScheme> PowerProfPowerSchemes => NativeSchemes;
-        public List<IPowerScheme> Activations { get; } = [];
-        public List<(Guid Source, Guid Destination)> BrightnessCopies { get; } = [];
-        public List<string> Operations { get; } = [];
-
-        public void SetActivePowerScheme(IPowerScheme newPowerScheme, bool isForce = false)
-        {
-            var previous = ActivePowerScheme;
-            ActivePowerScheme = newPowerScheme;
-            Activations.Add(newPowerScheme);
-            Operations.Add("activate");
-            if (!isForce)
-            {
-                RaiseSchemeChanged(previous, newPowerScheme);
-            }
-        }
-
-        public void RaiseSchemeChanged(IPowerScheme previous, IPowerScheme active) =>
-            ActivePowerSchemeChanged.Invoke(this, new PowerSchemeEventArgs(previous, active));
-
-        public void CopyBrightness(Guid sourcePowerScheme, Guid destinationPowerScheme)
-        {
-            BrightnessCopies.Add((sourcePowerScheme, destinationPowerScheme));
-            Operations.Add("brightness");
-        }
-
-        public IEnumerable<IPowerScheme> TypicalPowerSchemesWithDeleted => throw new NotSupportedException();
-        public IEnumerable<IPowerScheme> TypicalPowerSchemesWithoutDeleted => throw new NotSupportedException();
-        public IEnumerable<IPowerScheme> UserPowerSchemes => throw new NotSupportedException();
-        public IEnumerable<IPowerScheme> CustomPowerSchemes => throw new NotSupportedException();
-        public Watchers Watchers => throw new NotSupportedException();
-        public bool IsNeedAdminAccessForChangePowerScheme => throw new NotSupportedException();
-        public bool ExistsMobilePlatformRole => throw new NotSupportedException();
-        public bool ExistsHibernate => throw new NotSupportedException();
-        public bool ExistsSleep => throw new NotSupportedException();
-        public bool ExistsAllTypicalScheme => throw new NotSupportedException();
-        public void RestoreDefaultPowerSchemes() => throw new NotSupportedException();
-        public void DeleteAllTypicalScheme() => throw new NotSupportedException();
-        public void CreateTypicalSchemes() => throw new NotSupportedException();
-        public void RenameTypicalSchemes() => throw new NotSupportedException();
-        public void SetLid(int value) => throw new NotSupportedException();
-        public string TextActionToggle(StatePowerScheme statePowerScheme) => throw new NotSupportedException();
-        public StatePowerScheme? StatePowerSchemeToggle(StatePowerScheme statePowerScheme) => throw new NotSupportedException();
-        public void ActionPowerScheme(StatePowerScheme statePowerScheme) => throw new NotSupportedException();
-        public void DeletePowerScheme(StatePowerScheme statePowerScheme) => throw new NotSupportedException();
-        public void SetAllPowerSchemesIdleDisplay(int value) => throw new NotSupportedException();
-        public void SetIdleDisplay(Guid guid, int value) => throw new NotSupportedException();
-        public PowerSchemeDcAcValues GetIdleDisplay(Guid guid) => throw new NotSupportedException();
-        public void SetAllPowerSchemesIdleLockDisplay(int value) => throw new NotSupportedException();
-        public void SetIdleLockDisplay(Guid guid, int value) => throw new NotSupportedException();
-        public PowerSchemeDcAcValues GetIdleLockDisplay(Guid guid) => throw new NotSupportedException();
-        public void SetAllPowerSchemesIdleSleep(int value) => throw new NotSupportedException();
-        public void SetIdleSleep(Guid guid, int value) => throw new NotSupportedException();
-        public PowerSchemeDcAcValues GetIdleSleep(Guid guid) => throw new NotSupportedException();
-        public void SetAllPowerSchemesIdleHibernate(int value) => throw new NotSupportedException();
-        public void SetIdleHibernate(Guid guid, int value) => throw new NotSupportedException();
-        public PowerSchemeDcAcValues GetIdleHibernate(Guid guid) => throw new NotSupportedException();
-    }
 }
