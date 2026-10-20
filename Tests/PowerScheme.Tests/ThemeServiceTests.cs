@@ -1,14 +1,82 @@
 using System.Drawing;
 using System.Windows.Forms;
+using Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PowerScheme.Controls;
 using PowerScheme.Themes;
+using PowerScheme.Utility;
 
 namespace PowerScheme.Tests;
 
 [STATestClass]
 public sealed class ThemeServiceTests
 {
+    [TestMethod]
+    public void ApplyToolStripTheme_UsesCustomRendererForNestedLanguageMenu()
+    {
+        using var menu = new ContextMenuStrip();
+        using var settings = new ToolStripMenuItem("Settings");
+        using var languages = new ToolStripMenuItem("Language");
+        using var selected = new ToolStripMenuItem("Selected") { Checked = true, Image = ImageItem.Check.GetImage() };
+        menu.Items.Add(settings);
+        settings.DropDownItems.Add(languages);
+        languages.DropDownItems.Add(selected);
+
+        ThemeService.ApplyToolStripTheme(menu);
+
+        Assert.IsInstanceOfType<ToolStripMenuRenderer>(languages.DropDown.Renderer);
+        Assert.AreSame(menu.Renderer, languages.DropDown.Renderer);
+    }
+
+    [TestMethod]
+    [DataRow((int)ThemeKind.Default, false)]
+    [DataRow((int)ThemeKind.Default, true)]
+    [DataRow((int)ThemeKind.Dark, false)]
+    [DataRow((int)ThemeKind.Dark, true)]
+    [DataRow((int)ThemeKind.Light, false)]
+    [DataRow((int)ThemeKind.Light, true)]
+    [DataRow((int)ThemeKind.Blue, false)]
+    [DataRow((int)ThemeKind.Blue, true)]
+    [DataRow((int)ThemeKind.Green, false)]
+    [DataRow((int)ThemeKind.Green, true)]
+    public void RenderCheckedItemImage_DrawsOnlyTransparentGlyphWithoutBackgroundOrBorder(int kind, bool selected)
+    {
+        var theme = ((ThemeKind)kind).GetTheme();
+        var style = (IStyleTheme)theme;
+        var renderer = new ToolStripMenuRenderer(theme);
+        var image = ImageItem.Check.GetImage();
+        var rectangle = new Rectangle(6, 6, image.Width, image.Height);
+        using var actual = new Bitmap(image.Width + 12, image.Height + 12);
+        using var expected = new Bitmap(actual.Width, actual.Height);
+        using var menu = new ToolStripDropDownMenu();
+        using var item = new ToolStripMenuItem { Checked = true, Image = image };
+        menu.Items.Add(item);
+        if (selected)
+        {
+            item.Select();
+        }
+        var background = selected ? style.SelectedColor : style.BackColor;
+        using (var graphics = Graphics.FromImage(expected))
+        {
+            graphics.Clear(background);
+            graphics.DrawImage(image, rectangle);
+        }
+        using (var graphics = Graphics.FromImage(actual))
+        {
+            graphics.Clear(background);
+            renderer.DrawItemImage(new ToolStripItemImageRenderEventArgs(graphics, item, image, rectangle));
+        }
+
+        for (var row = 0; row < actual.Height; row++)
+        {
+            for (var column = 0; column < actual.Width; column++)
+            {
+                Assert.AreEqual(expected.GetPixel(column, row).ToArgb(), actual.GetPixel(column, row).ToArgb(),
+                    $"Unexpected check background or border at ({column}, {row}).");
+            }
+        }
+    }
+
     [TestMethod]
     [DataRow((int)ThemeKind.Default, false)]
     [DataRow((int)ThemeKind.Default, true)]

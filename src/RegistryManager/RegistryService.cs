@@ -236,17 +236,18 @@ public static class RegistryService
     public static void SetTheme(string company, string product, object value) =>
         SetRegistryValue(RegTheme(company, product), value);
 
-    public static int? GetLanguage(string company, string product)
+    public static string? GetLanguageCode(string company, string product)
     {
-        var result = GetSettings<int>(RegLanguage(company, product));
-
-        return result.IsError
-            ? null
-            : result.Data;
+        var result = GetSettings<object>(RegLanguage(company, product));
+        return result.IsError ? null : NormalizeLanguageCode(result.Data as string);
     }
 
-    public static void SetLanguage(string company, string product, object value) =>
-        SetRegistryValue(RegLanguage(company, product), value);
+    internal static string? NormalizeLanguageCode(string? value) =>
+        value == null || string.IsNullOrWhiteSpace(value) ? null : value.Trim().ToLowerInvariant();
+
+    public static void SetLanguage(string company, string product, string code) =>
+        SetRegistryValue(RegLanguage(company, product), NormalizeLanguageCode(code)
+            ?? throw new ArgumentException("Language code is required.", nameof(code)));
 
     internal static void SetRegistryValue(RegistryParam registryParam, object value, Action<RegistryParam>? save = null)
     {

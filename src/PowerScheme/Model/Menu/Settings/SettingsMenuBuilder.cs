@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -113,23 +114,39 @@ internal class SettingsMenuBuilder :
     }
 
     private void AddLanguages(ToolStripMenuItem root)
+        => root.DropDownItems.Add(CreateLanguageMenu());
+
+    internal ToolStripMenuItem CreateLanguageMenu(Func<IReadOnlyList<LanguageDefinition>>? discover = null)
     {
         var item = MenuItemFactory.Create(MenuItm.Language);
+        discover ??= () => Language.GetAvailableLanguages(reportError: message => ErrorLog.Write(message));
 
-        var itemEn = MenuItemFactory.Create(MenuItm.LanguageEn);
-        itemEn.Tag = LanguageKind.En;
-        itemEn.Image = GetLanguageCheckImage(Language.Kind == LanguageKind.En);
-        itemEn.BindCommand(new ChangeLanguageCommand(_power));
+        void RefreshLanguages(object? sender, EventArgs args)
+        {
+            while (item.DropDownItems.Count > 0)
+            {
+                var previous = item.DropDownItems[0];
+                item.DropDownItems.RemoveAt(0);
+                previous.Dispose();
+            }
 
-        var itemRu = MenuItemFactory.Create(MenuItm.LanguageRu);
-        itemRu.Tag = LanguageKind.Ru;
-        itemRu.Image = GetLanguageCheckImage(Language.Kind == LanguageKind.Ru);
-        itemRu.BindCommand(new ChangeLanguageCommand(_power));
+            foreach (var language in discover())
+            {
+                var child = new ToolStripMenuItem
+                {
+                    Name = $"Language_{language.Code}",
+                    Text = language.Name,
+                    Tag = language,
+                    Image = GetLanguageCheckImage(string.Equals(Language.Code, language.Code, StringComparison.OrdinalIgnoreCase))
+                };
+                child.BindCommand(new ChangeLanguageCommand(_power));
+                item.DropDownItems.Add(child);
+            }
+        }
 
-        item.DropDownItems.Add(itemEn);
-        item.DropDownItems.Add(itemRu);
-
-        root.DropDownItems.Add(item);
+        item.DropDownOpening += RefreshLanguages;
+        RefreshLanguages(null, EventArgs.Empty);
+        return item;
     }
 
     private static Bitmap GetLanguageCheckImage(bool isChecked) =>

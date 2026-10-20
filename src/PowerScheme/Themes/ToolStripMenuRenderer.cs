@@ -9,6 +9,14 @@ internal class ToolStripMenuRenderer(ProfessionalColorTable colorTable) :
 {
     private const int RADIUS = 5;
 
+    protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e)
+    {
+        if (e.Image != null)
+        {
+            e.Graphics.DrawImage(e.Image, e.ImageRectangle);
+        }
+    }
+
     protected override void OnRenderToolStripBackground(ToolStripRenderEventArgs e)
     {
         var g = e.Graphics;

@@ -157,16 +157,16 @@ public sealed class PowerSchemeOptionsTests
     public void PowerSchemes_RefreshesLanguageNamesAndSchemeListOnEveryRead(bool display)
     {
         var context = new TestContext(display);
-        var originalLanguage = Language.Kind;
+        var originalLanguage = Language.Code;
         try
         {
-            Language.SetLanguage(LanguageKind.En);
+            Language.SetLanguage("en");
             var english = context.Options.PowerSchemes;
             Assert.AreEqual(Language.Current.AllPowerSchemes, english[Guid.Empty]);
             Assert.AreEqual(3, english.Count);
             Assert.AreEqual("Main", english[context.Main.Guid]);
 
-            Language.SetLanguage(LanguageKind.Ru);
+            Language.SetLanguage("ru");
             context.Main.Name = "Renamed";
             context.Power.Schemes = [context.Main];
             var russian = context.Options.PowerSchemes;

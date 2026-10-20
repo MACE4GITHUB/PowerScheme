@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <language code="en">English</language>
+  <string name="UpdateApp">Update the app</string>
+  <string name="NewVersionIsAvailable">A new version is available</string>
+  <string name="UpdateAppToVersion">Update to version</string>
+  <string name="Version">Version</string>
+  <string name="Quit">Quit</string>
+  <string name="StartupOnWindows">Run automatically at startup in Windows</string>
+  <string name="RestoreDefaultPowerSchemesName">Restore default Windows PowerSchemes</string>
+  <string name="RestoreDefaultPowerSchemesDescription">All other schemes will be deleted</string>
+  <string name="Settings">Settings</string>
+  <string name="HibernateName">Hibernate</string>
+  <string name="HibernateDescription">Show in Power menu</string>
+  <string name="SleepName">Sleep</string>
+  <string name="SleepDescription">Show in Power menu</string>
+  <string name="PowerOptions">Power Options</string>
+  <string name="CreateTypicalSchemes">Create typical schemes</string>
+  <string name="DeleteTypicalSchemes">Delete typical schemes</string>
+  <string name="CreateStableScheme">Create stable scheme</string>
+  <string name="DeleteStableScheme">Delete stable scheme</string>
+  <string name="CreateMediaScheme">Create media scheme</string>
+  <string name="DeleteMediaScheme">Delete media scheme</string>
+  <string name="CreateSimpleScheme">Create simple scheme</string>
+  <string name="DeleteSimpleScheme">Delete simple scheme</string>
+  <string name="CreateExtremeScheme">Create extreme scheme</string>
+  <string name="DeleteExtremeScheme">Delete extreme scheme</string>
+  <string name="AllPowerSchemes">All Power Schemes</string>
+  <string name="MediaName">Media</string>
+  <string name="MediaDescription">Show media (video, etc.)</string>
+  <string name="StableName">Stable</string>
+  <string name="StableDescription">Constant CPU Speed</string>
+  <string name="SimpleName">Simple</string>
+  <string name="SimpleDescription">Power saver</string>
+  <string name="ExtremeName">Extreme</string>
+  <string name="ExtremeDescription">Ultimate CPU Speed</string>
+  <string name="HighName">High performance</string>
+  <string name="HighDescription">Maximizes performance and may increase power consumption</string>
+  <string name="BalanceName">Balanced</string>
+  <string name="BalanceDescription">Automatically balances performance and energy consumption</string>
+  <string name="LowName">Power saver</string>
+  <string name="LowDescription">Reduces performance to save energy</string>
+  <string name="ShutDown">Shut down</string>
+  <string name="DoNothing">Do nothing</string>
+  <string name="WhenICloseTheLid">When I close the lid</string>
+  <string name="AlreadyRunning">Another instance is already running.</string>
+  <string name="Error">Error</string>
+  <string name="Information">Information</string>
+  <string name="CannotGetAdministratorRights">This application cannot get administrator rights. 
+
+See yours access policy.</string>
+  <string name="ApplicationLatter">This application does not run on the current Windows version. 
+
+Works it on Vista and latter.</string>
+  <string name="FirstStartCaption">First start</string>
+  <string name="FirstStartDescription">Create typical power schemes Stable, Media, Simple?</string>
+  <string name="Apply">Apply</string>
+  <string name="Default">Default</string>
+  <string name="None">None</string>
+  <string name="Ok">OK</string>
+  <string name="Cancel">Cancel</string>
+  <string name="Abort">Abort</string>
+  <string name="Retry">Retry</string>
+  <string name="Ignore">Ignore</string>
+  <string name="Yes">Yes</string>
+  <string name="No">No</string>
+  <string name="RunAsAdministrator">You don't have permission to manage power settings. 
+
+Run the app once as an administrator to set permissions.</string>
+  <string name="SwitchPowerSchemeWhenIdle">Action when Idle</string>
+  <string name="PowerSchemes">Power Schemes</string>
+  <string name="KeepBrightness">Keep the brightness</string>
+  <string name="KeepBrightnessDescription">If enabled, the brightness when idle is the same as when active</string>
+  <string name="DeleteCustomScheme">Delete the custom scheme</string>
+  <string name="IdleSleepOptions">Sleep Idle Options</string>
+  <string name="IdleDisplayOptions">Display Idle Options</string>
+  <string name="TurnOffDisplay">Turn off the display</string>
+  <string name="TurnOffLockedDisplay">Turn off the display when locked</string>
+  <string name="SyncAcDc">Sync AC and DC</string>
+  <string name="IdleOptions">Idle Options</string>
+  <string name="IdleThreshold">Idle Threshold</string>
+  <string name="PollingActiveTime">Polling Active Time</string>
+  <string name="PollingIdleTime">Polling Idle Time</string>
+  <string name="Hours">h</string>
+  <string name="Minutes">m</string>
+  <string name="Seconds">s</string>
+  <string name="TheUserIdleTimeAfterWhichThePowerPlanWillChange">The user idle time after which the power plan will change</string>
+  <string name="MonitoringFrequencyWhenTheUserIsActive">Monitoring frequency when the user is active</string>
+  <string name="MonitoringFrequencyDuringUserInactivity">Monitoring frequency during user inactivity</string>
+  <string name="Themes">Themes</string>
+  <string name="Dark">Dark</string>
+  <string name="Light">Light</string>
+  <string name="Blue">Blue</string>
+  <string name="Green">Green</string>
+  <string name="SelectLanguage">Language</string>
+</resources>

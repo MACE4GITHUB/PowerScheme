@@ -10,6 +10,53 @@ namespace PowerScheme.Tests;
 public sealed class RegistrySettingOperationsTests
 {
     [TestMethod]
+    [DataRow(0, null)]
+    [DataRow(1, null)]
+    [DataRow(99, null)]
+    [DataRow("EN", "en")]
+    [DataRow("ru", "ru")]
+    [DataRow(" DE-de ", "de-de")]
+    [DataRow("", null)]
+    [DataRow("   ", null)]
+    [DataRow(null, null)]
+    public void GetLanguageCode_ReadsOnlyStringsWithoutChangingStoredValue(object? value, string? expected)
+    {
+        var company = "PowerScheme.Tests." + Guid.NewGuid().ToString("N");
+        const string product = "LanguageSelection";
+        var companyPath = @"SOFTWARE\" + company;
+        try
+        {
+            using var key = Registry.CurrentUser.CreateSubKey(companyPath + @"\" + product);
+            if (value != null)
+            {
+                key.SetValue("LanguageId", value);
+            }
+
+            var actual = RegistryService.GetLanguageCode(company, product);
+
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(value, key.GetValue("LanguageId"));
+        }
+        finally
+        {
+            Registry.CurrentUser.DeleteSubKeyTree(companyPath, false);
+        }
+    }
+
+    [TestMethod]
+    [DataRow("en", "en")]
+    [DataRow(" EN-us ", "en-us")]
+    [DataRow("0", "0")]
+    [DataRow("1", "1")]
+    [DataRow(" DE-de ", "de-de")]
+    [DataRow("ru", "ru")]
+    [DataRow("", null)]
+    [DataRow(null, null)]
+    [DataRow("fr", "fr")]
+    public void NormalizeLanguageCode_UsesSameStringRulesForEveryLanguage(string? value, string? expected) =>
+        Assert.AreEqual(expected, RegistryService.NormalizeLanguageCode(value));
+
+    [TestMethod]
     [DataRow(0, RegistryValueKind.DWord)]
     [DataRow(-1, RegistryValueKind.DWord)]
     [DataRow(60_000, RegistryValueKind.DWord)]

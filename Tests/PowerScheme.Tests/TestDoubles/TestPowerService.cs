@@ -24,6 +24,7 @@ internal sealed class TestPowerService(IPowerScheme initialScheme) : IPowerSchem
     public Dictionary<(string Setting, Guid Scheme), PowerSchemeDcAcValues> Values { get; } = [];
     public List<(string Setting, Guid Scheme)> Reads { get; } = [];
     public List<(string Setting, Guid? Scheme, int Value)> Writes { get; } = [];
+    public int RenameCount { get; private set; }
 
     public void SetActivePowerScheme(IPowerScheme newPowerScheme, bool isForce = false)
     {
@@ -81,7 +82,7 @@ internal sealed class TestPowerService(IPowerScheme initialScheme) : IPowerSchem
     public void RestoreDefaultPowerSchemes() => throw new NotSupportedException();
     public void DeleteAllTypicalScheme() => throw new NotSupportedException();
     public void CreateTypicalSchemes() => throw new NotSupportedException();
-    public void RenameTypicalSchemes() => throw new NotSupportedException();
+    public void RenameTypicalSchemes() => RenameCount++;
     public void SetLid(int value) => throw new NotSupportedException();
     public string TextActionToggle(StatePowerScheme statePowerScheme) => throw new NotSupportedException();
     public StatePowerScheme? StatePowerSchemeToggle(StatePowerScheme statePowerScheme) => throw new NotSupportedException();

@@ -51,8 +51,6 @@ internal static class MenuLookup
         { MenuItm.Blue, new ViewMenu(Language.Current.Blue, ImageItem.Blue) },
         { MenuItm.Green, new ViewMenu(Language.Current.Green, ImageItem.Green) },
         { MenuItm.Language, new ViewMenu(Language.Current.SelectLanguage, ImageItem.Empty) },
-        { MenuItm.LanguageEn, new ViewMenu(Language.Current.LanguageEnName, ImageItem.Empty) },
-        { MenuItm.LanguageRu, new ViewMenu(Language.Current.LanguageRuName, ImageItem.Empty) },
     };
 
     internal enum MenuItm
@@ -93,9 +91,7 @@ internal static class MenuLookup
         Light,
         Blue,
         Green,
-        Language,
-        LanguageEn,
-        LanguageRu
+        Language
     }
 
     internal enum MenuItmKind

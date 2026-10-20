@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Forms;
+using System.Xml;
 using Languages;
 using MessageForm;
 using PowerScheme.Configuration;
@@ -22,16 +25,53 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
-        var savedLanguage = RegistryService.GetLanguage(AppInfo.CompanyName, AppInfo.ProductName);
-        if (savedLanguage is { } languageKind)
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        Application.ThreadException += Application_ThreadException;
+
+        if (!TryRunStartup(RunApplication, ShowErrorMessage))
         {
-            Language.SetLanguage((LanguageKind)languageKind);
+            Environment.ExitCode = 1;
+        }
+    }
+
+    internal static bool TryRunStartup(Action startup, Action<string> reportError)
+    {
+        try
+        {
+            startup();
+            return true;
+        }
+        catch (Exception exception)
+        {
+            reportError($"[Startup] {exception}");
+            return false;
+        }
+        finally
+        {
+            OnceAppMutex?.Dispose();
+            OnceAppMutex = null;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void RunApplication()
+    {
+        Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+
+        var savedLanguage = RegistryService.GetLanguageCode(AppInfo.CompanyName, AppInfo.ProductName);
+        if (savedLanguage != null)
+        {
+            try
+            {
+                Language.SetLanguage(savedLanguage);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or XmlException or ArgumentException)
+            {
+                ErrorLog.Write($"Cannot restore language '{savedLanguage}': {exception}");
+            }
         }
 
-        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-
-        Application.ThreadException += Application_ThreadException;
-        Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+        _ = Language.Current.Settings;
 
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
@@ -47,8 +87,6 @@ internal static class Program
         DiRoot.GetService<IPowerSchemeService>().RenameTypicalSchemes();
 
         Application.Run((ApplicationContext)DiRoot.GetService<IViewService>());
-
-        OnceAppMutex?.Dispose();
     }
 
     #region Exception Handlers
@@ -59,13 +97,15 @@ internal static class Program
     private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) =>
         ShowError("UnhandledException", e.ExceptionObject as Exception);
 
-    private static void ShowError(string type, Exception? ex)
+    private static void ShowError(string type, Exception? ex) =>
+        ShowErrorMessage($"[{type}] {ex}");
+
+    private static void ShowErrorMessage(string message)
     {
-        var message = $"[{type}] {ex?.Message}\n\n{ex?.StackTrace}";
+        ErrorLog.Write(message);
 #if DEBUG
         MessageBox.Show(message, "Application error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 #endif
-        ErrorLog.Write(message);
     }
 
     #endregion

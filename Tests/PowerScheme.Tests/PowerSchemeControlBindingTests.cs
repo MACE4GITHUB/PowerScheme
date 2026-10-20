@@ -14,11 +14,11 @@ namespace PowerScheme.Tests;
 public sealed class PowerSchemeControlBindingTests
 {
     [TestMethod]
-    [DataRow(LanguageKind.En)]
-    [DataRow(LanguageKind.Ru)]
-    public void BindButtons_SetsCurrentLabelsAndHidesDefaultsWithoutExecutingCommands(LanguageKind language)
+    [DataRow("en")]
+    [DataRow("ru")]
+    public void BindButtons_SetsCurrentLabelsAndHidesDefaultsWithoutExecutingCommands(string language)
     {
-        var originalLanguage = Language.Kind;
+        var originalLanguage = Language.Code;
         try
         {
             Language.SetLanguage(language);
@@ -197,15 +197,15 @@ public sealed class PowerSchemeControlBindingTests
     {
         using var button = new BaseButton();
         using var toolTip = new ToolTip();
-        var originalLanguage = Language.Kind;
+        var originalLanguage = Language.Code;
         try
         {
-            Language.SetLanguage(LanguageKind.En);
+            Language.SetLanguage("en");
             PowerSchemeControlBinding.ReviewApplyButton(button, toolTip, false, _ => { }, _ => { });
             var english = toolTip.GetToolTip(button);
             Assert.AreEqual(Language.Current.SyncAcDc, english);
 
-            Language.SetLanguage(LanguageKind.Ru);
+            Language.SetLanguage("ru");
             PowerSchemeControlBinding.ReviewApplyButton(button, toolTip, false, _ => { }, _ => { });
 
             Assert.AreEqual(Language.Current.SyncAcDc, toolTip.GetToolTip(button));

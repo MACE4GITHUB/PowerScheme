@@ -10,11 +10,11 @@
          (Release / net48 / win-x64).
       2. ILRepacks the three helper exes into src\PowerScheme\Resources\.
       3. ILRepacks the app and all its libraries into install\PowerScheme.exe
-         (single-file output).
+         (merged executable, with external translations in install\lang).
       4. Signs install\PowerScheme.exe with the BulovaDmitriy certificate
          (signtool, /fd SHA256, DigiCert timestamp; same toolchain as
          D:\Lic\Sign\SignPowerScheme.ps1).
-      5. Compresses the merged exe into install\PowerScheme.zip.
+      5. Packages the merged exe and lang folder into install\PowerScheme.zip.
       6. Compiles install\PowerSchemeSetup.exe with Inno Setup 6
          (src\Setup\PowerScheme.iss, which reads the app version out of the
          merged exe itself at compile time).
@@ -250,10 +250,21 @@ try {
         Compress-Resource (Join-Path $Resources $helper)
     }
 
-    # --- 3. Main application (single-file) ---
+    # --- 3. Main application and external translations ---
     Build-Project (Join-Path $RepoRoot 'src\PowerScheme\PowerScheme.csproj')
     Write-Header 'Create PowerScheme installation'
     Merge-Exe 'PowerScheme' 'PowerScheme.exe' $AppDlls (Join-Path $InstallDir 'PowerScheme.exe')
+
+    $langDir = Join-Path $InstallDir 'lang'
+    $langSource = Join-Path $RepoRoot "src\PowerScheme\$BinSubDir\lang"
+    New-Item -ItemType Directory -Path $langDir -Force | Out-Null
+    foreach ($locale in 'en', 'ru') {
+        $obsoleteTranslation = Join-Path $langDir "$locale.xml.gz"
+        if (Test-Path -LiteralPath $obsoleteTranslation) {
+            Remove-Item -LiteralPath $obsoleteTranslation -Force
+        }
+    }
+    Copy-Item -Path (Join-Path $langSource '*.xml') -Destination $langDir -Force
 
     # --- 4. Sign the merged exe (same cert/password as D:\Lic\Sign\SignPowerScheme.ps1) ---
     Write-Header 'Sign PowerScheme.exe'
@@ -280,7 +291,7 @@ try {
     Write-Header 'Create PowerScheme zip archive'
     $zipPath = Join-Path $InstallDir 'PowerScheme.zip'
     if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
-    Compress-Archive -Path (Join-Path $InstallDir 'PowerScheme.exe') -DestinationPath $zipPath
+    Compress-Archive -Path @((Join-Path $InstallDir 'PowerScheme.exe'), $langDir) -DestinationPath $zipPath
 
     # --- 6. Inno Setup installer ---
     Write-Header 'Create PowerScheme Inno Setup installer'

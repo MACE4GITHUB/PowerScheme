@@ -4,4 +4,11 @@
 		<OutputType>Library</OutputType>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="PowerScheme.Tests" />
+		<Content Include="Resources\*.xml" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest">
+			<TargetPath>lang\%(Filename)%(Extension)</TargetPath>
+		</Content>
+	</ItemGroup>
+
 </Project>

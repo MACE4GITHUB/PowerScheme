@@ -1,126 +1,150 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace Languages;
 
-public abstract class Language
+public class Language
 {
     private static readonly List<string> _ruLanguages = ["ru", "ru-ru", "be", "be-by"];
+    private readonly string _code;
+    private readonly Lazy<IReadOnlyDictionary<string, string>> _strings;
+
+    private Language(LanguageDefinition definition)
+    {
+        _code = definition.Code;
+        _strings = definition.Strings;
+    }
+
+    private string GetString(string name) =>
+        _strings.Value.TryGetValue(name, out var value) ? value : LanguageResources.GetDefault(name);
 
     public static Language Current { get; private set; } = GetLanguage();
 
-    public static LanguageKind Kind { get; private set; } = GetDefaultKind();
+    public static string Code => Current._code;
 
-    public static void SetLanguage(LanguageKind kind)
+    public static IReadOnlyList<LanguageDefinition> GetAvailableLanguages(string? baseDirectory = null, Action<string>? reportError = null) =>
+        LanguageResources.Discover(baseDirectory ?? AppDomain.CurrentDomain.BaseDirectory, reportError);
+
+    public static void SetLanguage(string code, string? baseDirectory = null)
     {
-        Kind = kind;
-        Current = kind switch
+        var definition = GetAvailableLanguages(baseDirectory).FirstOrDefault(
+            language => string.Equals(language.Code, code, StringComparison.OrdinalIgnoreCase));
+        if (definition == null)
         {
-            LanguageKind.Ru => new LanguageRu(),
-            _ => new LanguageEn()
-        };
+            throw new ArgumentException($"Translation not found: {code}", nameof(code));
+        }
+        SetLanguage(definition);
     }
 
-    public static Language GetLanguage() =>
-        IsRuLocale(CultureInfo.CurrentCulture.Name)
-            ? new LanguageRu()
-            : new LanguageEn();
+    public static void SetLanguage(LanguageDefinition definition)
+    {
+        _ = definition.Strings.Value;
+        Current = new Language(definition);
+    }
 
-    private static LanguageKind GetDefaultKind() =>
-        IsRuLocale(CultureInfo.CurrentCulture.Name)
-            ? LanguageKind.Ru
-            : LanguageKind.En;
+    public static Language GetLanguage(string? locale = null, string? baseDirectory = null)
+    {
+        locale ??= CultureInfo.CurrentCulture.Name;
+        var languages = GetAvailableLanguages(baseDirectory);
+        var definition = languages.FirstOrDefault(language => string.Equals(language.Code, locale, StringComparison.OrdinalIgnoreCase))
+            ?? languages.FirstOrDefault(language => string.Equals(language.Code, locale.Split('-')[0], StringComparison.OrdinalIgnoreCase))
+            ?? (IsRuLocale(locale) ? languages.FirstOrDefault(language => language.Code == "ru") : null)
+            ?? languages.FirstOrDefault(language => language.Code == "en")
+            ?? languages.FirstOrDefault()
+            ?? throw new InvalidOperationException("No valid translations found in the lang directory.");
+        return new Language(definition);
+    }
 
     public static bool IsRuLocale(string locale) =>
         !string.IsNullOrWhiteSpace(locale) &&
         _ruLanguages.Contains(locale.Trim().ToLowerInvariant());
 
-    public abstract string UpdateApp { get; }
-    public abstract string NewVersionIsAvailable { get; }
-    public abstract string UpdateAppToVersion { get; }
-    public abstract string Version { get; }
-    public abstract string Quit { get; }
-    public abstract string StartupOnWindows { get; }
-    public abstract string RestoreDefaultPowerSchemesName { get; }
-    public abstract string RestoreDefaultPowerSchemesDescription { get; }
-    public abstract string Settings { get; }
-    public abstract string HibernateName { get; }
-    public abstract string HibernateDescription { get; }
-    public abstract string SleepName { get; }
-    public abstract string SleepDescription { get; }
-    public abstract string PowerOptions { get; }
-    public abstract string CreateTypicalSchemes { get; }
-    public abstract string DeleteTypicalSchemes { get; }
-    public abstract string CreateStableScheme { get; }
-    public abstract string DeleteStableScheme { get; }
-    public abstract string CreateMediaScheme { get; }
-    public abstract string DeleteMediaScheme { get; }
-    public abstract string CreateSimpleScheme { get; }
-    public abstract string DeleteSimpleScheme { get; }
-    public abstract string CreateExtremeScheme { get; }
-    public abstract string DeleteExtremeScheme { get; }
-    public abstract string AllPowerSchemes { get; }
-    public abstract string MediaName { get; }
-    public abstract string MediaDescription { get; }
-    public abstract string StableName { get; }
-    public abstract string StableDescription { get; }
-    public abstract string SimpleName { get; }
-    public abstract string SimpleDescription { get; }
-    public abstract string ExtremeName { get; }
-    public abstract string ExtremeDescription { get; }
-    public abstract string HighName { get; }
-    public abstract string HighDescription { get; }
-    public abstract string BalanceName { get; }
-    public abstract string BalanceDescription { get; }
-    public abstract string LowName { get; }
-    public abstract string LowDescription { get; }
-    public abstract string ShutDown { get; }
-    public abstract string DoNothing { get; }
-    public abstract string WhenICloseTheLid { get; }
-    public abstract string AlreadyRunning { get; }
-    public abstract string Error { get; }
-    public abstract string Information { get; }
-    public abstract string CannotGetAdministratorRights { get; }
-    public abstract string ApplicationLatter { get; }
-    public abstract string FirstStartCaption { get; }
-    public abstract string FirstStartDescription { get; }
-    public abstract string Apply { get; }
-    public abstract string Default { get; }
-    public abstract string None { get; }
-    public abstract string Ok { get; }
-    public abstract string Cancel { get; }
-    public abstract string Abort { get; }
-    public abstract string Retry { get; }
-    public abstract string Ignore { get; }
-    public abstract string Yes { get; }
-    public abstract string No { get; }
-    public abstract string RunAsAdministrator { get; }
-    public abstract string SwitchPowerSchemeWhenIdle { get; }
-    public abstract string PowerSchemes { get; }
-    public abstract string KeepBrightness { get; }
-    public abstract string KeepBrightnessDescription { get; }
-    public abstract string DeleteCustomScheme { get; }
-    public abstract string IdleSleepOptions { get; }
-    public abstract string IdleDisplayOptions { get; }
-    public abstract string TurnOffDisplay { get; }
-    public abstract string TurnOffLockedDisplay { get; }
-    public abstract string SyncAcDc { get; }
-    public abstract string IdleOptions { get; }
-    public abstract string IdleThreshold { get; }
-    public abstract string PollingActiveTime { get; }
-    public abstract string PollingIdleTime { get; }
-    public abstract string Hours { get; }
-    public abstract string Minutes { get; }
-    public abstract string Seconds { get; }
-    public abstract string TheUserIdleTimeAfterWhichThePowerPlanWillChange { get; }
-    public abstract string MonitoringFrequencyWhenTheUserIsActive { get; }
-    public abstract string MonitoringFrequencyDuringUserInactivity { get; }
-    public abstract string Themes { get; }
-    public abstract string Dark { get; }
-    public abstract string Light { get; }
-    public abstract string Blue { get; }
-    public abstract string Green { get; }
-    public abstract string SelectLanguage { get; }
-    public abstract string LanguageEnName { get; }
-    public abstract string LanguageRuName { get; }
+    public virtual string UpdateApp => GetString(nameof(UpdateApp));
+    public virtual string NewVersionIsAvailable => GetString(nameof(NewVersionIsAvailable));
+    public virtual string UpdateAppToVersion => GetString(nameof(UpdateAppToVersion));
+    public virtual string Version => GetString(nameof(Version));
+    public virtual string Quit => GetString(nameof(Quit));
+    public virtual string StartupOnWindows => GetString(nameof(StartupOnWindows));
+    public virtual string RestoreDefaultPowerSchemesName => GetString(nameof(RestoreDefaultPowerSchemesName));
+    public virtual string RestoreDefaultPowerSchemesDescription => GetString(nameof(RestoreDefaultPowerSchemesDescription));
+    public virtual string Settings => GetString(nameof(Settings));
+    public virtual string HibernateName => GetString(nameof(HibernateName));
+    public virtual string HibernateDescription => GetString(nameof(HibernateDescription));
+    public virtual string SleepName => GetString(nameof(SleepName));
+    public virtual string SleepDescription => GetString(nameof(SleepDescription));
+    public virtual string PowerOptions => GetString(nameof(PowerOptions));
+    public virtual string CreateTypicalSchemes => GetString(nameof(CreateTypicalSchemes));
+    public virtual string DeleteTypicalSchemes => GetString(nameof(DeleteTypicalSchemes));
+    public virtual string CreateStableScheme => GetString(nameof(CreateStableScheme));
+    public virtual string DeleteStableScheme => GetString(nameof(DeleteStableScheme));
+    public virtual string CreateMediaScheme => GetString(nameof(CreateMediaScheme));
+    public virtual string DeleteMediaScheme => GetString(nameof(DeleteMediaScheme));
+    public virtual string CreateSimpleScheme => GetString(nameof(CreateSimpleScheme));
+    public virtual string DeleteSimpleScheme => GetString(nameof(DeleteSimpleScheme));
+    public virtual string CreateExtremeScheme => GetString(nameof(CreateExtremeScheme));
+    public virtual string DeleteExtremeScheme => GetString(nameof(DeleteExtremeScheme));
+    public virtual string AllPowerSchemes => GetString(nameof(AllPowerSchemes));
+    public virtual string MediaName => GetString(nameof(MediaName));
+    public virtual string MediaDescription => GetString(nameof(MediaDescription));
+    public virtual string StableName => GetString(nameof(StableName));
+    public virtual string StableDescription => GetString(nameof(StableDescription));
+    public virtual string SimpleName => GetString(nameof(SimpleName));
+    public virtual string SimpleDescription => GetString(nameof(SimpleDescription));
+    public virtual string ExtremeName => GetString(nameof(ExtremeName));
+    public virtual string ExtremeDescription => GetString(nameof(ExtremeDescription));
+    public virtual string HighName => GetString(nameof(HighName));
+    public virtual string HighDescription => GetString(nameof(HighDescription));
+    public virtual string BalanceName => GetString(nameof(BalanceName));
+    public virtual string BalanceDescription => GetString(nameof(BalanceDescription));
+    public virtual string LowName => GetString(nameof(LowName));
+    public virtual string LowDescription => GetString(nameof(LowDescription));
+    public virtual string ShutDown => GetString(nameof(ShutDown));
+    public virtual string DoNothing => GetString(nameof(DoNothing));
+    public virtual string WhenICloseTheLid => GetString(nameof(WhenICloseTheLid));
+    public virtual string AlreadyRunning => GetString(nameof(AlreadyRunning));
+    public virtual string Error => GetString(nameof(Error));
+    public virtual string Information => GetString(nameof(Information));
+    public virtual string CannotGetAdministratorRights => GetString(nameof(CannotGetAdministratorRights));
+    public virtual string ApplicationLatter => GetString(nameof(ApplicationLatter));
+    public virtual string FirstStartCaption => GetString(nameof(FirstStartCaption));
+    public virtual string FirstStartDescription => GetString(nameof(FirstStartDescription));
+    public virtual string Apply => GetString(nameof(Apply));
+    public virtual string Default => GetString(nameof(Default));
+    public virtual string None => GetString(nameof(None));
+    public virtual string Ok => GetString(nameof(Ok));
+    public virtual string Cancel => GetString(nameof(Cancel));
+    public virtual string Abort => GetString(nameof(Abort));
+    public virtual string Retry => GetString(nameof(Retry));
+    public virtual string Ignore => GetString(nameof(Ignore));
+    public virtual string Yes => GetString(nameof(Yes));
+    public virtual string No => GetString(nameof(No));
+    public virtual string RunAsAdministrator => GetString(nameof(RunAsAdministrator));
+    public virtual string SwitchPowerSchemeWhenIdle => GetString(nameof(SwitchPowerSchemeWhenIdle));
+    public virtual string PowerSchemes => GetString(nameof(PowerSchemes));
+    public virtual string KeepBrightness => GetString(nameof(KeepBrightness));
+    public virtual string KeepBrightnessDescription => GetString(nameof(KeepBrightnessDescription));
+    public virtual string DeleteCustomScheme => GetString(nameof(DeleteCustomScheme));
+    public virtual string IdleSleepOptions => GetString(nameof(IdleSleepOptions));
+    public virtual string IdleDisplayOptions => GetString(nameof(IdleDisplayOptions));
+    public virtual string TurnOffDisplay => GetString(nameof(TurnOffDisplay));
+    public virtual string TurnOffLockedDisplay => GetString(nameof(TurnOffLockedDisplay));
+    public virtual string SyncAcDc => GetString(nameof(SyncAcDc));
+    public virtual string IdleOptions => GetString(nameof(IdleOptions));
+    public virtual string IdleThreshold => GetString(nameof(IdleThreshold));
+    public virtual string PollingActiveTime => GetString(nameof(PollingActiveTime));
+    public virtual string PollingIdleTime => GetString(nameof(PollingIdleTime));
+    public virtual string Hours => GetString(nameof(Hours));
+    public virtual string Minutes => GetString(nameof(Minutes));
+    public virtual string Seconds => GetString(nameof(Seconds));
+    public virtual string TheUserIdleTimeAfterWhichThePowerPlanWillChange => GetString(nameof(TheUserIdleTimeAfterWhichThePowerPlanWillChange));
+    public virtual string MonitoringFrequencyWhenTheUserIsActive => GetString(nameof(MonitoringFrequencyWhenTheUserIsActive));
+    public virtual string MonitoringFrequencyDuringUserInactivity => GetString(nameof(MonitoringFrequencyDuringUserInactivity));
+    public virtual string Themes => GetString(nameof(Themes));
+    public virtual string Dark => GetString(nameof(Dark));
+    public virtual string Light => GetString(nameof(Light));
+    public virtual string Blue => GetString(nameof(Blue));
+    public virtual string Green => GetString(nameof(Green));
+    public virtual string SelectLanguage => GetString(nameof(SelectLanguage));
 }

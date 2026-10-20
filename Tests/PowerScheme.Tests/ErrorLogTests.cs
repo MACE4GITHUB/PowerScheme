@@ -1,14 +1,17 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Languages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PowerScheme.Utility;
 
 namespace PowerScheme.Tests;
 
 [TestClass]
+[DoNotParallelize]
 public sealed class ErrorLogTests
 {
     private string _directory = null!;
@@ -34,6 +37,70 @@ public sealed class ErrorLogTests
     public void DirectoryPath_UsesLocalApplicationData() => Assert.AreEqual(
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PowerScheme"),
         ErrorLog.DirectoryPath);
+
+    [TestMethod]
+    public void Startup_SuccessDoesNotReportAnError()
+    {
+        var executed = false;
+        var reported = false;
+
+        var success = Program.TryRunStartup(() => executed = true, _ => reported = true);
+
+        Assert.IsTrue(success);
+        Assert.IsTrue(executed);
+        Assert.IsFalse(reported);
+    }
+
+    [TestMethod]
+    public void Startup_MissingDependencyCreatesLogWithFullException()
+    {
+        var success = Program.TryRunStartup(
+            () => throw new FileNotFoundException("Required dependency is missing.", "MissingDependency.dll"),
+            message => ErrorLog.Write(message, _directory));
+
+        Assert.IsFalse(success);
+        var contents = File.ReadAllText(LogPath);
+        StringAssert.Contains(contents, "[Startup]");
+        StringAssert.Contains(contents, "System.IO.FileNotFoundException");
+        StringAssert.Contains(contents, "MissingDependency.dll");
+        StringAssert.Contains(contents, "Required dependency is missing.");
+    }
+
+    [TestMethod]
+    public void Startup_MissingTranslationsLogsActualTypeInitializationFailure()
+    {
+        Directory.CreateDirectory(_directory);
+        var domain = AppDomain.CreateDomain("Missing translations", null, new AppDomainSetup
+        {
+            ApplicationBase = _directory
+        });
+        try
+        {
+            var probe = (LanguageStartupProbe)domain.CreateInstanceFromAndUnwrap(
+                typeof(LanguageStartupProbe).Assembly.Location, typeof(LanguageStartupProbe).FullName);
+
+            var success = Program.TryRunStartup(() => probe.LoadLanguage(typeof(Language).Assembly.Location),
+                message => ErrorLog.Write(message, _directory));
+
+            Assert.IsFalse(success);
+            var contents = File.ReadAllText(LogPath);
+            StringAssert.Contains(contents, "[Startup]");
+            StringAssert.Contains(contents, "System.TypeInitializationException");
+            StringAssert.Contains(contents, "Languages.Language");
+            StringAssert.Contains(contents, "No valid translations found in the lang directory.");
+        }
+        finally
+        {
+            AppDomain.Unload(domain);
+        }
+    }
+
+    public sealed class LanguageStartupProbe : MarshalByRefObject
+    {
+        public void LoadLanguage(string assemblyPath) =>
+            Assembly.LoadFrom(assemblyPath).GetType("Languages.Language", true)!
+                .GetProperty("Current", BindingFlags.Public | BindingFlags.Static)!.GetValue(null);
+    }
 
     [TestMethod]
     public void Write_CreatesDirectoryAndAppendsMessages()
