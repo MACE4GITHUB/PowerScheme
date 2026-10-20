@@ -5,14 +5,18 @@ using System.Threading.Tasks;
 namespace PowerScheme.Addins.IdleMonitoring;
 
 public class IdleMonitor(
-    IIdleDetector detector) : IIdleMonitor
+    IIdleDetector detector,
+    Action<string, Exception>? reportError = null) : IIdleMonitor
 {
     private readonly object _sync = new();
     private CancellationTokenSource? _cts;
     private Task? _monitoringTask;
+    private readonly System.Collections.Generic.Dictionary<string, DateTime> _lastErrors = new();
+    internal Func<TimeSpan, CancellationToken, Task> DelayAsync { get; set; } = Task.Delay;
 
     public event EventHandler? OnIdle;
     public event EventHandler? OnActive;
+    public event EventHandler<IdleMonitorFaultEventArgs>? Faulted;
 
     public async Task StartAsync(
         IdleMonitorOption idleMonitorOption)
@@ -67,39 +71,53 @@ public class IdleMonitor(
         var pollingActiveTimeInMilliseconds = TimeSpan.FromMilliseconds(idleMonitorOption.PollingActiveTimeInMilliseconds);
 
         var isIdle = false;
+        var activePending = true;
+        var initialSample = true;
+        Exception? failure = null;
 
         try
         {
             while (!token.IsCancellationRequested)
             {
-                var idle = detector.GetIdleTime();
-
-                switch (isIdle)
+                TimeSpan idle;
+                try
                 {
-                    case false when idle >= idleThresholdInMilliseconds:
-                        isIdle = true;
-                        RaiseEvent(OnIdle);
-                        break;
-                    case true when idle < idleThresholdInMilliseconds:
-                        isIdle = false;
-                        RaiseEvent(OnActive);
-                        break;
+                    idle = detector.GetIdleTime();
                 }
+                catch (Exception exception) when (!token.IsCancellationRequested)
+                {
+                    ReportError("ReadIdleTime", exception);
+                    await DelayAsync(pollingActiveTimeInMilliseconds, token);
+                    continue;
+                }
+
+                if (!isIdle && idle >= idleThresholdInMilliseconds)
+                {
+                    isIdle = true;
+                    activePending = true;
+                    RaiseEvent(OnIdle, EventArgs.Empty, "EnterIdle");
+                }
+                else if (idle < idleThresholdInMilliseconds && activePending)
+                {
+                    isIdle = false;
+                    activePending = !RaiseEvent(OnActive, new IdleMonitorActiveEventArgs(initialSample), "RestoreActive");
+                }
+                initialSample = false;
 
                 var delay = isIdle
                     ? pollingIdleTimeInMilliseconds
                     : pollingActiveTimeInMilliseconds;
 
-                await Task.Delay(delay, token);
+                await DelayAsync(delay, token);
             }
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
-            // Do nothing
         }
-        catch
+        catch (Exception exception)
         {
-            // Do logging here if needed
+            failure = exception;
+            ReportError("MonitorLoop", exception);
         }
         finally
         {
@@ -107,20 +125,59 @@ public class IdleMonitor(
             {
                 _cts?.Dispose();
                 _cts = null;
-                _monitoringTask = null;
+            }
+
+            if (failure != null)
+            {
+                try
+                {
+                    Faulted?.Invoke(this, new IdleMonitorFaultEventArgs(failure));
+                }
+                catch (Exception exception)
+                {
+                    ReportError("FaultNotification", exception);
+                }
             }
         }
     }
 
-    private void RaiseEvent(EventHandler? handler)
+    private bool RaiseEvent(EventHandler? handler, EventArgs args, string stage)
     {
         try
         {
-            handler?.Invoke(this, EventArgs.Empty);
+            handler?.Invoke(this, args);
+            return true;
         }
-        catch
+        catch (Exception exception)
         {
-            // Do logging here if needed
+            ReportError(stage, exception);
+            return false;
+        }
+    }
+
+    private void ReportError(string stage, Exception exception)
+    {
+        var now = DateTime.UtcNow;
+        if (_lastErrors.TryGetValue(stage, out var previous) && now - previous < TimeSpan.FromMinutes(1))
+        {
+            return;
+        }
+
+        _lastErrors[stage] = now;
+        try
+        {
+            if (reportError != null)
+            {
+                reportError(stage, exception);
+            }
+            else
+            {
+                System.Diagnostics.Trace.TraceError("Idle monitoring error ({0}): {1}", stage, exception);
+            }
+        }
+        catch (Exception)
+        {
+            System.Diagnostics.Trace.TraceError("Idle monitoring error ({0}): {1}", stage, exception);
         }
     }
 }

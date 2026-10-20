@@ -17,7 +17,7 @@ public static class DiRoot
     private static readonly Lazy<IPowerSchemeService> _power = new(static () => new PowerSchemeService());
     private static readonly Lazy<IContainer> _container = new(static () => new Container());
     private static readonly Lazy<IIdleDetector> _idleDetector = new(static () => new Win32IdleDetector());
-    private static readonly Lazy<IIdleMonitor> _idleMonitor = new(static () => new IdleMonitor(_idleDetector.Value));
+    private static readonly Lazy<IIdleMonitor> _idleMonitor = new(static () => new IdleMonitor(_idleDetector.Value, Program.LogMonitoringError));
     private static readonly Lazy<IIdleSettingsStore> _idleSettings = new(static () => new RegistryIdleSettingsStore(AppInfo.CompanyName, AppInfo.ProductName));
     private static readonly Lazy<IUpdateService> _updateService = new(static () => new UpdateService());
     private static readonly Lazy<LeftContextMenu> _leftContextMenu = new(static () => new LeftContextMenu(_container.Value, _power.Value));

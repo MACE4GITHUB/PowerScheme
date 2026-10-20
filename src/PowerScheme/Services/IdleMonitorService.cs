@@ -21,6 +21,11 @@ public sealed class IdleMonitorService(
     private long _restartGeneration;
     private bool _started;
     private bool _disposed;
+    private bool _restorePending;
+    private Guid _restoreSchemeId;
+    private Guid _mainSettingAtIdle;
+    private bool _switchingScheme;
+    private EventHandler<IdleMonitorFaultEventArgs>? _faultHandler;
 
     public void Start()
     {
@@ -47,6 +52,9 @@ public sealed class IdleMonitorService(
         power.ActivePowerSchemeChanged += ActivePowerSchemeChanged;
         idleMonitor.OnIdle += OnIdle;
         idleMonitor.OnActive += OnActive;
+        var generation = _generation;
+        _faultHandler = (_, _) => MonitorFaulted(generation);
+        idleMonitor.Faulted += _faultHandler;
         _started = true;
         try
         {
@@ -87,6 +95,8 @@ public sealed class IdleMonitorService(
         _started = false;
         idleMonitor.OnIdle -= OnIdle;
         idleMonitor.OnActive -= OnActive;
+        idleMonitor.Faulted -= _faultHandler;
+        _faultHandler = null;
         power.ActivePowerSchemeChanged -= ActivePowerSchemeChanged;
         idleMonitor.Stop();
     }
@@ -152,8 +162,35 @@ public sealed class IdleMonitorService(
         }
     }
 
+    private void MonitorFaulted(long generation)
+    {
+        lock (_lifecycleSync)
+        {
+            if (!_disposed && _started && generation == _generation)
+            {
+                StopCore();
+            }
+        }
+    }
+
     private void ActivePowerSchemeChanged(object sender, PowerSchemeEventArgs e)
     {
+        lock (_lifecycleSync)
+        {
+            if (_started && !_disposed)
+            {
+                UpdateMainScheme(e);
+            }
+        }
+    }
+
+    private void UpdateMainScheme(PowerSchemeEventArgs e)
+    {
+        if (_switchingScheme)
+        {
+            return;
+        }
+
         var idlePowerSchemeGuid = settings.IdlePowerSchemeId;
 
         if (idlePowerSchemeGuid == Guid.Empty)
@@ -170,19 +207,47 @@ public sealed class IdleMonitorService(
         if (mainPowerSchemeUpdate is { } mainPowerSchemeId)
         {
             settings.MainPowerSchemeId = mainPowerSchemeId;
+            if (_restorePending)
+            {
+                _restoreSchemeId = mainPowerSchemeId;
+                _mainSettingAtIdle = mainPowerSchemeId;
+            }
         }
     }
 
     private void OnActive(object sender, EventArgs e)
     {
-        var idlePowerSchemeGuid = settings.IdlePowerSchemeId;
+        lock (_lifecycleSync)
+        {
+            if (_started && !_disposed)
+            {
+                RestoreMainScheme(e);
+            }
+        }
+    }
 
-        if (idlePowerSchemeGuid == Guid.Empty)
+    private void RestoreMainScheme(EventArgs e)
+    {
+        if (e is IdleMonitorActiveEventArgs { IsInitialSample: true } && !_restorePending)
         {
             return;
         }
 
-        var mainPowerSchemeGuid = settings.MainPowerSchemeId;
+        var idlePowerSchemeGuid = settings.IdlePowerSchemeId;
+
+        if (idlePowerSchemeGuid == Guid.Empty && !_restorePending)
+        {
+            return;
+        }
+
+        var configuredMain = settings.MainPowerSchemeId;
+        if (_restorePending && configuredMain != _mainSettingAtIdle && configuredMain != Guid.Empty && configuredMain != idlePowerSchemeGuid)
+        {
+            _restoreSchemeId = configuredMain;
+            _mainSettingAtIdle = configuredMain;
+        }
+
+        var mainPowerSchemeGuid = _restorePending ? _restoreSchemeId : configuredMain;
         var previousPowerScheme =
             power
             .PowerSchemes
@@ -191,16 +256,44 @@ public sealed class IdleMonitorService(
             .PowerProfPowerSchemes
             .First();
 
-        power.SetActivePowerScheme(previousPowerScheme);
+        _restorePending = true;
+        _restoreSchemeId = previousPowerScheme.Guid;
+        SetActiveScheme(previousPowerScheme);
+        if (configuredMain != previousPowerScheme.Guid)
+        {
+            settings.MainPowerSchemeId = previousPowerScheme.Guid;
+        }
+        _restorePending = false;
     }
 
     private void OnIdle(object sender, EventArgs e)
     {
+        lock (_lifecycleSync)
+        {
+            if (_started && !_disposed)
+            {
+                EnterIdleScheme();
+            }
+        }
+    }
+
+    private void EnterIdleScheme()
+    {
         var idlePowerSchemeGuid = settings.IdlePowerSchemeId;
 
-        if (idlePowerSchemeGuid == Guid.Empty)
+        if (idlePowerSchemeGuid == Guid.Empty || _restorePending)
         {
             return;
+        }
+
+        var currentSchemeId = power.ActivePowerScheme.Guid;
+        _mainSettingAtIdle = settings.MainPowerSchemeId;
+        _restoreSchemeId = currentSchemeId == idlePowerSchemeGuid ? _mainSettingAtIdle : currentSchemeId;
+        _restorePending = true;
+        if (_mainSettingAtIdle != _restoreSchemeId)
+        {
+            settings.MainPowerSchemeId = _restoreSchemeId;
+            _mainSettingAtIdle = _restoreSchemeId;
         }
 
         if (settings.KeepBrightness)
@@ -216,7 +309,20 @@ public sealed class IdleMonitorService(
                 .PowerProfPowerSchemes
                 .Last(x => !x.IsMaxPerformance && x.IsNative);
 
-        power.SetActivePowerScheme(idlePowerScheme);
+        SetActiveScheme(idlePowerScheme);
+    }
+
+    private void SetActiveScheme(PowerSchemeServiceAPI.Model.IPowerScheme scheme)
+    {
+        _switchingScheme = true;
+        try
+        {
+            power.SetActivePowerScheme(scheme);
+        }
+        finally
+        {
+            _switchingScheme = false;
+        }
     }
 
     public void Dispose()

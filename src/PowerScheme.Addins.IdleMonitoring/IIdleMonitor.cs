@@ -3,6 +3,16 @@ using System.Threading.Tasks;
 
 namespace PowerScheme.Addins.IdleMonitoring;
 
+public sealed class IdleMonitorActiveEventArgs(bool isInitialSample) : EventArgs
+{
+    public bool IsInitialSample { get; } = isInitialSample;
+}
+
+public sealed class IdleMonitorFaultEventArgs(Exception exception) : EventArgs
+{
+    public Exception Exception { get; } = exception;
+}
+
 /// <summary>
 /// Defines a contract for monitoring and responding to idle and active states within an application.
 /// </summary>
@@ -21,6 +31,7 @@ public interface IIdleMonitor
 {
     event EventHandler? OnIdle;
     event EventHandler? OnActive;
+    event EventHandler<IdleMonitorFaultEventArgs>? Faulted;
     Task StartAsync(IdleMonitorOption idleMonitorOption);
     void Stop();
     Task WaitForStopAsync();

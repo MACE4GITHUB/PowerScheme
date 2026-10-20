@@ -5,4 +5,8 @@
 		<NoWarn>$(NoWarn);CA1416;SYSLIB1054;</NoWarn>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="PowerScheme.Tests" />
+	</ItemGroup>
+
 </Project>

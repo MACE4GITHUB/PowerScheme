@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using Languages;
@@ -7,6 +6,7 @@ using MessageForm;
 using PowerScheme.Configuration;
 using PowerScheme.Model;
 using PowerScheme.Services;
+using PowerScheme.Utility;
 using PowerSchemeServiceAPI;
 using RegistryManager;
 
@@ -15,6 +15,9 @@ namespace PowerScheme;
 internal static class Program
 {
     public static Mutex? OnceAppMutex { get; set; }
+
+    internal static void LogMonitoringError(string stage, Exception exception) =>
+        ErrorLog.Write($"[IdleMonitor:{stage}] {exception}");
 
     [STAThread]
     private static void Main()
@@ -62,7 +65,7 @@ internal static class Program
 #if DEBUG
         MessageBox.Show(message, "Application error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 #endif
-        File.AppendAllText("errors.log", $"{DateTime.Now}: {message}{Environment.NewLine}");
+        ErrorLog.Write(message);
     }
 
     #endregion

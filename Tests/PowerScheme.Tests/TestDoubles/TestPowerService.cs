@@ -18,12 +18,16 @@ internal sealed class TestPowerService(IPowerScheme initialScheme) : IPowerSchem
     public List<IPowerScheme> Activations { get; } = [];
     public List<(Guid Source, Guid Destination)> BrightnessCopies { get; } = [];
     public List<string> Operations { get; } = [];
+    public Action<IPowerScheme>? BeforeActivation { get; set; }
+    public Action<IPowerScheme>? AfterActivation { get; set; }
+    public Action? BeforeBrightnessCopy { get; set; }
     public Dictionary<(string Setting, Guid Scheme), PowerSchemeDcAcValues> Values { get; } = [];
     public List<(string Setting, Guid Scheme)> Reads { get; } = [];
     public List<(string Setting, Guid? Scheme, int Value)> Writes { get; } = [];
 
     public void SetActivePowerScheme(IPowerScheme newPowerScheme, bool isForce = false)
     {
+        BeforeActivation?.Invoke(newPowerScheme);
         var previous = ActivePowerScheme;
         ActivePowerScheme = newPowerScheme;
         Activations.Add(newPowerScheme);
@@ -32,6 +36,7 @@ internal sealed class TestPowerService(IPowerScheme initialScheme) : IPowerSchem
         {
             RaiseSchemeChanged(previous, newPowerScheme);
         }
+        AfterActivation?.Invoke(newPowerScheme);
     }
 
     public void RaiseSchemeChanged(IPowerScheme previous, IPowerScheme active) =>
@@ -39,6 +44,7 @@ internal sealed class TestPowerService(IPowerScheme initialScheme) : IPowerSchem
 
     public void CopyBrightness(Guid sourcePowerScheme, Guid destinationPowerScheme)
     {
+        BeforeBrightnessCopy?.Invoke();
         BrightnessCopies.Add((sourcePowerScheme, destinationPowerScheme));
         Operations.Add("brightness");
     }

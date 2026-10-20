@@ -5,8 +5,6 @@ namespace PowerScheme.Addins.IdleMonitoring;
 
 public class Win32IdleDetector : IIdleDetector
 {
-    private const int DEFAULT_IDLE_TIMEOUT_IN_SECONDS = 1;
-
     public TimeSpan GetIdleTime()
     {
         var info = new LASTINPUTINFO();
@@ -14,7 +12,7 @@ public class Win32IdleDetector : IIdleDetector
 
         if (!GetLastInputInfo(ref info))
         {
-            return TimeSpan.FromSeconds(DEFAULT_IDLE_TIMEOUT_IN_SECONDS);
+            throw new InvalidOperationException("GetLastInputInfo failed to read user activity.");
         }
 
         var idleTicks = unchecked((uint)Environment.TickCount - info.dwTime);

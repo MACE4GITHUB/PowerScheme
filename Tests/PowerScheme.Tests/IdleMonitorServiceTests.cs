@@ -13,6 +13,367 @@ namespace PowerScheme.Tests;
 public sealed class IdleMonitorServiceTests
 {
     [TestMethod]
+    public void OnIdle_StaleMainSetting_RemembersActuallyActiveScheme()
+    {
+        using var context = new TestContext();
+        context.Settings.MainSchemeId = context.Other.Guid;
+        context.Service.Start();
+
+        context.Monitor.RaiseIdle();
+        context.Monitor.RaiseActive();
+
+        Assert.AreSame(context.Main, context.Power.ActivePowerScheme);
+        Assert.AreEqual(context.Main.Guid, context.Settings.MainPowerSchemeId);
+    }
+
+    [TestMethod]
+    public async Task RestartWhileStillIdle_DoesNotOverwritePendingMainOrRepeatBrightnessCopy()
+    {
+        using var context = new TestContext();
+        context.Settings.KeepBrightness = true;
+        context.Service.Start();
+        context.Monitor.RaiseIdle();
+
+        await context.Service.RestartAsync();
+        context.Monitor.RaiseIdle();
+        context.Monitor.RaiseActive();
+
+        Assert.AreSame(context.Main, context.Power.ActivePowerScheme);
+        Assert.AreEqual(1, context.Power.BrightnessCopies.Count);
+        Assert.AreEqual(2, context.Power.Activations.Count);
+    }
+
+    [TestMethod]
+    public async Task RealMonitor_RestoreRetryPausesWhileIdleAndResumesOnActivity()
+    {
+        using var context = new TestContext();
+        var restored = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var restoreSamples = new System.Collections.Generic.List<int>();
+        var detector = new TestIdleDetector
+        {
+            Sample = count => count is 1 or 3 or 4 ? TimeSpan.FromMinutes(2) : TimeSpan.Zero
+        };
+        var monitor = new IdleMonitor(detector, (_, _) => { }) { DelayAsync = (_, token) => Task.Delay(1, token) };
+        context.Power.BeforeActivation = scheme =>
+        {
+            if (scheme.Guid == context.Main.Guid)
+            {
+                restoreSamples.Add(detector.SampleCount);
+                if (restoreSamples.Count == 1)
+                {
+                    throw new InvalidOperationException("Restore failed.");
+                }
+            }
+        };
+        context.Power.AfterActivation = scheme =>
+        {
+            if (scheme.Guid == context.Main.Guid)
+            {
+                restored.TrySetResult(true);
+            }
+        };
+        using var service = new IdleMonitorService(monitor, context.Power, context.Settings);
+        try
+        {
+            service.Start();
+            await AwaitSignal(restored.Task);
+        }
+        finally
+        {
+            service.Stop();
+            await monitor.WaitForStopAsync();
+        }
+
+        CollectionAssert.AreEqual(new[] { 2, 5 }, restoreSamples);
+        Assert.AreEqual(2, context.Power.Activations.Count);
+    }
+
+    [TestMethod]
+    [DataRow(false, false)]
+    [DataRow(true, false)]
+    [DataRow(false, true)]
+    [DataRow(true, true)]
+    public async Task FailedIdleSwitch_RestoresMainEvenAfterRestart(bool partiallyApplied, bool restart)
+    {
+        using var context = new TestContext();
+        Action<PowerSchemeServiceAPI.Model.IPowerScheme> fail = scheme =>
+        {
+            if (scheme.Guid == context.Idle.Guid)
+            {
+                throw new InvalidOperationException("Idle switch failed.");
+            }
+        };
+        if (partiallyApplied)
+        {
+            context.Power.AfterActivation = fail;
+        }
+        else
+        {
+            context.Power.BeforeActivation = fail;
+        }
+        context.Service.Start();
+        Assert.ThrowsExactly<InvalidOperationException>(() => context.Monitor.RaiseIdle());
+
+        if (restart)
+        {
+            await context.Service.RestartAsync();
+        }
+        context.Monitor.RaiseInitialActive();
+
+        Assert.AreSame(context.Main, context.Power.ActivePowerScheme);
+        Assert.AreEqual(context.Main.Guid, context.Settings.MainPowerSchemeId);
+        Assert.AreEqual(0, context.Settings.MainWriteCount);
+    }
+
+    [TestMethod]
+    public async Task FailedRestore_SurvivesRestartAndDisabledIdleSetting()
+    {
+        using var context = new TestContext();
+        context.Service.Start();
+        context.Monitor.RaiseIdle();
+        context.Power.BeforeActivation = _ => throw new InvalidOperationException("Restore failed.");
+        Assert.ThrowsExactly<InvalidOperationException>(() => context.Monitor.RaiseActive());
+        context.Settings.IdlePowerSchemeId = Guid.Empty;
+
+        await context.Service.RestartAsync();
+        context.Power.BeforeActivation = null;
+        context.Monitor.RaiseInitialActive();
+        context.Monitor.RaiseInitialActive();
+
+        Assert.AreSame(context.Main, context.Power.ActivePowerScheme);
+        Assert.AreEqual(2, context.Power.Activations.Count);
+    }
+
+    [TestMethod]
+    public void FailedBrightnessCopy_DoesNotLoseRestoration()
+    {
+        using var context = new TestContext();
+        context.Settings.KeepBrightness = true;
+        context.Power.BeforeBrightnessCopy = () => throw new InvalidOperationException("Copy failed.");
+        context.Service.Start();
+        Assert.ThrowsExactly<InvalidOperationException>(() => context.Monitor.RaiseIdle());
+
+        context.Monitor.RaiseActive();
+
+        Assert.AreSame(context.Main, context.Power.ActivePowerScheme);
+        Assert.AreEqual(1, context.Power.Activations.Count);
+    }
+
+    [TestMethod]
+    public void FaultedMonitor_AllowsStartAndIgnoresLateOldFault()
+    {
+        using var context = new TestContext();
+        context.Service.Start();
+        var oldNotification = context.Monitor.CaptureFault();
+        context.Monitor.RaiseFault(new InvalidOperationException("Loop failed."));
+        context.Monitor.RaiseIdle();
+        Assert.AreEqual(0, context.Power.Activations.Count);
+
+        context.Service.Start();
+        oldNotification();
+        context.Monitor.RaiseIdle();
+
+        Assert.AreEqual(2, context.Monitor.StartCount);
+        Assert.AreEqual(1, context.Power.Activations.Count);
+    }
+
+    [TestMethod]
+    public async Task FaultedMonitor_RestartRetainsPendingRestoration()
+    {
+        using var context = new TestContext();
+        context.Service.Start();
+        context.Monitor.RaiseIdle();
+        context.Monitor.RaiseFault(new InvalidOperationException("Loop failed."));
+
+        await context.Service.RestartAsync();
+        context.Monitor.RaiseInitialActive();
+
+        Assert.AreSame(context.Main, context.Power.ActivePowerScheme);
+        Assert.AreEqual(2, context.Power.Activations.Count);
+    }
+
+    [TestMethod]
+    public async Task RealMonitor_PartialIdleFailureAndRestoreFailures_EventuallyRestoreMain()
+    {
+        using var context = new TestContext();
+        var restored = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var restoreAttempts = 0;
+        var idleAttempts = 0;
+        var errorStages = new System.Collections.Generic.List<string>();
+        var delays = new System.Collections.Generic.List<TimeSpan>();
+        var detector = new TestIdleDetector { Sample = count => count == 1 ? TimeSpan.FromMinutes(2) : TimeSpan.Zero };
+        var monitor = new IdleMonitor(detector, (stage, _) => errorStages.Add(stage))
+        {
+            DelayAsync = (delay, token) =>
+            {
+                delays.Add(delay);
+                return Task.Delay(1, token);
+            }
+        };
+        context.Power.AfterActivation = scheme =>
+        {
+            if (scheme.Guid == context.Idle.Guid)
+            {
+                idleAttempts++;
+                throw new InvalidOperationException("Failure after idle switch.");
+            }
+            restored.TrySetResult(true);
+        };
+        context.Power.BeforeActivation = scheme =>
+        {
+            if (scheme.Guid == context.Main.Guid && ++restoreAttempts < 3)
+            {
+                throw new InvalidOperationException("Restore temporarily unavailable.");
+            }
+        };
+        using var service = new IdleMonitorService(monitor, context.Power, context.Settings);
+        try
+        {
+            service.Start();
+            await AwaitSignal(restored.Task);
+        }
+        finally
+        {
+            service.Stop();
+            await monitor.WaitForStopAsync();
+        }
+
+        Assert.AreSame(context.Main, context.Power.ActivePowerScheme);
+        Assert.AreEqual(1, idleAttempts);
+        Assert.AreEqual(3, restoreAttempts);
+        CollectionAssert.AreEqual(new[] { "EnterIdle", "RestoreActive" }, errorStages);
+        Assert.AreEqual(TimeSpan.FromMilliseconds(context.Settings.Options.PollingIdleTimeInMilliseconds), delays[0]);
+        Assert.AreEqual(TimeSpan.FromMilliseconds(context.Settings.Options.PollingActiveTimeInMilliseconds), delays[1]);
+        Assert.AreEqual(delays[1], delays[2]);
+    }
+
+    [TestMethod]
+    public async Task RealMonitor_FailedMeasurement_DoesNotCreateFalseActiveTransition()
+    {
+        var active = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var activeSample = 0;
+        var errors = new System.Collections.Generic.List<string>();
+        var detector = new TestIdleDetector
+        {
+            Sample = count => count switch
+            {
+                1 or 3 => TimeSpan.FromMinutes(2),
+                2 => throw new InvalidOperationException("Measurement failed."),
+                _ => TimeSpan.Zero
+            }
+        };
+        var monitor = new IdleMonitor(detector, (stage, _) => errors.Add(stage)) { DelayAsync = (_, token) => Task.Delay(1, token) };
+        monitor.OnActive += (_, _) =>
+        {
+            activeSample = detector.SampleCount;
+            active.TrySetResult(true);
+        };
+        try
+        {
+            await monitor.StartAsync(IdleMonitorOption.Default);
+            await AwaitSignal(active.Task);
+        }
+        finally
+        {
+            monitor.Stop();
+            await monitor.WaitForStopAsync();
+        }
+
+        Assert.AreEqual(4, activeSample);
+        CollectionAssert.AreEqual(new[] { "ReadIdleTime" }, errors);
+    }
+
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public async Task RealMonitor_RepeatedReadErrors_AreThrottledEvenWhenLoggingFails(bool brokenLogger)
+    {
+        var sampled = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var errorCount = 0;
+        var faultCount = 0;
+        var detector = new TestIdleDetector
+        {
+            Sample = count => count <= 3 ? throw new OperationCanceledException("Not monitor cancellation.") : TimeSpan.Zero
+        };
+        var monitor = new IdleMonitor(detector, (_, _) =>
+        {
+            errorCount++;
+            if (brokenLogger)
+            {
+                throw new InvalidOperationException("Logging unavailable.");
+            }
+        }) { DelayAsync = (_, token) => Task.Delay(1, token) };
+        monitor.OnActive += (_, _) => sampled.TrySetResult(true);
+        monitor.Faulted += (_, _) => faultCount++;
+        try
+        {
+            await monitor.StartAsync(IdleMonitorOption.Default);
+            await AwaitSignal(sampled.Task);
+        }
+        finally
+        {
+            monitor.Stop();
+            await monitor.WaitForStopAsync();
+        }
+
+        Assert.AreEqual(1, errorCount);
+        Assert.AreEqual(0, faultCount);
+    }
+
+    [TestMethod]
+    public async Task RealMonitor_NormalCancellation_DoesNotReportFailure()
+    {
+        var errors = 0;
+        var faults = 0;
+        var monitor = new IdleMonitor(new TestIdleDetector(), (_, _) => errors++);
+        monitor.Faulted += (_, _) => faults++;
+        await monitor.StartAsync(IdleMonitorOption.Default);
+
+        monitor.Stop();
+        await monitor.WaitForStopAsync();
+        await monitor.WaitForStopAsync();
+
+        Assert.AreEqual(0, errors);
+        Assert.AreEqual(0, faults);
+    }
+
+    [TestMethod]
+    public async Task RealMonitor_LoopFailure_NotifiesServiceAndAllowsRestart()
+    {
+        using var context = new TestContext();
+        var failure = new InvalidOperationException("Delay failed.");
+        var errors = new System.Collections.Generic.List<string>();
+        var monitor = new IdleMonitor(new TestIdleDetector(), (stage, _) => errors.Add(stage))
+        {
+            DelayAsync = (_, _) => Task.FromException(failure)
+        };
+        Exception? observed = null;
+        monitor.Faulted += (_, args) => observed = args.Exception;
+        using var service = new IdleMonitorService(monitor, context.Power, context.Settings);
+        service.Start();
+        await monitor.WaitForStopAsync();
+        Assert.AreSame(failure, observed);
+        monitor.DelayAsync = (_, token) => Task.Delay(1000, token);
+        try
+        {
+            await service.RestartAsync();
+            Assert.IsFalse(monitor.WaitForStopAsync().IsCompleted);
+        }
+        finally
+        {
+            service.Stop();
+            await monitor.WaitForStopAsync();
+        }
+        CollectionAssert.AreEqual(new[] { "MonitorLoop" }, errors);
+    }
+
+    private static async Task AwaitSignal(Task signal)
+    {
+        Assert.AreSame(signal, await Task.WhenAny(signal, Task.Delay(TimeSpan.FromSeconds(10))), "Monitor did not reach the expected state.");
+        await signal;
+    }
+
+    [TestMethod]
     public async Task RestartAsync_WaitsForActualStopAndReloadsLatestOptions()
     {
         using var context = new TestContext();
@@ -635,12 +996,13 @@ public sealed class IdleMonitorServiceTests
     private sealed class TestIdleDetector : IIdleDetector
     {
         private int _sampleCount;
+        public Func<int, TimeSpan>? Sample { get; set; }
         public int SampleCount => Volatile.Read(ref _sampleCount);
 
         public TimeSpan GetIdleTime()
         {
-            Interlocked.Increment(ref _sampleCount);
-            return TimeSpan.Zero;
+            var count = Interlocked.Increment(ref _sampleCount);
+            return Sample?.Invoke(count) ?? TimeSpan.Zero;
         }
     }
 
@@ -648,6 +1010,7 @@ public sealed class IdleMonitorServiceTests
     {
         public event EventHandler? OnIdle;
         public event EventHandler? OnActive;
+        public event EventHandler<IdleMonitorFaultEventArgs>? Faulted;
         public IdleMonitorOption? Options { get; private set; }
         public int StartCount { get; private set; }
         public int StopCount { get; private set; }
@@ -665,6 +1028,13 @@ public sealed class IdleMonitorServiceTests
         public Task WaitForStopAsync() => StopTask;
         public void RaiseIdle() => OnIdle?.Invoke(this, EventArgs.Empty);
         public void RaiseActive() => OnActive?.Invoke(this, EventArgs.Empty);
+        public void RaiseInitialActive() => OnActive?.Invoke(this, new IdleMonitorActiveEventArgs(true));
+        public void RaiseFault(Exception exception) => Faulted?.Invoke(this, new IdleMonitorFaultEventArgs(exception));
+        public Action CaptureFault()
+        {
+            var handlers = Faulted;
+            return () => handlers?.Invoke(this, new IdleMonitorFaultEventArgs(new InvalidOperationException("Old cycle failed.")));
+        }
     }
 
 }
