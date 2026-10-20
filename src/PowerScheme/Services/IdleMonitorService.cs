@@ -2,16 +2,16 @@
 using System.Linq;
 using System.Threading;
 using PowerScheme.Addins.IdleMonitoring;
-using PowerScheme.Model;
+using PowerScheme.Services.Settings;
 using PowerSchemeServiceAPI;
 using PowerSchemeServiceAPI.EventsArgs;
-using RegistryManager;
 
 namespace PowerScheme.Services;
 
 public sealed class IdleMonitorService(
     IIdleMonitor idleMonitor,
-    IPowerSchemeService power) :
+    IPowerSchemeService power,
+    IIdleSettingsStore settings) :
     IIdleMonitorService
 {
     public void Start()
@@ -19,18 +19,13 @@ public sealed class IdleMonitorService(
         power.ActivePowerSchemeChanged += ActivePowerSchemeChanged;
         idleMonitor.OnIdle += OnIdle;
         idleMonitor.OnActive += OnActive;
-        var idleMonitorOption = new IdleMonitorOption(
-            RegistryService.GetIdleThresholdInMilliseconds(AppInfo.CompanyName, AppInfo.ProductName),
-            RegistryService.GetPollingActiveTimeInMilliseconds(AppInfo.CompanyName, AppInfo.ProductName),
-            RegistryService.GetPollingIdleTimeInMilliseconds(AppInfo.CompanyName, AppInfo.ProductName));
+        var idleMonitorOption = settings.LoadMonitorOptions();
 
         if (!idleMonitorOption.IsValid)
         {
             idleMonitorOption = IdleMonitorOption.Default;
 
-            RegistryService.SetIdleThresholdInMilliseconds(AppInfo.CompanyName, AppInfo.ProductName, idleMonitorOption.IdleThresholdInMilliseconds);
-            RegistryService.SetPollingActiveTimeInMilliseconds(AppInfo.CompanyName, AppInfo.ProductName, idleMonitorOption.PollingActiveTimeInMilliseconds);
-            RegistryService.SetPollingIdleTimeInMilliseconds(AppInfo.CompanyName, AppInfo.ProductName, idleMonitorOption.PollingIdleTimeInMilliseconds);
+            settings.SaveMonitorOptions(idleMonitorOption);
         }
 
         idleMonitor.StartAsync(idleMonitorOption);
@@ -51,71 +46,37 @@ public sealed class IdleMonitorService(
         Start();
     }
 
-    private static void ActivePowerSchemeChanged(object sender, PowerSchemeEventArgs e)
+    private void ActivePowerSchemeChanged(object sender, PowerSchemeEventArgs e)
     {
-        var idlePowerSchemeGuid = GetIdlePowerSchemeGuid();
+        var idlePowerSchemeGuid = settings.IdlePowerSchemeId;
 
         if (idlePowerSchemeGuid == Guid.Empty)
         {
             return;
         }
 
-        var mainPowerSchemeGuid = GetMainPowerSchemeGuid();
+        var mainPowerSchemeUpdate = IdlePowerSchemePolicy.GetMainPowerSchemeUpdate(
+            e.PreviousPowerScheme.Guid,
+            e.ActivePowerScheme.Guid,
+            idlePowerSchemeGuid,
+            settings.MainPowerSchemeId);
 
-        var isIdleToIdle =
-            idlePowerSchemeGuid == e.PreviousPowerScheme.Guid &&
-            idlePowerSchemeGuid == e.ActivePowerScheme.Guid &&
-            mainPowerSchemeGuid != e.ActivePowerScheme.Guid;
-
-        if (isIdleToIdle)
+        if (mainPowerSchemeUpdate is { } mainPowerSchemeId)
         {
-            SetMainPowerScheme(e.ActivePowerScheme.Guid);
-            return;
-        }
-
-        var isIdleToNotIdle =
-            idlePowerSchemeGuid == e.PreviousPowerScheme.Guid &&
-            idlePowerSchemeGuid != e.ActivePowerScheme.Guid &&
-            mainPowerSchemeGuid != e.ActivePowerScheme.Guid;
-
-        if (isIdleToNotIdle)
-        {
-            SetMainPowerScheme(e.ActivePowerScheme.Guid);
-            return;
-        }
-
-        var isNotIdleToNotIdle =
-            idlePowerSchemeGuid != e.PreviousPowerScheme.Guid &&
-            idlePowerSchemeGuid != e.ActivePowerScheme.Guid &&
-            mainPowerSchemeGuid != e.ActivePowerScheme.Guid;
-
-        if (isNotIdleToNotIdle)
-        {
-            SetMainPowerScheme(e.ActivePowerScheme.Guid);
-            return;
-        }
-
-        var isNotIdleToIdle =
-            idlePowerSchemeGuid != e.PreviousPowerScheme.Guid &&
-            idlePowerSchemeGuid == e.ActivePowerScheme.Guid &&
-            mainPowerSchemeGuid != e.PreviousPowerScheme.Guid;
-
-        if (isNotIdleToIdle)
-        {
-            SetMainPowerScheme(e.PreviousPowerScheme.Guid);
+            settings.MainPowerSchemeId = mainPowerSchemeId;
         }
     }
 
     private void OnActive(object sender, EventArgs e)
     {
-        var idlePowerSchemeGuid = GetIdlePowerSchemeGuid();
+        var idlePowerSchemeGuid = settings.IdlePowerSchemeId;
 
         if (idlePowerSchemeGuid == Guid.Empty)
         {
             return;
         }
 
-        var mainPowerSchemeGuid = GetMainPowerSchemeGuid();
+        var mainPowerSchemeGuid = settings.MainPowerSchemeId;
         var previousPowerScheme =
             power
             .PowerSchemes
@@ -129,16 +90,16 @@ public sealed class IdleMonitorService(
 
     private void OnIdle(object sender, EventArgs e)
     {
-        var idlePowerSchemeGuid = GetIdlePowerSchemeGuid();
+        var idlePowerSchemeGuid = settings.IdlePowerSchemeId;
 
         if (idlePowerSchemeGuid == Guid.Empty)
         {
             return;
         }
 
-        if (GetKeepBrightness())
+        if (settings.KeepBrightness)
         {
-            power.CopyBrightness(GetMainPowerSchemeGuid(), idlePowerSchemeGuid);
+            power.CopyBrightness(settings.MainPowerSchemeId, idlePowerSchemeGuid);
         }
 
         var idlePowerScheme =
@@ -151,18 +112,6 @@ public sealed class IdleMonitorService(
 
         power.SetActivePowerScheme(idlePowerScheme);
     }
-
-    private static Guid GetIdlePowerSchemeGuid() =>
-        RegistryService.GetIdleMonitoring(AppInfo.CompanyName, AppInfo.ProductName);
-
-    private static Guid GetMainPowerSchemeGuid() =>
-        RegistryService.GetMainMonitoring(AppInfo.CompanyName, AppInfo.ProductName);
-
-    private static bool GetKeepBrightness() =>
-        RegistryService.GetKeepBrightness(AppInfo.CompanyName, AppInfo.ProductName);
-
-    private static void SetMainPowerScheme(Guid guid) =>
-        RegistryService.SetMainPowerScheme(AppInfo.CompanyName, AppInfo.ProductName, guid);
 
     public void Dispose()
     {

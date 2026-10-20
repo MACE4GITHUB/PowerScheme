@@ -4,6 +4,7 @@ using MessageForm;
 using PowerScheme.Addins.IdleMonitoring;
 using PowerScheme.Model;
 using PowerScheme.Services;
+using PowerScheme.Services.Settings;
 using PowerSchemeServiceAPI;
 
 namespace PowerScheme.Configuration;
@@ -17,11 +18,12 @@ public static class DiRoot
     private static readonly Lazy<IContainer> _container = new(static () => new Container());
     private static readonly Lazy<IIdleDetector> _idleDetector = new(static () => new Win32IdleDetector());
     private static readonly Lazy<IIdleMonitor> _idleMonitor = new(static () => new IdleMonitor(_idleDetector.Value));
+    private static readonly Lazy<IIdleSettingsStore> _idleSettings = new(static () => new RegistryIdleSettingsStore(AppInfo.CompanyName, AppInfo.ProductName));
     private static readonly Lazy<IUpdateService> _updateService = new(static () => new UpdateService());
     private static readonly Lazy<LeftContextMenu> _leftContextMenu = new(static () => new LeftContextMenu(_container.Value, _power.Value));
     private static readonly Lazy<RightContextMenu> _rightContextMenu = new(static () => new RightContextMenu(_container.Value, _power.Value, _updateService.Value));
     private static readonly Lazy<IViewModel> _viewModel = new(static () => new ViewModel(_container.Value, _leftContextMenu.Value, _rightContextMenu.Value, _power.Value));
-    private static readonly Lazy<IIdleMonitorService> _idleMonitorService = new(static () => new IdleMonitorService(_idleMonitor.Value, _power.Value));
+    private static readonly Lazy<IIdleMonitorService> _idleMonitorService = new(static () => new IdleMonitorService(_idleMonitor.Value, _power.Value, _idleSettings.Value));
     private static readonly Lazy<IViewService> _viewService = new(static () => new ViewService(_viewModel.Value, _updateService.Value, _idleMonitorService.Value));
 
     /// <summary>Gets the service of T.</summary>
