@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
+using System.Threading.Tasks;
 using PowerScheme.Addins.IdleMonitoring;
 using PowerScheme.Services.Settings;
 using PowerSchemeServiceAPI;
@@ -14,36 +14,142 @@ public sealed class IdleMonitorService(
     IIdleSettingsStore settings) :
     IIdleMonitorService
 {
+    private readonly object _lifecycleSync = new();
+    private Task _startTask = Task.CompletedTask;
+    private Task? _restartTask;
+    private long _generation;
+    private long _restartGeneration;
+    private bool _started;
+    private bool _disposed;
+
     public void Start()
+    {
+        lock (_lifecycleSync)
+        {
+            ThrowIfDisposed();
+            if (_started)
+            {
+                return;
+            }
+
+            if (!_startTask.IsCompleted || _restartTask is { IsCompleted: false } || !idleMonitor.WaitForStopAsync().IsCompleted)
+            {
+                throw new InvalidOperationException("The previous monitoring cycle has not stopped. Use RestartAsync instead.");
+            }
+
+            _generation++;
+            StartCore();
+        }
+    }
+
+    private Task StartCore()
     {
         power.ActivePowerSchemeChanged += ActivePowerSchemeChanged;
         idleMonitor.OnIdle += OnIdle;
         idleMonitor.OnActive += OnActive;
-        var idleMonitorOption = settings.LoadMonitorOptions();
-
-        if (!idleMonitorOption.IsValid)
+        _started = true;
+        try
         {
-            idleMonitorOption = IdleMonitorOption.Default;
+            var idleMonitorOption = settings.LoadMonitorOptions();
+            if (!idleMonitorOption.IsValid)
+            {
+                idleMonitorOption = IdleMonitorOption.Default;
+                settings.SaveMonitorOptions(idleMonitorOption);
+            }
 
-            settings.SaveMonitorOptions(idleMonitorOption);
+            _startTask = idleMonitor.StartAsync(idleMonitorOption);
+            if (_startTask.IsCompleted)
+            {
+                _startTask.GetAwaiter().GetResult();
+            }
+
+            return _startTask;
         }
-
-        idleMonitor.StartAsync(idleMonitorOption);
+        catch
+        {
+            _startTask = Task.CompletedTask;
+            StopCore();
+            throw;
+        }
     }
 
     public void Stop()
     {
+        lock (_lifecycleSync)
+        {
+            _generation++;
+            StopCore();
+        }
+    }
+
+    private void StopCore()
+    {
+        _started = false;
         idleMonitor.OnIdle -= OnIdle;
         idleMonitor.OnActive -= OnActive;
         power.ActivePowerSchemeChanged -= ActivePowerSchemeChanged;
         idleMonitor.Stop();
     }
 
-    public void Restart()
+    public Task RestartAsync()
     {
-        Stop();
-        Thread.Sleep(1000);
-        Start();
+        lock (_lifecycleSync)
+        {
+            ThrowIfDisposed();
+            if (!_started && _restartTask is { IsCompleted: false } && _restartGeneration == _generation)
+            {
+                return _restartTask;
+            }
+
+            var generation = ++_generation;
+            _restartGeneration = generation;
+            StopCore();
+            _restartTask = RestartCoreAsync(generation, _startTask);
+            return _restartTask;
+        }
+    }
+
+    private async Task RestartCoreAsync(long generation, Task previousStart)
+    {
+        try
+        {
+            await previousStart;
+            await idleMonitor.WaitForStopAsync();
+
+            Task start;
+            lock (_lifecycleSync)
+            {
+                if (_disposed || generation != _generation)
+                {
+                    return;
+                }
+
+                start = StartCore();
+            }
+
+            await start;
+        }
+        catch
+        {
+            lock (_lifecycleSync)
+            {
+                if (generation == _generation)
+                {
+                    _startTask = Task.CompletedTask;
+                    StopCore();
+                }
+            }
+
+            throw;
+        }
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(nameof(IdleMonitorService));
+        }
     }
 
     private void ActivePowerSchemeChanged(object sender, PowerSchemeEventArgs e)
@@ -115,6 +221,16 @@ public sealed class IdleMonitorService(
 
     public void Dispose()
     {
-        Stop();
+        lock (_lifecycleSync)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            _generation++;
+            StopCore();
+        }
     }
 }

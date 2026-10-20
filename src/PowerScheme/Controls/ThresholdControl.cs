@@ -46,7 +46,7 @@ public partial class ThresholdControl : UserControl
         pollingIdleTimeTrackBar.Value = idleOptions.PollingIdleTime;
     }
 
-    private void OkButtonOnClick(object sender, EventArgs e)
+    private async void OkButtonOnClick(object sender, EventArgs e)
     {
         WindowManager.HideForm<IdleForm>();
 
@@ -54,7 +54,7 @@ public partial class ThresholdControl : UserControl
         RegistryService.SetPollingActiveTimeInMilliseconds(AppInfo.CompanyName, AppInfo.ProductName, _idleOptions.PollingActiveTimeMs);
         RegistryService.SetPollingIdleTimeInMilliseconds(AppInfo.CompanyName, AppInfo.ProductName, _idleOptions.PollingIdleTimeMs);
 
-        _idleMonitorService.Restart();
+        await _idleMonitorService.RestartAsync();
     }
 
     private void DefaultButtonOnClick(object sender, EventArgs e)
