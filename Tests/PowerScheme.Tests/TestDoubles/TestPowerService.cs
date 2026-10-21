@@ -13,6 +13,10 @@ internal sealed class TestPowerService(IPowerScheme initialScheme) : IPowerSchem
     public IPowerScheme ActivePowerScheme { get; private set; } = initialScheme;
     public IEnumerable<IPowerScheme> Schemes { get; set; } = [];
     public IEnumerable<IPowerScheme> NativeSchemes { get; set; } = [];
+    public IEnumerable<IPowerScheme> UserSchemes { get; set; } = [];
+    public IEnumerable<IPowerScheme> TypicalSchemes { get; set; } = [];
+    public IEnumerable<IPowerScheme> VisibleTypicalSchemes { get; set; } = [];
+    public IEnumerable<IPowerScheme> CustomSchemes { get; set; } = [];
     public IEnumerable<IPowerScheme> PowerSchemes => Schemes;
     public IEnumerable<IPowerScheme> PowerProfPowerSchemes => NativeSchemes;
     public List<IPowerScheme> Activations { get; } = [];
@@ -69,14 +73,14 @@ internal sealed class TestPowerService(IPowerScheme initialScheme) : IPowerSchem
     public void SetIdleHibernate(Guid guid, int value) => Writes.Add(("hibernate", guid, value));
     public PowerSchemeDcAcValues GetIdleHibernate(Guid guid) => ReadValues("hibernate", guid);
 
-    public IEnumerable<IPowerScheme> TypicalPowerSchemesWithDeleted => throw new NotSupportedException();
-    public IEnumerable<IPowerScheme> TypicalPowerSchemesWithoutDeleted => throw new NotSupportedException();
-    public IEnumerable<IPowerScheme> UserPowerSchemes => throw new NotSupportedException();
-    public IEnumerable<IPowerScheme> CustomPowerSchemes => throw new NotSupportedException();
+    public IEnumerable<IPowerScheme> TypicalPowerSchemesWithDeleted => TypicalSchemes;
+    public IEnumerable<IPowerScheme> TypicalPowerSchemesWithoutDeleted => VisibleTypicalSchemes;
+    public IEnumerable<IPowerScheme> UserPowerSchemes => UserSchemes;
+    public IEnumerable<IPowerScheme> CustomPowerSchemes => CustomSchemes;
     public Watchers Watchers => throw new NotSupportedException();
     public bool IsNeedAdminAccessForChangePowerScheme => throw new NotSupportedException();
-    public bool ExistsMobilePlatformRole => throw new NotSupportedException();
-    public bool ExistsHibernate => throw new NotSupportedException();
+    public bool ExistsMobilePlatformRole { get; set; }
+    public bool ExistsHibernate { get; set; }
     public bool ExistsSleep => throw new NotSupportedException();
     public bool ExistsAllTypicalScheme => throw new NotSupportedException();
     public void RestoreDefaultPowerSchemes() => throw new NotSupportedException();

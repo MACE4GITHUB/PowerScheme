@@ -11,41 +11,34 @@ internal sealed class LeftContextMenu(
     IPowerSchemeService power) :
     ContextMainMenu(components, power)
 {
-    private bool _isBuilt;
-
     internal override void UpdateMenu()
     {
-        ClearMenu();
-
         BuildMenu();
     }
 
     internal override void ClearMenu()
     {
-        if (!_isBuilt || Items.Count == 0)
+        if (Items.Count == 0)
         {
             return;
         }
 
         Items.RemoveMenu();
         Items.Clear();
-
-        _isBuilt = false;
     }
 
     protected override void BuildContextMenu()
     {
-        var powerSchemeMenu = new PowerSchemeMenuBuilder(Power).Build();
-
-        while (powerSchemeMenu.DropDownItems.Count > 0)
+        try
         {
-            var item = powerSchemeMenu.DropDownItems[0];
-            Items.Add(item);
+            PowerSchemeMenuBuilder.Update(Items, Power);
+            ThemeService.ApplyToolStripTheme(this);
         }
-
-        ThemeService.ApplyToolStripTheme(this);
-
-        _isBuilt = true;
+        catch
+        {
+            ClearMenu();
+            throw;
+        }
     }
 
     protected override void Dispose(bool disposing)

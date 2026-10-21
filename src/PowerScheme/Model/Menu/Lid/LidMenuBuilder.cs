@@ -10,8 +10,9 @@ namespace PowerScheme.Model.Menu.Lid;
 using static MenuLookup;
 
 internal class LidMenuBuilder(
-    IPowerSchemeService power) :
-    BaseMenuBuilder
+    IPowerSchemeService power,
+    ToolStripMenuItem? root = null) :
+    BaseMenuBuilder(root)
 {
     private const MenuItm MENU_ITM = MenuItm.Lid;
 
@@ -21,8 +22,6 @@ internal class LidMenuBuilder(
 
     internal ToolStripMenuItem Build()
     {
-        var dropDownItems = Root.DropDownItems;
-
         var isShowSleepOption = RegistryService.IsShowSleepOption;
         var isShowHibernateOption = RegistryService.IsShowHibernateOption;
 
@@ -44,7 +43,7 @@ internal class LidMenuBuilder(
 
         foreach (var lidMenuItem in lidMenuItems)
         {
-            var lidItem = MenuItemFactory.Create(lidMenuItem.Key);
+            var lidItem = Menu.Item(lidMenuItem.Key);
 
             var lid = (Lid)lidMenuItem.Value.Tag!;
             lidItem.Tag = lid;
@@ -53,17 +52,14 @@ internal class LidMenuBuilder(
                 pictureName = lidMenuItem.Value.Picture;
             }
 
-            var command = new LidCommand(power);
-            lidItem.BindCommand(command);
-
-            dropDownItems.Add(lidItem);
+            lidItem.BindCommandOnce(power, static service => new LidCommand(service));
         }
 
         var prev = Root.Image;
-        Root.Image = pictureName.GetImage();
-        prev?.Dispose();
+        Root.Image = pictureName.GetMenuImage();
+        ImageExtensions.DisposeOwnedImage(prev);
 
-        return Root;
+        return Complete();
     }
 
     private static bool IsHiddenLid(Lid lid, bool isShowSleepOption, bool isShowHibernateOption) =>

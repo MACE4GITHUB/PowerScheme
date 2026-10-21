@@ -12,6 +12,74 @@ namespace PowerScheme.Tests;
 public sealed class ThemeServiceTests
 {
     [TestMethod]
+    public void ApplyToolStripTheme_ReusesRendererUntilThemeChanges()
+    {
+        using var menu = new ContextMenuStrip();
+        ThemeService.ApplyToolStripTheme(menu, ThemeKind.Light);
+        var original = menu.Renderer;
+
+        for (var index = 0; index < 100; index++)
+        {
+            ThemeService.ApplyToolStripTheme(menu, ThemeKind.Light);
+            Assert.AreSame(original, menu.Renderer);
+        }
+
+        ThemeService.ApplyToolStripTheme(menu, ThemeKind.Dark);
+        Assert.AreNotSame(original, menu.Renderer);
+        Assert.AreEqual(ThemeKind.Dark, ((ToolStripMenuRenderer)menu.Renderer).AppliedTheme);
+    }
+
+    [TestMethod]
+    public void RepeatedMenuPaints_ReuseRegionUntilSizeChanges()
+    {
+        using var menu = new ContextMenuStrip { AutoSize = false, Size = new Size(120, 70) };
+        using var bitmap = new Bitmap(240, 160);
+        using var graphics = Graphics.FromImage(bitmap);
+        ThemeService.ApplyToolStripTheme(menu, ThemeKind.Light);
+        menu.Renderer.DrawToolStripBackground(new ToolStripRenderEventArgs(graphics, menu));
+        var original = menu.Region;
+        Assert.IsNotNull(original);
+
+        for (var index = 0; index < 100; index++)
+        {
+            menu.Renderer.DrawToolStripBackground(new ToolStripRenderEventArgs(graphics, menu));
+            Assert.AreSame(original, menu.Region);
+        }
+
+        ThemeService.ApplyToolStripTheme(menu, ThemeKind.Dark);
+        menu.Renderer.DrawToolStripBackground(new ToolStripRenderEventArgs(graphics, menu));
+        Assert.AreSame(original, menu.Region);
+        menu.Size = new Size(240, 160);
+        menu.Renderer.DrawToolStripBackground(new ToolStripRenderEventArgs(graphics, menu));
+        Assert.AreNotSame(original, menu.Region);
+        Assert.IsTrue(menu.Region!.IsVisible(230, 150));
+    }
+
+    [TestMethod]
+    [DataRow((int)ThemeKind.Default)]
+    [DataRow((int)ThemeKind.Dark)]
+    [DataRow((int)ThemeKind.Light)]
+    [DataRow((int)ThemeKind.Blue)]
+    [DataRow((int)ThemeKind.Green)]
+    public void RepeatedMenuPaints_ReuseApplicationFont(int kind)
+    {
+        var theme = ((ThemeKind)kind).GetTheme();
+        var style = (IStyleTheme)theme;
+        var renderer = new ToolStripMenuRenderer(theme);
+        using var menu = new ContextMenuStrip { AutoSize = false, Size = new Size(120, 70) };
+        using var bitmap = new Bitmap(menu.Width, menu.Height);
+        using var graphics = Graphics.FromImage(bitmap);
+
+        for (var index = 0; index < 100; index++)
+        {
+            renderer.DrawToolStripBackground(new ToolStripRenderEventArgs(graphics, menu));
+            Assert.AreSame(ThemeService.MenuFont, style.Font);
+            Assert.AreSame(ThemeService.MenuFont, menu.Font);
+            Assert.AreSame(ThemeService.MenuFont, ((IStyleTheme)((ThemeKind)kind).GetTheme()).Font);
+        }
+    }
+
+    [TestMethod]
     [DataRow(120, 70)]
     [DataRow(240, 160)]
     [DataRow(90, 28)]

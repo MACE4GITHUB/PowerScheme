@@ -69,7 +69,7 @@ public class Language
     public virtual string StartupOnWindows => GetString(nameof(StartupOnWindows));
     public virtual string RestoreDefaultPowerSchemesName => GetString(nameof(RestoreDefaultPowerSchemesName));
     public virtual string RestoreDefaultPowerSchemesDescription => GetString(nameof(RestoreDefaultPowerSchemesDescription));
-    public virtual string Settings => GetString(nameof(Settings));
+    public virtual string Parameters => GetString(nameof(Parameters));
     public virtual string HibernateName => GetString(nameof(HibernateName));
     public virtual string HibernateDescription => GetString(nameof(HibernateDescription));
     public virtual string SleepName => GetString(nameof(SleepName));

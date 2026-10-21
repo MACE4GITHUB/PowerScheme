@@ -13,5 +13,5 @@ internal sealed class TestScheme(Guid guid, bool isNative = true, bool isMaxPerf
     public bool IsActive => throw new NotSupportedException();
     public string Name { get; set; } = "Test scheme";
     public string? Description => throw new NotSupportedException();
-    public ImageItem Picture => throw new NotSupportedException();
+    public ImageItem Picture { get; set; } = ImageItem.Empty;
 }

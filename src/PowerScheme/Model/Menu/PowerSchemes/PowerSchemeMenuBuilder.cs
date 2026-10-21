@@ -21,39 +21,41 @@ internal class PowerSchemeMenuBuilder(
 
     internal ToolStripMenuItem Build()
     {
-        AddPowerSchemes(power.PowerProfPowerSchemes);
-
-        if (!power.UserPowerSchemes.Any())
+        try
         {
+            Update(Root.DropDownItems, power);
             return Root;
         }
-
-        Root.DropDownItems.Add(new ToolStripSeparator());
-
-        AddPowerSchemes(power.UserPowerSchemes);
-
-        return Root;
+        catch
+        {
+            Root.SafeRemove();
+            throw;
+        }
     }
 
-    private void AddPowerSchemes(
+    internal static void Update(ToolStripItemCollection items, IPowerSchemeService power)
+    {
+        var update = new MenuItemUpdater(items);
+        AddPowerSchemes(update, power, power.PowerProfPowerSchemes);
+        if (power.UserPowerSchemes.Any())
+        {
+            update.Separator();
+            AddPowerSchemes(update, power, power.UserPowerSchemes);
+        }
+        update.Complete();
+    }
+
+    private static void AddPowerSchemes(
+        MenuItemUpdater update,
+        IPowerSchemeService power,
         IEnumerable<IPowerScheme> powerSchemes)
     {
-        var dropDownItems = Root.DropDownItems;
-
         foreach (var powerScheme in powerSchemes)
         {
-            var item = new ToolStripMenuItem
-            {
-                Name = $"{powerScheme.Name}_ps",
-                Text = powerScheme.Name,
-                Tag = new StatePowerScheme(powerScheme),
-                Image = powerScheme.Picture.GetImage()
-            };
+            var item = update.Item($"scheme_{powerScheme.Guid}", powerScheme.Name, powerScheme.Picture.GetMenuImage());
+            item.Tag = new StatePowerScheme(powerScheme);
 
-            var command = new PowerSchemeCommand(power);
-            item.BindCommand(command);
-
-            dropDownItems.Add(item);
+            item.BindCommandOnce(power, static service => new PowerSchemeCommand(service));
         }
     }
 }

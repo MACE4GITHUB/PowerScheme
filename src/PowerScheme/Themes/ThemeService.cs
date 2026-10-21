@@ -9,6 +9,8 @@ namespace PowerScheme.Themes;
 
 internal static class ThemeService
 {
+    internal static Font MenuFont { get; } = new("Segoe UI", 10f);
+
     private static ThemeKind ThemeKind => (ThemeKind)RegistryService.GetTheme(AppInfo.CompanyName, AppInfo.ProductName);
 
     private static ProfessionalColorTable Theme => ThemeKind.GetTheme();
@@ -16,7 +18,17 @@ internal static class ThemeService
     private static IStyleTheme StyleTheme => (IStyleTheme)Theme;
 
     public static void ApplyToolStripTheme(ToolStrip toolStrip) =>
-        toolStrip.Renderer = new ToolStripMenuRenderer(Theme);
+        ApplyToolStripTheme(toolStrip, ThemeKind);
+
+    internal static void ApplyToolStripTheme(ToolStrip toolStrip, ThemeKind kind)
+    {
+        if (toolStrip.Renderer is ToolStripMenuRenderer renderer && renderer.AppliedTheme == kind)
+        {
+            return;
+        }
+
+        toolStrip.Renderer = new ToolStripMenuRenderer(kind.GetTheme(), kind);
+    }
 
     public static void ApplyControlTheme(Control control) =>
         ApplyControlTheme(control, StyleTheme);

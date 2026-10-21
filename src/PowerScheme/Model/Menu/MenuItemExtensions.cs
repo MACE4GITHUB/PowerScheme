@@ -16,8 +16,33 @@ internal static class MenuItemExtensions
     private static readonly ConditionalWeakTable<ToolStripMenuItem, CommandEventHandlerAdapter> _map
     = new();
 
+    internal static void BindCommandOnce(this ToolStripMenuItem item, Func<ICommand> createCommand)
+    {
+        if (!_map.TryGetValue(item, out _))
+        {
+            item.BindCommand(createCommand());
+        }
+    }
+
+    internal static void BindCommandOnce<TState>(
+        this ToolStripMenuItem item,
+        TState state,
+        Func<TState, ICommand> createCommand)
+    {
+        if (!_map.TryGetValue(item, out _))
+        {
+            item.BindCommand(createCommand(state));
+        }
+    }
+
     internal static void BindCommand(this ToolStripMenuItem item, ICommand command)
     {
+        if (_map.TryGetValue(item, out var existing))
+        {
+            existing.Command = command;
+            return;
+        }
+
         var adapter = new CommandEventHandlerAdapter(command);
 
         _map.Add(item, adapter);
@@ -37,15 +62,18 @@ internal static class MenuItemExtensions
 
     internal static void SafeRemove(this ToolStripMenuItem parent, ToolStripMenuItem item)
     {
-        item.UnbindCommand();
         parent.DropDownItems.Remove(item);
-        item.Dispose();
+        item.SafeRemove();
     }
 
     internal static void SafeRemove(this ToolStripMenuItem menu)
     {
         menu.UnbindCommand();
         menu.RemoveDropDownItems();
+        var image = menu.Image;
+        menu.Image = null;
+        ImageExtensions.DisposeOwnedImage(image);
+        menu.Tag = null;
         menu.Dispose();
     }
 
@@ -65,17 +93,19 @@ internal static class MenuItemExtensions
 
         if (string.IsNullOrWhiteSpace(menuItem.Name))
         {
+            menuItem.SafeRemove();
             throw new ArgumentException(@"Menu item must have a non-empty name.", nameof(menuItem.Name));
         }
 
         if (collection[menuItem.Name] is not ToolStripMenuItem item)
         {
+            menuItem.SafeRemove();
             return collection;
         }
 
         var index = collection.IndexOf(item);
-        item.ChildrenSafeRemove();
         collection.Remove(item);
+        item.SafeRemove();
         collection.Insert(index, menuItem);
 
         return collection;
@@ -121,9 +151,6 @@ internal static class MenuItemExtensions
             return false;
         }
 
-        var prev = menuItem.Image;
-        prev?.Dispose();
-
         menuItem.CheckMenu(isChecked);
 
         return isChecked;
@@ -134,25 +161,9 @@ internal static class MenuItemExtensions
         var addShield = item.Name is nameof(MenuItm.Hibernate) or nameof(MenuItm.Sleep);
 
         var prev = item.Image;
-        var next = GetImageIfCheck(isChecked, addShield);
+        var next = ImageExtensions.GetMenuCheckImage(isChecked, addShield);
         item.Image = next;
-        prev?.Dispose();
-    }
-
-    private static Bitmap? GetImageIfCheck(bool isChecked, bool addShield)
-    {
-        var bitmap = ImageItem.Check.GetImage();
-
-        if (!addShield)
-        {
-            return isChecked ? bitmap : null;
-        }
-
-        var shield = ImageItem.Shield.GetImage();
-
-        return isChecked
-            ? bitmap.CopyToSquareCanvas(Color.Transparent, shield)
-            : shield;
+        ImageExtensions.DisposeOwnedImage(prev);
     }
 
     #region Private ConditionalWeakTable Methods
@@ -173,21 +184,6 @@ internal static class MenuItemExtensions
             {
                 item.Dispose();
                 continue;
-            }
-
-            var img = toolStripItem.Image;
-            if (img is not null)
-            {
-                toolStripItem.Image = null;
-                img.Dispose();
-            }
-
-            toolStripItem.Tag = null;
-            toolStripItem.Text = null;
-
-            if (toolStripItem.DropDownItems.Count > 0)
-            {
-                toolStripItem.RemoveDropDownItems();
             }
 
             menu.SafeRemove(toolStripItem);

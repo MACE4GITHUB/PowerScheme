@@ -4,8 +4,8 @@ using static PowerScheme.MenuLookup;
 
 namespace PowerScheme.Model.Menu.WindowsStartup;
 
-internal class WindowsStartupMenuBuilder :
-    BaseMenuBuilder
+internal class WindowsStartupMenuBuilder(ToolStripMenuItem? root = null) :
+    BaseMenuBuilder(root)
 {
     private const MenuItm MENU_ITM = MenuItm.StartupOnWindows;
 
@@ -18,9 +18,8 @@ internal class WindowsStartupMenuBuilder :
         Root.Tag = RegistryService.IsRunOnStartup;
         Root.GetCheckedOption();
 
-        var command = new WindowsStartupCommand();
-        Root.BindCommand(command);
+        Root.BindCommandOnce(static () => new WindowsStartupCommand());
 
-        return Root;
+        return Complete();
     }
 }

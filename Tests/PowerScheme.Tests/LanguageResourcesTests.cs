@@ -43,7 +43,7 @@ public sealed class LanguageResourcesTests
             var language = Language.GetLanguage(locale, directory);
 
             Assert.AreEqual(typeof(Language), language.GetType());
-            Assert.AreEqual(expectedDefinition.Strings.Value[nameof(Language.Settings)], language.Settings);
+            Assert.AreEqual(expectedDefinition.Strings.Value[nameof(Language.Parameters)], language.Parameters);
             var code = typeof(Language).GetField("_code", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(language);
             Assert.AreEqual(expected, code);
         }
@@ -92,11 +92,18 @@ public sealed class LanguageResourcesTests
             Assert.AreEqual("en", ((LanguageDefinition)english.Tag!).Code);
             Assert.IsFalse(english.Checked, "The selection must use the transparent image, not the native check renderer.");
             AssertMenuImage(ImageItem.Check, english.Image);
+            var previousImage = (Bitmap)english.Image!;
+            var disposed = false;
+            english.Disposed += (_, _) => disposed = true;
 
             WriteTranslation(directory, "new.xml", "de", "Deutsch");
             menu.DropDown.Opening += (_, args) => args.Cancel = true;
             menu.ShowDropDown();
 
+            Assert.IsFalse(disposed);
+            Assert.AreSame(english, menu.DropDownItems.Cast<ToolStripMenuItem>().Single(item => ((LanguageDefinition)item.Tag!).Code == "en"));
+            Assert.AreSame(previousImage, english.Image);
+            Assert.IsTrue(previousImage.Width > 0);
             Assert.AreEqual(2, menu.DropDownItems.Count);
             var german = menu.DropDownItems.Cast<ToolStripMenuItem>().Single(item => ((LanguageDefinition)item.Tag!).Code == "de");
             Assert.AreEqual("Deutsch", german.Text);
@@ -131,7 +138,7 @@ public sealed class LanguageResourcesTests
             Assert.AreEqual("de", savedCode);
             Assert.AreEqual(1, power.RenameCount);
             Assert.AreEqual(1, icons);
-            Assert.AreEqual(Language.Current.Settings, MenuLookup.MenuItems[MenuLookup.MenuItm.Settings].Name);
+            Assert.AreEqual(Language.Current.Parameters, MenuLookup.MenuItems[MenuLookup.MenuItm.Parameters].Name);
         }
         finally
         {
@@ -192,14 +199,14 @@ public sealed class LanguageResourcesTests
             WriteTranslation(directory, "anything.xml", "de", "Deutsch");
             var path = Path.Combine(directory, "lang", "anything.xml");
             var document = XDocument.Load(path);
-            document.Root!.Elements("string").Single(element => (string?)element.Attribute("name") == "Settings").Value = "Einstellungen";
+            document.Root!.Elements("string").Single(element => (string?)element.Attribute("name") == "Parameters").Value = "Einstellungen";
             document.Root.Elements("string").Single(element => (string?)element.Attribute("name") == "Quit").Remove();
             document.Save(path);
 
             Language.SetLanguage("de", directory);
 
             Assert.AreEqual("de", Language.Code);
-            Assert.AreEqual("Einstellungen", Language.Current.Settings);
+            Assert.AreEqual("Einstellungen", Language.Current.Parameters);
             Assert.AreEqual("Quit", Language.Current.Quit);
         }
         finally
@@ -273,8 +280,8 @@ public sealed class LanguageResourcesTests
     }
 
     [TestMethod]
-    [DataRow("en", "BB05241A3FDC751308C51D5DF73B2661DA5D65220149FF27BBC5C77A8256F5D0")]
-    [DataRow("ru", "469ECBAFC9CFC883C3E4FDE0DAB517276685A5A4CEAE624C72098C1E8512EB33")]
+    [DataRow("en", "1F71A4A567212F105E3C525602FC5F661071E2EEDA07D3ABAAF4903A6F49C34D")]
+    [DataRow("ru", "6F9A040F5B8D503D6A73D4759DE4B68A6A852D84382AFF54E47A2DF07B8498EA")]
     public void Translation_PreservesEveryOriginalString(string locale, string expectedHash)
     {
         var language = Language.GetLanguage(locale);
@@ -352,7 +359,7 @@ public sealed class LanguageResourcesTests
             Language.SetLanguage("en");
             Assert.AreEqual("en", Language.Code);
             Assert.AreEqual(typeof(Language), Language.Current.GetType());
-            Assert.AreEqual("Settings", Language.Current.Settings);
+            Assert.AreEqual("Parameters", Language.Current.Parameters);
             Assert.AreEqual("Create typical power schemes Stable, Media, Simple?", Language.Current.FirstStartDescription);
             Assert.AreNotEqual(russian, Language.Current.FirstStartDescription);
 
@@ -377,7 +384,7 @@ public sealed class LanguageResourcesTests
 
             var loader = LanguageResources.CreateLoader("en");
 
-            Assert.AreEqual("Settings", loader.Value[nameof(Language.Settings)]);
+            Assert.AreEqual("Parameters", loader.Value[nameof(Language.Parameters)]);
             Assert.IsFalse(Directory.Exists(Path.Combine(unrelatedDirectory, "lang")));
         }
         finally
@@ -403,7 +410,7 @@ public sealed class LanguageResourcesTests
             var strings = loader.Value;
             File.Delete(path);
 
-            Assert.AreEqual("Settings", strings[nameof(Language.Settings)]);
+            Assert.AreEqual("Parameters", strings[nameof(Language.Parameters)]);
             Assert.AreSame(strings, loader.Value);
             Assert.AreEqual(86, loader.Value.Count);
         }

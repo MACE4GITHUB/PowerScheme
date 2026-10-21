@@ -6,8 +6,9 @@ using static PowerScheme.MenuLookup;
 namespace PowerScheme.Model.Menu.Version;
 
 internal class VersionMenuBuilder(
-    IUpdateService updateService) :
-    BaseMenuBuilder
+    IUpdateService updateService,
+    ToolStripMenuItem? root = null) :
+    BaseMenuBuilder(root)
 {
     private const MenuItm MENU_ITM = MenuItm.Version;
 
@@ -17,37 +18,31 @@ internal class VersionMenuBuilder(
 
     internal ToolStripMenuItem Build()
     {
-        var root = new ToolStripMenuItem
-        {
-            Name = nameof(MenuItm.Version),
-            Text = $@"{AppInfo.ProductName} {AppInfo.ProductVersion}"
-        };
+        Root.Text = $@"{AppInfo.ProductName} {AppInfo.ProductVersion}";
+        Root.Image = null;
+        Root.ToolTipText = string.Empty;
 
         if (updateService.ReleaseInfo.NewVersionAvailable)
         {
-            AddUpdateAppMenu(root);
+            AddUpdateAppMenu();
         }
 
-        return root;
+        return Complete();
     }
 
-    private void AddUpdateAppMenu(ToolStripMenuItem root)
+    private void AddUpdateAppMenu()
     {
-        var infoMenuItem = MenuItemFactory.Create(MenuItm.NewVersionIsAvailable);
+        var infoMenuItem = Menu.Item(MenuItm.NewVersionIsAvailable);
         infoMenuItem.Enabled = false;
-
-        root.DropDownItems.Add(infoMenuItem);
 
         var releaseInfo = updateService.ReleaseInfo;
         var text = $@"{Language.Current.UpdateAppToVersion} {releaseInfo.RemoteVersion}";
 
         var updateMenuItem = releaseInfo.NewVersionAvailable
-            ? MenuItemFactory.Create(MenuItm.UpdateApp, text)
-            : MenuItemFactory.Create(MenuItm.UpdateApp);
+            ? Menu.Item(MenuItm.UpdateApp, text)
+            : Menu.Item(MenuItm.UpdateApp);
 
-        var command = new UpdateAppCommand(updateService);
-        updateMenuItem.BindCommand(command);
+        updateMenuItem.BindCommandOnce(updateService, static service => new UpdateAppCommand(service));
 
-        root.DropDownItems.Add(updateMenuItem);
     }
 }

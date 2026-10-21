@@ -18,28 +18,24 @@ internal class SettingsMenuBuilder :
 {
     private readonly IPowerSchemeService _power;
 
-    private const MenuItm MENU_ITM = MenuItm.Settings;
+    private const MenuItm MENU_ITM = MenuItm.Parameters;
 
     protected override MenuItm MenuItm => MENU_ITM;
 
     internal static ToolStripMenuItem Empty => new() { Name = $"{MENU_ITM}" };
 
-    internal SettingsMenuBuilder(IPowerSchemeService power) =>
+    internal SettingsMenuBuilder(IPowerSchemeService power, ToolStripMenuItem? root = null) : base(root) =>
         _power = power ?? throw new ArgumentNullException(nameof(power));
 
     internal ToolStripMenuItem Build()
     {
-        var root = new ToolStripMenuItem
-        {
-            Name = $"{MenuItm}",
-            Text = MenuItems[MenuItm].Name
-        };
-
-        AddControlPanelScheme(root);
-        AddRestoreDefault(root);
-        AddThemes(root);
-        AddLanguages(root);
-        root.DropDownItems.Add(new ToolStripSeparator());
+        Root.Image = null;
+        Root.ToolTipText = string.Empty;
+        AddControlPanelScheme();
+        AddRestoreDefault();
+        AddThemes();
+        AddLanguages();
+        Menu.Separator();
 
         var withoutDeletedCount = _power.TypicalPowerSchemesWithoutDeleted.Count();
         var withDeletedCount = _power.TypicalPowerSchemesWithDeleted.Count();
@@ -47,135 +43,125 @@ internal class SettingsMenuBuilder :
 
         if (onlyDeletedCount >= 0 && withoutDeletedCount != 0)
         {
-            AddDeleteTypicalSchemes(root);
+            AddDeleteTypicalSchemes();
         }
 
         if (onlyDeletedCount > 0)
         {
-            AddTypicalSchemes(root);
+            AddTypicalSchemes();
         }
 
-        root.DropDownItems.Add(new ToolStripSeparator());
+        Menu.Separator();
 
-        AddDynamicPowerSchemes(root);
-        AddCustomPowerSchemes(root);
+        AddDynamicPowerSchemes();
+        AddCustomPowerSchemes();
 
-        return root;
+        return Complete();
     }
 
-    private static void AddControlPanelScheme(ToolStripMenuItem root)
+    private void AddControlPanelScheme()
     {
-        var item = MenuItemFactory.Create(
+        var item = Menu.Item(
             MenuItm.ControlPanelSchemeWindows);
 
-        var command = new OpenPowerSchemesPanelCommand();
-        item.BindCommand(command);
-
-        root.DropDownItems.Add(item);
+        item.BindCommandOnce(static () => new OpenPowerSchemesPanelCommand());
     }
 
-    private void AddRestoreDefault(ToolStripMenuItem root)
+    private void AddRestoreDefault()
     {
-        var item = MenuItemFactory.Create(
+        var item = Menu.Item(
             MenuItm.RestoreDefaultPowerSchemes);
 
-        var command = new RestoreDefaultPowerSchemesCommand(_power);
-        item.BindCommand(command);
-
-        root.DropDownItems.Add(item);
+        item.BindCommandOnce(_power, static service => new RestoreDefaultPowerSchemesCommand(service));
     }
 
-    private void AddThemes(ToolStripMenuItem root)
+    private void AddThemes()
     {
-        var item = MenuItemFactory.Create(MenuItm.Themes);
+        var item = Menu.Item(MenuItm.Themes);
+        var themes = new MenuItemUpdater(item.DropDownItems);
 
-        var itemDark = MenuItemFactory.Create(MenuItm.Dark);
+        var itemDark = themes.Item(MenuItm.Dark);
         itemDark.Tag = ThemeKind.Dark;
-        itemDark.BindCommand(new ChangeThemeCommand());
+        itemDark.BindCommandOnce(static () => new ChangeThemeCommand());
 
-        var itemLight = MenuItemFactory.Create(MenuItm.Light);
+        var itemLight = themes.Item(MenuItm.Light);
         itemLight.Tag = ThemeKind.Light;
-        itemLight.BindCommand(new ChangeThemeCommand());
+        itemLight.BindCommandOnce(static () => new ChangeThemeCommand());
 
-        var itemBlue = MenuItemFactory.Create(MenuItm.Blue);
+        var itemBlue = themes.Item(MenuItm.Blue);
         itemBlue.Tag = ThemeKind.Blue;
-        itemBlue.BindCommand(new ChangeThemeCommand());
+        itemBlue.BindCommandOnce(static () => new ChangeThemeCommand());
 
-        var itemGreen = MenuItemFactory.Create(MenuItm.Green);
+        var itemGreen = themes.Item(MenuItm.Green);
         itemGreen.Tag = ThemeKind.Green;
-        itemGreen.BindCommand(new ChangeThemeCommand());
+        itemGreen.BindCommandOnce(static () => new ChangeThemeCommand());
 
-        item.DropDownItems.Add(itemDark);
-        item.DropDownItems.Add(itemLight);
-        item.DropDownItems.Add(itemBlue);
-        item.DropDownItems.Add(itemGreen);
-
-        root.DropDownItems.Add(item);
+        themes.Complete();
     }
 
-    private void AddLanguages(ToolStripMenuItem root)
-        => root.DropDownItems.Add(CreateLanguageMenu());
+    private void AddLanguages()
+        => CreateLanguageMenu(item: Menu.Item(MenuItm.Language));
 
-    internal ToolStripMenuItem CreateLanguageMenu(Func<IReadOnlyList<LanguageDefinition>>? discover = null)
+    internal ToolStripMenuItem CreateLanguageMenu(
+        Func<IReadOnlyList<LanguageDefinition>>? discover = null,
+        ToolStripMenuItem? item = null)
     {
-        var item = MenuItemFactory.Create(MenuItm.Language);
+        item ??= MenuItemFactory.Create(MenuItm.Language);
         discover ??= () => Language.GetAvailableLanguages(reportError: message => ErrorLog.Write(message));
 
-        void RefreshLanguages(object? sender, EventArgs args)
+        if (item.Tag is not LanguageMenuState state)
         {
-            while (item.DropDownItems.Count > 0)
+            state = new LanguageMenuState(_power, discover);
+            item.Tag = state;
+            item.DropDownOpening += state.Refresh;
+            state.Refresh(item, EventArgs.Empty);
+        }
+        return item;
+    }
+
+    private sealed class LanguageMenuState(IPowerSchemeService power, Func<IReadOnlyList<LanguageDefinition>> discover)
+    {
+        internal void Refresh(object? sender, EventArgs args)
+        {
+            if (sender is not ToolStripMenuItem item)
             {
-                var previous = item.DropDownItems[0];
-                item.DropDownItems.RemoveAt(0);
-                previous.Dispose();
+                return;
             }
+            var update = new MenuItemUpdater(item.DropDownItems);
 
             foreach (var language in discover())
             {
-                var child = new ToolStripMenuItem
-                {
-                    Name = $"Language_{language.Code}",
-                    Text = language.Name,
-                    Tag = language,
-                    Image = GetLanguageCheckImage(string.Equals(Language.Code, language.Code, StringComparison.OrdinalIgnoreCase))
-                };
-                child.BindCommand(new ChangeLanguageCommand(_power));
-                item.DropDownItems.Add(child);
+                var child = update.Item($"Language_{language.Code}", language.Name,
+                    GetLanguageCheckImage(string.Equals(Language.Code, language.Code, StringComparison.OrdinalIgnoreCase)));
+                child.Tag = language;
+                child.Checked = false;
+                child.BindCommandOnce(power, static service => new ChangeLanguageCommand(service));
             }
+            update.Complete();
         }
-
-        item.DropDownOpening += RefreshLanguages;
-        RefreshLanguages(null, EventArgs.Empty);
-        return item;
     }
 
     private static Bitmap GetLanguageCheckImage(bool isChecked) =>
         isChecked
-            ? ImageItem.Check.GetImage()
-            : ImageItem.Empty.GetImage();
+            ? ImageItem.Check.GetMenuImage()
+            : ImageItem.Empty.GetMenuImage();
 
-    private void AddTypicalSchemes(ToolStripMenuItem root)
+    private void AddTypicalSchemes()
     {
-        var item = MenuItemFactory.Create(
+        var item = Menu.Item(
             MenuItm.CreateTypicalSchemes);
 
-        var command = new CreateTypicalPowerSchemesCommand(_power);
-        item.BindCommand(command);
-
-        root.DropDownItems.Add(item);
+        item.BindCommandOnce(_power, static service => new CreateTypicalPowerSchemesCommand(service));
     }
 
-    private void AddDeleteTypicalSchemes(ToolStripMenuItem root)
+    private void AddDeleteTypicalSchemes()
     {
-        var item = MenuItemFactory.Create(MenuItm.DeleteTypicalSchemes);
+        var item = Menu.Item(MenuItm.DeleteTypicalSchemes);
 
-        var command = new DeleteTypicalPowerSchemesCommand(_power);
-        item.BindCommand(command);
-
-        root.DropDownItems.Add(item);
+        item.BindCommandOnce(_power, static service => new DeleteTypicalPowerSchemesCommand(service));
     }
 
-    private void AddDynamicPowerSchemes(ToolStripMenuItem root)
+    private void AddDynamicPowerSchemes()
     {
         foreach (var scheme in _power.TypicalPowerSchemesWithDeleted)
         {
@@ -183,20 +169,17 @@ internal class SettingsMenuBuilder :
                 .First(x => x.Value.Picture == scheme.Picture)
                 .Key;
 
-            var item = MenuItemFactory.Create(menuItem);
+            var item = Menu.Item(menuItem);
 
             var tag = new StatePowerScheme(scheme, ActionWithPowerScheme.Create);
             item.Text = _power.TextActionToggle(tag);
             item.Tag = _power.StatePowerSchemeToggle(tag);
 
-            var command = new ActionPowerSchemeCommand(_power);
-            item.BindCommand(command);
-
-            root.DropDownItems.Add(item);
+            item.BindCommandOnce(_power, static service => new ActionPowerSchemeCommand(service));
         }
     }
 
-    private void AddCustomPowerSchemes(ToolStripMenuItem root)
+    private void AddCustomPowerSchemes()
     {
         var customPowerSchemes = _power.CustomPowerSchemes.ToList();
 
@@ -205,26 +188,17 @@ internal class SettingsMenuBuilder :
             return;
         }
 
-        root.DropDownItems.Add(new ToolStripSeparator());
-
+        Menu.Separator();
 
         foreach (var scheme in customPowerSchemes)
         {
-            var item = new ToolStripMenuItem
-            {
-                Name = $"scheme_{scheme.Guid}",
-                Text = $@"{Language.Current.DeleteCustomScheme} '{scheme.Name}'",
-                Image = scheme.Picture.GetImage(),
-                ImageScaling = ToolStripItemImageScaling.SizeToFit,
-            };
+            var item = Menu.Item($"scheme_{scheme.Guid}",
+                $@"{Language.Current.DeleteCustomScheme} '{scheme.Name}'", scheme.Picture.GetMenuImage());
 
             var tag = new StatePowerScheme(scheme);
             item.Tag = tag;
 
-            var command = new DeletePowerSchemeCommand(_power);
-            item.BindCommand(command);
-
-            root.DropDownItems.Add(item);
+            item.BindCommandOnce(_power, static service => new DeletePowerSchemeCommand(service));
         }
     }
 }

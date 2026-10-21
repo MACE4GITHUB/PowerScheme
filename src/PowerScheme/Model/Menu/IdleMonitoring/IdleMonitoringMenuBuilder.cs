@@ -9,8 +9,9 @@ using static PowerScheme.MenuLookup;
 namespace PowerScheme.Model.Menu.IdleMonitoring;
 
 internal class IdleMonitoringMenuBuilder(
-    IPowerSchemeService power) :
-    BaseMenuBuilder
+    IPowerSchemeService power,
+    ToolStripMenuItem? root = null) :
+    BaseMenuBuilder(root)
 {
     private const MenuItm MENU_ITM = MenuItm.IdleMonitoring;
 
@@ -26,14 +27,12 @@ internal class IdleMonitoringMenuBuilder(
         AddIdleDisplayForm();
         AddIdleSleepForm();
 
-        return Root;
+        return Complete();
     }
 
     private void AddIdleMonitoringItems()
     {
-        var dropDownItems = Root.DropDownItems;
-
-        AddIdleDoNothing(dropDownItems);
+        AddIdleDoNothing();
 
         var activePowerSchemeId = power.ActivePowerScheme.Guid;
 
@@ -56,13 +55,10 @@ internal class IdleMonitoringMenuBuilder(
 
         foreach (var powerSchemeMenuItem in wellKnownSchemeMenuItems)
         {
-            var item = MenuItemFactory.Create(powerSchemeMenuItem.Key);
+            var item = Menu.Item(powerSchemeMenuItem.Key);
             item.Tag = powerSchemeMenuItem.Value.Tag;
 
-            var command = new IdleMonitoringCommand();
-            item.BindCommand(command);
-
-            dropDownItems.Add(item);
+            item.BindCommandOnce(static () => new IdleMonitoringCommand());
         }
 
         var wellKnownSchemeMenuItemIds = wellKnownSchemeMenuItems
@@ -73,35 +69,25 @@ internal class IdleMonitoringMenuBuilder(
 
         foreach (var powerScheme in unknownSchemeMenuItems)
         {
-            var item = new ToolStripMenuItem
-            {
-                Tag = powerScheme.Guid,
-                Text = powerScheme.Name,
-                Image = powerScheme.Picture.GetImage()
-            };
+            var item = Menu.Item($"scheme_{powerScheme.Guid}", powerScheme.Name, powerScheme.Picture.GetMenuImage());
+            item.Tag = powerScheme.Guid;
 
-            var command = new IdleMonitoringCommand();
-            item.BindCommand(command);
-
-            dropDownItems.Add(item);
+            item.BindCommandOnce(static () => new IdleMonitoringCommand());
         }
 
         var prev = Root.Image;
         Root.Image = lidPowerScheme != null
-            ? lidPowerScheme.Picture.GetImage()
-            : MenuItems[MenuItm.IdleDoNothing].Picture.GetImage();
-        prev?.Dispose();
+            ? lidPowerScheme.Picture.GetMenuImage()
+            : MenuItems[MenuItm.IdleDoNothing].Picture.GetMenuImage();
+        ImageExtensions.DisposeOwnedImage(prev);
     }
 
-    private static void AddIdleDoNothing(ToolStripItemCollection dropDownItems)
+    private void AddIdleDoNothing()
     {
-        var doNothingItem = MenuItemFactory.Create(MenuItm.IdleDoNothing);
+        var doNothingItem = Menu.Item(MenuItm.IdleDoNothing);
         doNothingItem.Tag = Guid.Empty;
 
-        var command = new IdleMonitoringCommand();
-        doNothingItem.BindCommand(command);
-
-        dropDownItems.Add(doNothingItem);
+        doNothingItem.BindCommandOnce(static () => new IdleMonitoringCommand());
     }
 
     private void AddKeepingBrightness()
@@ -118,55 +104,35 @@ internal class IdleMonitoringMenuBuilder(
             return;
         }
 
-        var dropDownItems = Root.DropDownItems;
+        Menu.Separator();
 
-        dropDownItems.Add(new ToolStripSeparator());
-
-        var keepBrightness = MenuItemFactory.Create(MenuItm.KeepBrightness);
+        var keepBrightness = Menu.Item(MenuItm.KeepBrightness);
         keepBrightness.Tag = RegistryService.GetKeepBrightness(AppInfo.CompanyName, AppInfo.ProductName);
         keepBrightness.GetCheckedOption();
 
-        var command = new KeepBrightnessCommand();
-        keepBrightness.BindCommand(command);
-
-        dropDownItems.Add(keepBrightness);
+        keepBrightness.BindCommandOnce(static () => new KeepBrightnessCommand());
     }
 
     private void AddIdleForm()
     {
-        var dropDownItems = Root.DropDownItems;
+        Menu.Separator();
 
-        dropDownItems.Add(new ToolStripSeparator());
+        var showIdleOptions = Menu.Item(MenuItm.ShowIdleOptions);
 
-        var showIdleOptions = MenuItemFactory.Create(MenuItm.ShowIdleOptions);
-
-        var command = new ShowIdleFormCommand();
-        showIdleOptions.BindCommand(command);
-
-        dropDownItems.Add(showIdleOptions);
+        showIdleOptions.BindCommandOnce(static () => new ShowIdleFormCommand());
     }
 
     private void AddIdleDisplayForm()
     {
-        var dropDownItems = Root.DropDownItems;
+        var showIdleDisplayOptions = Menu.Item(MenuItm.ShowIdleDisplayOptions);
 
-        var showIdleDisplayOptions = MenuItemFactory.Create(MenuItm.ShowIdleDisplayOptions);
-
-        var command = new ShowIdleDisplayFormCommand();
-        showIdleDisplayOptions.BindCommand(command);
-
-        dropDownItems.Add(showIdleDisplayOptions);
+        showIdleDisplayOptions.BindCommandOnce(static () => new ShowIdleDisplayFormCommand());
     }
 
     private void AddIdleSleepForm()
     {
-        var dropDownItems = Root.DropDownItems;
+        var showIdleSleepOptions = Menu.Item(MenuItm.ShowIdleSleepOptions);
 
-        var showIdleSleepOptions = MenuItemFactory.Create(MenuItm.ShowIdleSleepOptions);
-
-        var command = new ShowIdleSleepFormCommand();
-        showIdleSleepOptions.BindCommand(command);
-
-        dropDownItems.Add(showIdleSleepOptions);
+        showIdleSleepOptions.BindCommandOnce(static () => new ShowIdleSleepFormCommand());
     }
 }

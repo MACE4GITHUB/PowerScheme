@@ -1,13 +1,23 @@
 ﻿using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 
 namespace PowerScheme.Themes;
 
-internal class ToolStripMenuRenderer(ProfessionalColorTable colorTable) :
+internal class ToolStripMenuRenderer(ProfessionalColorTable colorTable, ThemeKind? appliedTheme = null) :
     ToolStripProfessionalRenderer(colorTable)
 {
     private const int RADIUS = 5;
+    private static readonly ConditionalWeakTable<ToolStrip, MenuRegionState> Regions = new();
+
+    internal ThemeKind? AppliedTheme { get; } = appliedTheme;
+
+    private sealed class MenuRegionState
+    {
+        internal Size Size;
+        internal Region? Region;
+    }
 
     protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e)
     {
@@ -33,7 +43,13 @@ internal class ToolStripMenuRenderer(ProfessionalColorTable colorTable) :
             g.Restore(state);
         }
 
-        e.ToolStrip.Region = new Region(path);
+        var regionState = Regions.GetValue(e.ToolStrip, _ => new MenuRegionState());
+        if (regionState.Size != e.ToolStrip.Size || !ReferenceEquals(regionState.Region, e.ToolStrip.Region))
+        {
+            e.ToolStrip.Region = new Region(path);
+            regionState.Size = e.ToolStrip.Size;
+            regionState.Region = e.ToolStrip.Region;
+        }
         e.ToolStrip.ForeColor = ((IStyleTheme)ColorTable).ForeColor;
         e.ToolStrip.Font = ((IStyleTheme)ColorTable).Font;
     }

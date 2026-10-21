@@ -71,7 +71,7 @@ internal static class Program
             }
         }
 
-        _ = Language.Current.Settings;
+        _ = Language.Current.Parameters;
 
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);

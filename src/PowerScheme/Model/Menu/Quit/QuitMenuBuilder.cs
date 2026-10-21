@@ -3,8 +3,8 @@ using static PowerScheme.MenuLookup;
 
 namespace PowerScheme.Model.Menu.Quit;
 
-internal class QuitMenuBuilder :
-    BaseMenuBuilder
+internal class QuitMenuBuilder(ToolStripMenuItem? root = null) :
+    BaseMenuBuilder(root)
 {
     private const MenuItm MENU_ITM = MenuItm.Quit;
 
@@ -14,9 +14,8 @@ internal class QuitMenuBuilder :
 
     internal ToolStripMenuItem Build()
     {
-        var command = new QuitCommand();
-        Root.BindCommand(command);
+        Root.BindCommandOnce(static () => new QuitCommand());
 
-        return Root;
+        return Complete();
     }
 }

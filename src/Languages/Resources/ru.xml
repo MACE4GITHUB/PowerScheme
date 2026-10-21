@@ -9,7 +9,7 @@
   <string name="StartupOnWindows">Запускать вместе с Windows</string>
   <string name="RestoreDefaultPowerSchemesName">Восстановить схемы Windows по умолчанию</string>
   <string name="RestoreDefaultPowerSchemesDescription">Все типовые схемы будут удалены. Windows схемы не удаляются.</string>
-  <string name="Settings">Настройки</string>
+  <string name="Parameters">Параметры</string>
   <string name="HibernateName">Режим гибернации</string>
   <string name="HibernateDescription">Отображать в меню завершения работы</string>
   <string name="SleepName">Режим сна</string>
@@ -67,7 +67,7 @@
  Частота переменная, преимущественно низкая. 
  Для просмотра интернет.
 
- При нажатии "Нет" типовые схемы можно будет создать позже из меню "Настройки".</string>
+ При нажатии "Нет" типовые схемы можно будет создать позже из меню "Параметры".</string>
   <string name="Apply">Применить</string>
   <string name="Default">По умолчанию</string>
   <string name="None">Ничего</string>

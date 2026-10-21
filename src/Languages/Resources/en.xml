@@ -9,7 +9,7 @@
   <string name="StartupOnWindows">Run automatically at startup in Windows</string>
   <string name="RestoreDefaultPowerSchemesName">Restore default Windows PowerSchemes</string>
   <string name="RestoreDefaultPowerSchemesDescription">All other schemes will be deleted</string>
-  <string name="Settings">Settings</string>
+  <string name="Parameters">Parameters</string>
   <string name="HibernateName">Hibernate</string>
   <string name="HibernateDescription">Show in Power menu</string>
   <string name="SleepName">Sleep</string>

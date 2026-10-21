@@ -9,7 +9,7 @@ public class LightColorTable : ProfessionalColorTable, IStyleTheme
 
     public Color ForeColor => Color.Black;
 
-    public Font Font => new("Segoe UI", 10f);
+    public Font Font => ThemeService.MenuFont;
 
     public Color SeparatorBackColor => BackColor;
     public Color SeparatorForeColor => Color.FromArgb(230, 230, 230);

@@ -4,8 +4,8 @@ using static PowerScheme.MenuLookup;
 
 namespace PowerScheme.Model.Menu.Sleep;
 
-internal class SleepMenuBuilder :
-    BaseMenuBuilder
+internal class SleepMenuBuilder(ToolStripMenuItem? root = null) :
+    BaseMenuBuilder(root)
 {
     private const MenuItm MENU_ITM = MenuItm.Sleep;
 
@@ -18,9 +18,8 @@ internal class SleepMenuBuilder :
         Root.Tag = RegistryService.IsShowSleepOption;
         Root.GetCheckedOption();
 
-        var command = new SleepCommand();
-        Root.BindCommand(command);
+        Root.BindCommandOnce(static () => new SleepCommand());
 
-        return Root;
+        return Complete();
     }
 }

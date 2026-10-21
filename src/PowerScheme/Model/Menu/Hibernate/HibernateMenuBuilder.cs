@@ -4,8 +4,8 @@ using static PowerScheme.MenuLookup;
 
 namespace PowerScheme.Model.Menu.Hibernate;
 
-internal class HibernateMenuBuilder :
-    BaseMenuBuilder
+internal class HibernateMenuBuilder(ToolStripMenuItem? root = null) :
+    BaseMenuBuilder(root)
 {
     private const MenuItm MENU_ITM = MenuItm.Hibernate;
 
@@ -18,9 +18,8 @@ internal class HibernateMenuBuilder :
         Root.Tag = RegistryService.IsShowHibernateOption;
         Root.GetCheckedOption();
 
-        var command = new HibernateCommand();
-        Root.BindCommand(command);
+        Root.BindCommandOnce(static () => new HibernateCommand());
 
-        return Root;
+        return Complete();
     }
 }
